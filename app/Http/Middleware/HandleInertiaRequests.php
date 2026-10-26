@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use App\Enums\Theme;
 use App\Listeners\CollapseNavGroupsOnLogin;
+use App\Models\Admin\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -50,8 +52,15 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            /*
+             * Always, because a partial reload is exactly when a revoked
+             * permission must land: `useCan()` hides surfaces, and a page left
+             * open through a permission change would otherwise go on offering
+             * buttons the server now refuses.
+             */
             'auth' => Inertia::always([
                 'user' => $request->user(),
+                'permissions' => $this->permissionsFor($request->user()),
             ]),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'collapsedNavGroups' => $this->collapsedNavGroups($request),
@@ -114,6 +123,32 @@ class HandleInertiaRequests extends Middleware
         return array_values(array_filter(
             array_map(trim(...), explode(',', $cookie)),
             fn (string $label): bool => $label !== '',
+        ));
+    }
+
+    /**
+     * The signed-in user's effective permission names.
+     *
+     * A super admin gets `['*']` rather than the whole catalogue — the
+     * `Gate::before` bypass makes the list meaningless anyway, and `useCan()`
+     * reads the wildcard. Hiding UI is not authorization; the route middleware
+     * and the services' guards are.
+     *
+     * @return list<string>
+     */
+    private function permissionsFor(?User $user): array
+    {
+        if (! $user instanceof User) {
+            return [];
+        }
+
+        if ($user->hasRole(Role::SUPER_ADMIN)) {
+            return ['*'];
+        }
+
+        return array_values(array_filter(
+            $user->getAllPermissions()->pluck('name')->all(),
+            is_string(...),
         ));
     }
 }

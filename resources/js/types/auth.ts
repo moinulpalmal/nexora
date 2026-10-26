@@ -22,6 +22,11 @@ export type User = {
 
 export type Auth = {
     user: User;
+    /**
+     * The signed-in user's effective permission names, or `['*']` for a super
+     * admin. Shared by `HandleInertiaRequests`; read it with `useCan()`.
+     */
+    permissions: string[];
 };
 
 /**

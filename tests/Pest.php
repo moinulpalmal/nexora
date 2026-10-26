@@ -1,9 +1,13 @@
 <?php
 
+use App\Models\Admin\Permission;
+use App\Models\Admin\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 /*
@@ -59,6 +63,7 @@ foreach ($cachedArtifacts as $kind => $cachedPath) {
 // `phpunit.browser.xml` supplies that.
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    ->beforeEach(fn () => app(PermissionRegistrar::class)->forgetCachedPermissions())
     // A closure, not `fakeBreachedPasswordLookup(...)`: Pest rebinds each
     // `beforeEach` to the test case, and a first-class callable made from a
     // global function has no scope to rebind.
@@ -92,6 +97,40 @@ expect()->extend('toBeOne', function () {
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
+
+/**
+ * A user holding exactly the given permissions, directly rather than via a role.
+ *
+ * The permissions are created on the fly, so a test names the abilities it
+ * needs without depending on the seeded catalogue.
+ */
+function userWithPermissions(string ...$permissions): User
+{
+    $user = User::factory()->create();
+
+    $user->givePermissionTo(array_map(
+        fn (string $name): Permission => Permission::findOrCreate($name, 'web'),
+        $permissions,
+    ));
+
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+    return $user;
+}
+
+/**
+ * A user holding the super-admin role, which bypasses every permission check.
+ */
+function superAdmin(): User
+{
+    $user = User::factory()->create();
+
+    $user->assignRole(Role::findOrCreate(Role::SUPER_ADMIN, 'web'));
+
+    app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+    return $user;
+}
 
 /**
  * A password that satisfies every rule in `config/auth.password_policy`.

@@ -2,15 +2,37 @@
 
 namespace App\Providers;
 
+use App\Models\Admin\Permission;
+use App\Models\Admin\Role;
+use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\DevCommands;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * Every model that may appear in a polymorphic column, by its stored alias.
+     *
+     * Aliases are kebab-case singular, matching the URL vocabulary rather than
+     * the class name — the point is that the stored value does not track the
+     * class. **This map is also the audit viewer's model allow-list**, so the
+     * list of auditable types can never drift from what is actually mapped.
+     *
+     * @var array<string, class-string<Model>>
+     */
+    public const array MORPH_MAP = [
+        'user' => User::class,
+        'role' => Role::class,
+        'permission' => Permission::class,
+    ];
+
     /**
      * Register any application services.
      */
@@ -25,7 +47,46 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        $this->configureMorphMap();
+        $this->configureAuthorization();
         $this->configureDevCommands();
+    }
+
+    /**
+     * Store polymorphic types as short aliases rather than class names.
+     *
+     * `audit_logs.auditable_type` is the reason this exists: without a map,
+     * moving or renaming a model orphans its entire history.
+     *
+     * **`enforceMorphMap`, not `morphMap`.** The enforcing variant throws when an
+     * unmapped model is used in a morph, so a model added later fails loudly on
+     * its first audit instead of quietly writing a class name a future rename
+     * would orphan. Adding a model to {@see self::MORPH_MAP} is part of adding a
+     * model.
+     *
+     * The map is global: spatie/laravel-permission writes
+     * `model_has_roles.model_type` through the same `getMorphClass()`, so it was
+     * registered before any role was ever assigned.
+     */
+    protected function configureMorphMap(): void
+    {
+        Relation::enforceMorphMap(self::MORPH_MAP);
+    }
+
+    /**
+     * Grant the super-admin role every ability.
+     *
+     * Returning null rather than false leaves every other check untouched, so
+     * a normal user still falls through to the permission check. Because this
+     * bypass wins over everything, self-protection rules ("you cannot delete
+     * yourself", "the last super admin stays") live in the services as
+     * `*Blocker()` guards, not in gates — see ARCHITECTURE.md §9.1.
+     *
+     * @see Role::SUPER_ADMIN
+     */
+    protected function configureAuthorization(): void
+    {
+        Gate::before(fn (User $user): ?bool => $user->hasRole(Role::SUPER_ADMIN) ? true : null);
     }
 
     /**

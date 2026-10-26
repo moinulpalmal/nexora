@@ -8,6 +8,9 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Spatie\Permission\Middleware\PermissionMiddleware;
+use Spatie\Permission\Middleware\RoleMiddleware;
+use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -21,6 +24,14 @@ return Application::configure(basePath: dirname(__DIR__))
          * on the next request, and the sidebar and theme render right on first paint.
          */
         $middleware->encryptCookies(except: ['theme', 'sidebar_state', 'sidebar_groups']);
+
+        // Routes gate on permissions (`permission:admin.users.view`), never on
+        // role names — see ARCHITECTURE.md §9.1.
+        $middleware->alias([
+            'role' => RoleMiddleware::class,
+            'permission' => PermissionMiddleware::class,
+            'role_or_permission' => RoleOrPermissionMiddleware::class,
+        ]);
 
         $middleware->web(append: [
             EnsureUserIsActive::class,

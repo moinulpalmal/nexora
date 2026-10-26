@@ -135,6 +135,24 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Seeded Super Admin
+    |--------------------------------------------------------------------------
+    |
+    | The first account, created by `Database\Seeders\Admin\SuperAdminSeeder`.
+    | Outside production a missing password falls back to `password`; in
+    | production the seeder refuses to run without one.
+    |
+    */
+
+    'super_admin' => [
+        'name' => env('SUPER_ADMIN_NAME', 'Super Admin'),
+        'username' => env('SUPER_ADMIN_USERNAME', 'superadmin'),
+        'email' => env('SUPER_ADMIN_EMAIL', 'superadmin@example.com'),
+        'password' => env('SUPER_ADMIN_PASSWORD'),
+    ],
+
     'password_policy' => [
         'min_length' => 8,
         'mixed_case' => true,
