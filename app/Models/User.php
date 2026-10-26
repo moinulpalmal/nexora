@@ -4,7 +4,9 @@ namespace App\Models;
 
 use App\Concerns\Audited;
 use App\Concerns\HasStatus;
+use App\Concerns\Listable;
 use App\Contracts\Auditable;
+use App\Enums\FilterType;
 use App\Enums\RecordStatus;
 use App\Enums\Theme;
 use App\Observers\ActorObserver;
@@ -50,7 +52,32 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<UserFactory> */
-    use Audited, HasFactory, HasRoles, HasStatus, Notifiable, SoftDeletes;
+    use Audited, HasFactory, HasRoles, HasStatus, Listable, Notifiable, SoftDeletes;
+
+    /**
+     * The users list's filter row.
+     *
+     * Identifiers match by prefix (indexable); names and emails by substring.
+     * `role` is not a column: `Scope` hands it to spatie's own `role()` scope.
+     *
+     * @var array<literal-string, FilterType>
+     */
+    public const array FILTERABLE = [
+        'name' => FilterType::Contains,
+        'username' => FilterType::Prefix,
+        'email' => FilterType::Contains,
+        'employee_code' => FilterType::Prefix,
+        'phone' => FilterType::Prefix,
+        'status' => FilterType::Equals,
+        'role' => FilterType::Scope,
+    ];
+
+    /**
+     * The columns the users list may be sorted by.
+     *
+     * @var list<string>
+     */
+    public const array SORTABLE = ['name', 'username', 'email', 'employee_code', 'last_login_at', 'created_at'];
 
     /**
      * Never written to the trail.

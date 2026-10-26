@@ -3,7 +3,9 @@
 namespace App\Models\Admin;
 
 use App\Concerns\Audited;
+use App\Concerns\Listable;
 use App\Contracts\Auditable;
+use App\Enums\FilterType;
 use App\Providers\AppServiceProvider;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
@@ -29,7 +31,20 @@ use Spatie\Permission\Models\Role as SpatieRole;
  */
 class Role extends SpatieRole implements Auditable
 {
-    use Audited;
+    use Audited, Listable;
+
+    /**
+     * The roles list's filter row. User and permission counts have no cell:
+     * they are `withCount` aggregates, which would need `HAVING`.
+     *
+     * @var array<literal-string, FilterType>
+     */
+    public const array FILTERABLE = ['name' => FilterType::Contains];
+
+    /**
+     * @var list<string>
+     */
+    public const array SORTABLE = ['name', 'created_at'];
 
     /**
      * The role that bypasses every permission check.

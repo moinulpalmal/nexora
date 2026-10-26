@@ -3,7 +3,9 @@
 namespace App\Models\Admin;
 
 use App\Concerns\Audited;
+use App\Concerns\Listable;
 use App\Contracts\Auditable;
+use App\Enums\FilterType;
 use Database\Seeders\Admin\RolePermissionSeeder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -27,7 +29,23 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
  */
 class Permission extends SpatiePermission implements Auditable
 {
-    use Audited;
+    use Audited, Listable;
+
+    /**
+     * The permissions catalogue's filter row. `module` is not a column: it is
+     * the name's first segment, matched by {@see self::scopeModule()}.
+     *
+     * @var array<literal-string, FilterType>
+     */
+    public const array FILTERABLE = [
+        'name' => FilterType::Contains,
+        'module' => FilterType::Scope,
+    ];
+
+    /**
+     * @var list<string>
+     */
+    public const array SORTABLE = ['name', 'created_at'];
 
     /**
      * The module a permission belongs to — the first segment of its name.
@@ -42,7 +60,7 @@ class Permission extends SpatiePermission implements Auditable
      *
      * Backs the permissions list's module filter, which is not a column of its
      * own: the module is the name's prefix. LIKE wildcards in the input are
-     * escaped so `admin_` cannot match `adminx`.
+     * escaped (Listable's driver-neutral escape) so `admin_` cannot match `adminx`.
      *
      * @param  Builder<static>  $query
      */
@@ -54,6 +72,6 @@ class Permission extends SpatiePermission implements Auditable
             return;
         }
 
-        $query->where('name', 'like', addcslashes($module, '%_\\').'.%');
+        static::whereLikeLiteral($query, 'name', static::escapeLike($module).'.%');
     }
 }

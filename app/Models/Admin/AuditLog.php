@@ -3,7 +3,9 @@
 namespace App\Models\Admin;
 
 use App\Concerns\Audited;
+use App\Concerns\Listable;
 use App\Enums\Admin\AuditEvent;
+use App\Enums\FilterType;
 use App\Models\User;
 use App\Services\Admin\AuditRecorder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,6 +39,34 @@ use OwenIt\Auditing\Models\Audit;
  */
 class AuditLog extends Audit
 {
+    use Listable;
+
+    /**
+     * The audit viewer's filter row. `auditable_type` and `event` are dropdowns
+     * fed from the morph map and {@see AuditEvent}, so they match exactly.
+     *
+     * @var array<literal-string, FilterType>
+     */
+    public const array FILTERABLE = [
+        'actor_name' => FilterType::Contains,
+        'event' => FilterType::Equals,
+        'auditable_type' => FilterType::Equals,
+        'ip_address' => FilterType::Prefix,
+    ];
+
+    /**
+     * @var list<string>
+     */
+    public const array SORTABLE = ['created_at', 'actor_name', 'event', 'auditable_type'];
+
+    /**
+     * The trail reads newest first; the request supplies `desc` by default.
+     */
+    public static function defaultSort(): string
+    {
+        return 'created_at';
+    }
+
     /**
      * The event as this application names it, or null for a string no case
      * knows (an event retired after the row was written).
