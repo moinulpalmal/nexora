@@ -69,6 +69,8 @@ export default function UserFormDialog({
     const [usernameTouched, setUsernameTouched] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
     const [removeAvatar, setRemoveAvatar] = useState(false);
+    // Held above `DialogContent`, so "Save & add another" keeps the choice.
+    const [notify, setNotify] = useState(true);
 
     const usernameState = useAvailability('username', username, user?.id);
     const emailState = useAvailability('email', email, user?.id);
@@ -333,6 +335,29 @@ export default function UserFormDialog({
                                     </Field>
                                 )}
                             </div>
+
+                            {isCreate && (
+                                <label className="flex cursor-pointer items-start gap-3">
+                                    <Checkbox
+                                        name="notify"
+                                        value="1"
+                                        checked={notify}
+                                        onChange={(event) =>
+                                            setNotify(event.target.checked)
+                                        }
+                                        className="mt-0.5"
+                                        data-test="user-form-notify"
+                                    />
+                                    <span className="text-sm">
+                                        Email this user their username and
+                                        password.
+                                        <span className="block text-xs text-base-content/60">
+                                            Sent Mails keeps a copy with the
+                                            password masked.
+                                        </span>
+                                    </span>
+                                </label>
+                            )}
 
                             {isCreate && roles !== undefined && (
                                 <fieldset className="grid gap-2 rounded-box border border-base-300/70 p-4">

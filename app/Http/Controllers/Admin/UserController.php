@@ -10,6 +10,7 @@ use App\Http\Requests\Admin\UserRoleUpdateRequest;
 use App\Http\Requests\Admin\UserStoreRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
 use App\Models\User;
+use App\Services\Admin\UserCredentialMailer;
 use App\Services\Admin\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -26,7 +27,10 @@ use Inertia\Response;
  */
 class UserController extends Controller
 {
-    public function __construct(protected UserService $users) {}
+    public function __construct(
+        protected UserService $users,
+        protected UserCredentialMailer $credentials,
+    ) {}
 
     public function index(UserIndexRequest $request): Response
     {
@@ -58,14 +62,20 @@ class UserController extends Controller
 
     public function store(UserStoreRequest $request): RedirectResponse
     {
-        $this->users->create(
+        $password = $request->string('password')->value();
+
+        $user = $this->users->create(
             $request->userAttributes(),
-            $request->string('password')->value(),
+            $password,
             $request->submittedRoles(),
             $request->file('avatar'),
         );
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('User created.')]);
+        $mailed = $request->boolean('notify') && $this->credentials->welcome($user, $password);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $mailed
+            ? __('User created. Their sign-in details are being emailed to :address.', ['address' => $user->email])
+            : __('User created.')]);
 
         return back();
     }
@@ -131,9 +141,18 @@ class UserController extends Controller
 
     public function updatePassword(UserPasswordUpdateRequest $request, User $user): RedirectResponse
     {
-        $this->users->resetPassword($user, $request->string('password')->value());
+        $password = $request->string('password')->value();
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => __('Password updated.')]);
+        $this->users->resetPassword($user, $password);
+
+        /** @var User $actor */
+        $actor = $request->user();
+
+        $mailed = $request->boolean('notify') && $this->credentials->passwordReset($user, $password, $actor);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $mailed
+            ? __('Password updated. The new password is being emailed to :address.', ['address' => $user->email])
+            : __('Password updated.')]);
 
         return back();
     }

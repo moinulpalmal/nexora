@@ -1,8 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\ApplicationSettingController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\MailSettingController;
 use App\Http\Controllers\Admin\PermissionController;
+use App\Http\Controllers\Admin\QuickLoginSettingController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\SentMailController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -71,4 +75,29 @@ Route::middleware(['auth', 'auth.session'])
         Route::get('audit-logs/history', [AuditLogController::class, 'history'])
             ->middleware('permission:admin.audit-logs.view')
             ->name('audit-logs.history');
+
+        // The settings hub opens for either tab's `.view`; each tab saves on its own route.
+        Route::get('application-settings', [ApplicationSettingController::class, 'edit'])
+            ->middleware('permission:admin.mail-settings.view|admin.quick-login.view')
+            ->name('application-settings.edit');
+
+        Route::put('application-settings/mail', [MailSettingController::class, 'update'])
+            ->middleware('permission:admin.mail-settings.update')
+            ->name('mail-settings.update');
+
+        Route::post('application-settings/mail/test', [MailSettingController::class, 'test'])
+            ->middleware(['permission:admin.mail-settings.update', 'throttle:6,1'])
+            ->name('mail-settings.test');
+
+        Route::put('application-settings/quick-login', [QuickLoginSettingController::class, 'update'])
+            ->middleware('permission:admin.quick-login.update')
+            ->name('quick-login.update');
+
+        Route::get('sent-mails', [SentMailController::class, 'index'])
+            ->middleware('permission:admin.sent-mails.view')
+            ->name('sent-mails.index');
+
+        Route::get('sent-mails/{sentMail}', [SentMailController::class, 'show'])
+            ->middleware('permission:admin.sent-mails.view')
+            ->name('sent-mails.show');
     });

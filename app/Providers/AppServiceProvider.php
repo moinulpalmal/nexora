@@ -2,18 +2,23 @@
 
 namespace App\Providers;
 
+use App\Models\Admin\MailSetting;
 use App\Models\Admin\Permission;
+use App\Models\Admin\QuickLoginSetting;
 use App\Models\Admin\Role;
 use App\Models\User;
+use App\Services\Admin\MailSettingService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\DevCommands;
+use Illuminate\Mail\MailManager;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
         'user' => User::class,
         'role' => Role::class,
         'permission' => Permission::class,
+        'mail-setting' => MailSetting::class,
+        'quick-login-setting' => QuickLoginSetting::class,
     ];
 
     /**
@@ -50,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
         $this->configureMorphMap();
         $this->configureAuthorization();
         $this->configureDevCommands();
+        $this->configureMailer();
     }
 
     /**
@@ -91,11 +99,31 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Processes `php artisan dev` runs alongside the framework defaults
-     * (server, queue, logs, vite).
+     * (server, default queue, logs, vite).
+     *
+     * Mail has its own queue so a slow SMTP server never delays other jobs.
      */
     protected function configureDevCommands(): void
     {
+        DevCommands::artisan('queue:listen --queue=mail --tries=3 --timeout=0', 'mail');
         DevCommands::artisan('schedule:work', 'schedule');
+    }
+
+    /**
+     * Register the `database` mailer, whose transport is built from the mail
+     * server saved on Application Settings → Mail Server.
+     *
+     * Registered after the mail manager resolves, so a request that sends no
+     * mail never reads the setting.
+     */
+    protected function configureMailer(): void
+    {
+        $this->callAfterResolving('mail.manager', function (MailManager $manager): void {
+            $manager->extend(
+                MailSettingService::MAILER,
+                fn (): TransportInterface => $this->app->make(MailSettingService::class)->transport($manager),
+            );
+        });
     }
 
     /**

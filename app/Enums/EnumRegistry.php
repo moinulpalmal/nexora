@@ -5,6 +5,8 @@ namespace App\Enums;
 use App\Contracts\IdentifiedEnum;
 use App\Contracts\LabelledEnum;
 use App\Enums\Admin\AuditEvent;
+use App\Enums\Admin\MailEncryption;
+use App\Enums\Admin\MailTransport;
 use InvalidArgumentException;
 
 /**
@@ -39,6 +41,8 @@ final class EnumRegistry
 
         // Admin
         AuditEvent::class,
+        MailEncryption::class,
+        MailTransport::class,
     ];
 
     /**

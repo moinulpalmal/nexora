@@ -19,9 +19,11 @@ class DemoUserSeeder extends Seeder
     use WithoutModelEvents;
 
     /**
+     * Username → account. Public because Quick Login offers these accounts.
+     *
      * @var array<string, array{name: string, email: string, role: string}>
      */
-    protected const array ACCOUNTS = [
+    public const array ACCOUNTS = [
         'admin' => ['name' => 'Demo Admin', 'email' => 'admin@example.com', 'role' => 'admin'],
         'viewer' => ['name' => 'Demo Viewer', 'email' => 'viewer@example.com', 'role' => 'viewer'],
     ];

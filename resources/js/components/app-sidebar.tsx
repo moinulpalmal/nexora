@@ -3,7 +3,9 @@ import {
     History,
     KeyRound,
     LayoutGrid,
+    Mail,
     ShieldCheck,
+    SlidersHorizontal,
     Users,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -21,9 +23,11 @@ import {
 import { useCan } from '@/hooks/use-can';
 import { useNavGroups } from '@/hooks/use-nav-groups';
 import { dashboard } from '@/routes';
+import { edit as applicationSettingsEdit } from '@/routes/admin/application-settings';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
+import { index as sentMailsIndex } from '@/routes/admin/sent-mails';
 import { index as usersIndex } from '@/routes/admin/users';
 import type { NavGroup, NavItem } from '@/types';
 
@@ -42,6 +46,12 @@ export function AppSidebar() {
     const canViewRoles = useCan('admin.roles.view');
     const canViewPermissions = useCan('admin.permissions.view');
     const canViewAuditLogs = useCan('admin.audit-logs.view');
+    const canViewSentMails = useCan('admin.sent-mails.view');
+
+    // Either tab's `.view` opens the hub, as on its route. Both hooks are
+    // called unconditionally; only their results are combined.
+    const canViewMailSettings = useCan('admin.mail-settings.view');
+    const canViewQuickLogin = useCan('admin.quick-login.view');
 
     const adminNavLinks: (NavItem & { visible: boolean })[] = [
         {
@@ -67,6 +77,18 @@ export function AppSidebar() {
             href: auditLogsIndex(),
             icon: History,
             visible: canViewAuditLogs,
+        },
+        {
+            title: 'Sent Mails',
+            href: sentMailsIndex(),
+            icon: Mail,
+            visible: canViewSentMails,
+        },
+        {
+            title: 'Application Settings',
+            href: applicationSettingsEdit(),
+            icon: SlidersHorizontal,
+            visible: canViewMailSettings || canViewQuickLogin,
         },
     ];
 

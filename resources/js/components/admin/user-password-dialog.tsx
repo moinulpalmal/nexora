@@ -5,6 +5,7 @@ import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import FormDialogFooter from '@/components/shared/form-dialog-footer';
 import PasswordPolicyChecklist from '@/components/shared/password-policy-checklist';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -27,8 +28,8 @@ import type { RouteFormDefinition } from '@/wayfinder';
  * **No "Save & add another"** — it acts on one named user, so there is no next
  * record to add (ARCHITECTURE.md §8.10).
  *
- * The change is audited as its own `password-reset` event; the password itself
- * never reaches the trail.
+ * **Notify by email** is ticked by default: the user is
+ * mailed the new password (queued), and Sent Mails keeps a copy with it masked.
  */
 export default function UserPasswordDialog({
     submit,
@@ -41,11 +42,13 @@ export default function UserPasswordDialog({
 }) {
     const [open, setOpen] = useState(false);
     const [password, setPassword] = useState('');
+    const [notify, setNotify] = useState(true);
 
-    // `password` lives out here, above `DialogContent`, so it survives the
-    // children unmounting and has to be reset by hand.
+    // `password` and `notify` live out here, above `DialogContent`, so they
+    // survive the children unmounting and have to be reset by hand.
     const close = useCallback(() => {
         setPassword('');
+        setNotify(true);
         setOpen(false);
     }, []);
 
@@ -58,8 +61,9 @@ export default function UserPasswordDialog({
             <DialogContent>
                 <DialogTitle>Set a password for {user.name}</DialogTitle>
                 <DialogDescription>
-                    Hand the new password over yourself, and ask them to change
-                    it from their security settings.
+                    {notify
+                        ? 'The user is emailed the new password and asked to change it.'
+                        : 'The user is not notified. Hand the new password over yourself, and ask them to change it.'}
                 </DialogDescription>
 
                 <Form
@@ -115,6 +119,29 @@ export default function UserPasswordDialog({
                                     message={errors.password_confirmation}
                                 />
                             </div>
+
+                            <label className="flex cursor-pointer items-start gap-3">
+                                <Checkbox
+                                    name="notify"
+                                    value="1"
+                                    checked={notify}
+                                    onChange={(event) =>
+                                        setNotify(event.target.checked)
+                                    }
+                                    className="mt-0.5"
+                                    data-test="user-password-notify"
+                                />
+                                <span className="text-sm">
+                                    Email {user.email ?? 'the user'} the new
+                                    password.
+                                    <span className="block text-xs text-base-content/60">
+                                        Sent Mails keeps a copy with the
+                                        password masked.
+                                    </span>
+                                </span>
+                            </label>
+
+                            <InputError message={errors.notify} />
 
                             <FormDialogFooter
                                 processing={processing}

@@ -14,7 +14,19 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
+    /*
+     * **The mail server lives in the database**: the `database` mailer builds
+     * its transport from Admin → Application Settings → Mail Server
+     * (`MailSettingService::transport()`). The suite keeps `MAIL_MAILER=array`
+     * from phpunit.xml, so a test never needs a configured server.
+     */
+    'default' => env('APP_ENV') === 'testing' ? env('MAIL_MAILER', 'array') : 'database',
+
+    /*
+     * The `MAIL_MAILER` this install had before the database took over — read
+     * once, by the migration that seeds `mail_settings`.
+     */
+    'legacy_mailer' => env('MAIL_MAILER'),
 
     /*
     |--------------------------------------------------------------------------
@@ -36,6 +48,11 @@ return [
     */
 
     'mailers' => [
+
+        // Built from `mail_settings` on first use in a process.
+        'database' => [
+            'transport' => 'database',
+        ],
 
         'smtp' => [
             'transport' => 'smtp',

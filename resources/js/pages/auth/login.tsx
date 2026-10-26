@@ -1,4 +1,8 @@
+import type { FormComponentRef } from '@inertiajs/core';
 import { Form, Head } from '@inertiajs/react';
+import { useRef } from 'react';
+import DevQuickLogin from '@/components/dev-quick-login';
+import type { QuickLoginAccount } from '@/components/dev-quick-login';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
@@ -13,15 +17,34 @@ import { request } from '@/routes/password';
 type Props = {
     status?: string;
     canResetPassword: boolean;
+    /** Empty unless Application Settings → Quick Login is on, in local/testing. */
+    quickLoginAccounts: QuickLoginAccount[];
 };
 
-export default function Login({ status, canResetPassword }: Props) {
+export default function Login({ status, canResetPassword, quickLoginAccounts }: Props) {
+    const formRef = useRef<FormComponentRef>(null);
+
+    /** Fill the (uncontrolled) inputs and submit the real Fortify form. */
+    const quickLogin = (username: string) => {
+        const login = document.getElementById('login') as HTMLInputElement | null;
+        const password = document.getElementById('password') as HTMLInputElement | null;
+
+        if (!login || !password) {
+            return;
+        }
+
+        login.value = username;
+        password.value = 'password';
+        formRef.current?.submit();
+    };
+
     return (
         <>
             <Head title="Log In" />
 
             <Form
                 {...store.form()}
+                ref={formRef}
                 resetOnError={['password']}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
@@ -93,6 +116,10 @@ export default function Login({ status, canResetPassword }: Props) {
                     </div>
                 )}
             </Form>
+
+            {quickLoginAccounts.length > 0 && (
+                <DevQuickLogin accounts={quickLoginAccounts} onSelect={quickLogin} />
+            )}
 
             {status && (
                 <div className="mb-4 text-center text-sm font-medium text-success">

@@ -145,6 +145,34 @@ export const AUDIT_EVENT_LABELS: Record<AuditEvent, string> = {
     'login-failed': 'Sign-in failed',
 };
 
+export const MAIL_ENCRYPTION = {
+    Ssl: 'ssl',
+    Starttls: 'starttls',
+    None: 'none',
+} as const;
+
+export type MailEncryption =
+    (typeof MAIL_ENCRYPTION)[keyof typeof MAIL_ENCRYPTION];
+
+export const MAIL_ENCRYPTION_LABELS: Record<MailEncryption, string> = {
+    ssl: 'SSL/TLS (usually port 465)',
+    starttls: 'STARTTLS (usually port 587)',
+    none: 'None',
+};
+
+export const MAIL_TRANSPORT = {
+    Smtp: 'smtp',
+    Log: 'log',
+} as const;
+
+export type MailTransport =
+    (typeof MAIL_TRANSPORT)[keyof typeof MAIL_TRANSPORT];
+
+export const MAIL_TRANSPORT_LABELS: Record<MailTransport, string> = {
+    smtp: 'SMTP server',
+    log: "Log only (don't send)",
+};
+
 export const THEME_MODES: Record<Theme, 'light' | 'dark'> = {
     system: 'light',
     light: 'light',
