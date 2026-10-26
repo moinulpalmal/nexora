@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Testing\TestResponse;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
@@ -130,6 +131,18 @@ function superAdmin(): User
     app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     return $user;
+}
+
+/**
+ * Assert the response flashed a toast of the given type.
+ *
+ * Every write answers `back()` with `Inertia::flash('toast', …)`, and a
+ * refused one (a service `*Blocker()`) answers with an `error` toast rather
+ * than a validation error — so the type is what tells success from refusal.
+ */
+function assertToast(TestResponse $response, string $type): TestResponse
+{
+    return $response->assertSessionHas('inertia.flash_data.toast.type', $type);
 }
 
 /**

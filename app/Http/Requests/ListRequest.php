@@ -187,7 +187,8 @@ abstract class ListRequest extends FormRequest
         $core = [
             'sort' => $this->filled('sort') ? $this->string('sort')->value() : ($sortable[0] ?? 'id'),
             'direction' => $direction === 'desc' ? 'desc' : 'asc',
-            'per_page' => $this->integer('per_page') ?: self::DEFAULT_PER_PAGE,
+            // `static::` so a surface may redeclare its own default page size.
+            'per_page' => $this->integer('per_page') ?: static::DEFAULT_PER_PAGE,
             'filter' => $filter,
         ];
 
