@@ -1,0 +1,8 @@
+resources/views/mail/*
+
+# Wayfinder output — generated, never hand-edited. Formatting it would make the
+# tree flip between two states depending on whether `npm run format` or
+# `php artisan wayfinder:generate --with-form` ran last.
+resources/js/actions/
+resources/js/routes/
+resources/js/wayfinder/
