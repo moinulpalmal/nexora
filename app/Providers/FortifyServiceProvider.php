@@ -3,12 +3,14 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\ResetUserPassword;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
@@ -39,6 +41,51 @@ class FortifyServiceProvider extends ServiceProvider
     private function configureActions(): void
     {
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
+
+        Fortify::authenticateUsing($this->authenticate(...));
+
+        // Fortify's default confirmation re-runs the guard with
+        // `Fortify::username()`, which is the virtual `login` field here, not a
+        // column — so the check is done against the signed-in user directly.
+        Fortify::confirmPasswordsUsing(
+            fn (User $user, ?string $password): bool => Hash::check((string) $password, $user->password),
+        );
+    }
+
+    /**
+     * Resolve the `login` field to a user by email **or** username.
+     *
+     * Both columns are stored lowercased and Fortify lowercases the input
+     * (`lowercase_usernames`), so the comparison is case-insensitive on every
+     * driver. Soft-deleted users never match — the default scope excludes them.
+     *
+     * A deactivated account is refused with its own message, but only once the
+     * password has matched: the distinction is never revealed to someone who
+     * does not already hold the credentials. Returning `null` instead hands the
+     * attempt back to Fortify, which fires `Failed`, counts it against the
+     * throttle and shows the generic message.
+     *
+     * @throws ValidationException
+     */
+    private function authenticate(Request $request): ?User
+    {
+        $login = (string) $request->input(Fortify::username());
+
+        $user = User::query()
+            ->where(fn ($query) => $query->where('email', $login)->orWhere('username', $login))
+            ->first();
+
+        if (! $user || ! Hash::check((string) $request->input('password'), $user->password)) {
+            return null;
+        }
+
+        if (! $user->isActive()) {
+            throw ValidationException::withMessages([
+                Fortify::username() => __('This account has been deactivated. Contact an administrator.'),
+            ]);
+        }
+
+        return $user;
     }
 
     /**
@@ -54,7 +101,6 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetPasswordView(fn (Request $request) => Inertia::render('auth/reset-password', [
             'email' => $request->email,
             'token' => $request->route('token'),
-            'passwordRules' => Password::defaults()->toPasswordRulesString(),
         ]));
 
         Fortify::requestPasswordResetLinkView(fn (Request $request) => Inertia::render('auth/forgot-password', [

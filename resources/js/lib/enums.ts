@@ -15,6 +15,18 @@ export const FILTER_TYPE = {
 
 export type FilterType = (typeof FILTER_TYPE)[keyof typeof FILTER_TYPE];
 
+export const RECORD_STATUS = {
+    Active: 'A',
+    Inactive: 'I',
+} as const;
+
+export type RecordStatus = (typeof RECORD_STATUS)[keyof typeof RECORD_STATUS];
+
+export const RECORD_STATUS_LABELS: Record<RecordStatus, string> = {
+    A: 'Active',
+    I: 'Inactive',
+};
+
 export const THEME = {
     System: 'system',
     Light: 'light',

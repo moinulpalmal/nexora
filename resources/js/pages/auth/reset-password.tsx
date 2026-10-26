@@ -2,10 +2,12 @@ import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
+import PasswordPolicyChecklist from '@/components/shared/password-policy-checklist';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { usePasswordPolicy } from '@/hooks/use-password-policy';
 import { update } from '@/routes/password';
 
 type Props = {
@@ -15,6 +17,7 @@ type Props = {
 
 export default function ResetPassword({ token, email }: Props) {
     const [password, setPassword] = useState('');
+    const { hint } = usePasswordPolicy();
 
     return (
         <>
@@ -60,6 +63,13 @@ export default function ResetPassword({ token, email }: Props) {
                                 className="mt-1 block w-full"
                                 autoFocus
                                 placeholder="Password"
+                                passwordrules={hint}
+                                aria-describedby="password-policy"
+                            />
+                            <PasswordPolicyChecklist
+                                id="password-policy"
+                                password={password}
+                                className="mt-1"
                             />
                             <InputError message={errors.password} />
                         </div>
@@ -74,6 +84,7 @@ export default function ResetPassword({ token, email }: Props) {
                                 autoComplete="new-password"
                                 className="mt-1 block w-full"
                                 placeholder="Confirm password"
+                                passwordrules={hint}
                             />
                             <InputError
                                 message={errors.password_confirmation}

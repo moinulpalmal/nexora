@@ -29,18 +29,22 @@ export default function Login({ status, canResetPassword }: Props) {
                 {({ processing, errors }) => (
                     <div className="grid gap-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email address</Label>
+                            {/* One field for either identifier — resolved by
+                                `Fortify::authenticateUsing()`. */}
+                            <Label htmlFor="login">Email or username</Label>
                             <Input
-                                id="email"
-                                type="email"
-                                name="email"
+                                id="login"
+                                type="text"
+                                name="login"
                                 required
                                 autoFocus
                                 tabIndex={1}
                                 autoComplete="username"
-                                placeholder="email@example.com"
+                                autoCapitalize="none"
+                                spellCheck={false}
+                                placeholder="email@example.com or username"
                             />
-                            <InputError message={errors.email} />
+                            <InputError message={errors.login} />
                         </div>
 
                         <div className="grid gap-2">
@@ -104,5 +108,5 @@ export default function Login({ status, canResetPassword }: Props) {
  * says what the screen is.
  */
 Login.layout = {
-    description: 'Enter your email and password below to log in',
+    description: 'Enter your email or username and password to log in',
 };

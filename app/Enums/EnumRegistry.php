@@ -33,6 +33,7 @@ final class EnumRegistry
     private const array CLASSES = [
         // Module-less — app/Enums/ root
         FilterType::class,
+        RecordStatus::class,
         Theme::class,
     ];
 

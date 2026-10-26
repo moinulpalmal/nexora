@@ -1,19 +1,18 @@
 import { Form, Head } from '@inertiajs/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
+import PasswordPolicyChecklist from '@/components/shared/password-policy-checklist';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { usePasswordPolicy } from '@/hooks/use-password-policy';
 import { edit } from '@/routes/security';
 
-// oxfmt-ignore
-type Props = {
-    passwordRules: string;
-};
-
-export default function Security(props: Props) {
+export default function Security() {
+    const [password, setPassword] = useState('');
+    const { hint } = usePasswordPolicy();
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
@@ -41,7 +40,10 @@ export default function Security(props: Props) {
                         'current_password',
                     ]}
                     resetOnSuccess
+                    onSuccess={() => setPassword('')}
                     onError={(errors) => {
+                        setPassword('');
+
                         if (errors.password) {
                             passwordInput.current?.focus();
                         }
@@ -81,7 +83,18 @@ export default function Security(props: Props) {
                                     className="mt-1 block w-full"
                                     autoComplete="new-password"
                                     placeholder="New password"
-                                    passwordrules={props.passwordRules}
+                                    value={password}
+                                    onChange={(event) =>
+                                        setPassword(event.target.value)
+                                    }
+                                    passwordrules={hint}
+                                    aria-describedby="password-policy"
+                                />
+
+                                <PasswordPolicyChecklist
+                                    id="password-policy"
+                                    password={password}
+                                    className="mt-1"
                                 />
 
                                 <InputError message={errors.password} />
@@ -98,7 +111,7 @@ export default function Security(props: Props) {
                                     className="mt-1 block w-full"
                                     autoComplete="new-password"
                                     placeholder="Confirm password"
-                                    passwordrules={props.passwordRules}
+                                    passwordrules={hint}
                                 />
 
                                 <InputError

@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Factory;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /*
@@ -56,6 +59,12 @@ foreach ($cachedArtifacts as $kind => $cachedPath) {
 // `phpunit.browser.xml` supplies that.
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    // A closure, not `fakeBreachedPasswordLookup(...)`: Pest rebinds each
+    // `beforeEach` to the test case, and a first-class callable made from a
+    // global function has no scope to rebind.
+    ->beforeEach(function () {
+        fakeBreachedPasswordLookup();
+    })
     ->in('Feature', 'Browser');
 
 /*
@@ -84,7 +93,43 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * A password that satisfies every rule in `config/auth.password_policy`.
+ *
+ * The factory password is `password`, which this deliberately is not: it fails
+ * four of the six rules and is in every breach corpus there is.
+ */
+function compliantPassword(): string
 {
-    // ..
+    return 'Str0ng-Pass!word';
+}
+
+/**
+ * Answer every Have I Been Pwned range lookup with "not found".
+ *
+ * The password policy includes `uncompromised` in every environment, so every
+ * password-setting test would otherwise make a live HTTPS call — slow, broken
+ * offline, and worse, failing **open**: `NotPwnedVerifier` treats a network
+ * error as "not compromised", so the assertion would pass without checking
+ * anything.
+ *
+ * An empty 200 body is a valid range response with no matching suffix. Pass
+ * `$breached` to get the opposite: the body then carries that password's own
+ * SHA-1 suffix, which is what a hit looks like.
+ *
+ * The factory is swapped rather than re-faked because `Http::fake()` *merges*
+ * stubs and the first match wins — a second call would be silently overruled
+ * by the suite-wide stub. Other hosts fall through to the real handler.
+ */
+function fakeBreachedPasswordLookup(?string $breached = null): void
+{
+    Http::swap(new Factory(app('events')));
+
+    $body = $breached === null
+        ? ''
+        : substr(strtoupper(sha1($breached)), 5).':42';
+
+    Http::fake(fn (Request $request) => str_contains($request->url(), 'api.pwnedpasswords.com')
+        ? Http::response($body, 200)
+        : null);
 }

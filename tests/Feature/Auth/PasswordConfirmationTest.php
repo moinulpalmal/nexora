@@ -15,6 +15,24 @@ test('confirm password screen can be rendered', function () {
     );
 });
 
+test('the correct password confirms and opens the protected page', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('password.confirm.store'), ['password' => 'password'])
+        ->assertSessionHasNoErrors()
+        ->assertSessionHas('auth.password_confirmed_at');
+});
+
+test('a wrong password does not confirm', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('password.confirm.store'), ['password' => 'wrong-password'])
+        ->assertSessionHasErrors('password')
+        ->assertSessionMissing('auth.password_confirmed_at');
+});
+
 test('password confirmation requires authentication', function () {
     $response = $this->get(route('password.confirm'));
 

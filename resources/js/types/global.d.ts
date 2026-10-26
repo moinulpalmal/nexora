@@ -1,4 +1,4 @@
-import type { Auth } from '@/types/auth';
+import type { Auth, PasswordPolicy } from '@/types/auth';
 
 declare module 'react' {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,6 +17,7 @@ declare module '@inertiajs/core' {
             collapsedNavGroups: string[];
             /** The stored `App\Enums\Theme` value for this request. */
             theme: string;
+            passwordPolicy: PasswordPolicy;
             [key: string]: unknown;
         };
     }

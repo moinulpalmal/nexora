@@ -114,4 +114,34 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Password Policy
+    |--------------------------------------------------------------------------
+    |
+    | The single definition of what makes an acceptable password. It is read in
+    | exactly two places: `AppServiceProvider` assembles `Password::defaults()`
+    | from it, and `HandleInertiaRequests` shares it with every page so the
+    | checklist under each password field states the same rules the validator
+    | enforces. Nothing else may restate a rule.
+    |
+    | This applies in *every* environment. There is deliberately no production
+    | branch: a policy the local suite does not exercise is a policy no test
+    | can prove.
+    |
+    | `uncompromised` checks the password against the Have I Been Pwned range
+    | API over the network. The test suite fakes that endpoint — see
+    | `fakeBreachedPasswordLookup()` in `tests/Pest.php`.
+    |
+    */
+
+    'password_policy' => [
+        'min_length' => 8,
+        'mixed_case' => true,
+        'letters' => true,
+        'numbers' => true,
+        'symbols' => true,
+        'uncompromised' => true,
+    ],
+
 ];

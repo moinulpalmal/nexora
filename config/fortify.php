@@ -45,7 +45,10 @@ return [
     |
     */
 
-    'username' => 'email',
+    // One `login` field that takes either the email or the username — resolved
+    // by Fortify::authenticateUsing() in FortifyServiceProvider. It is not a
+    // column; password reset still keys on `email`.
+    'username' => 'login',
 
     'email' => 'email',
 
