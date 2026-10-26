@@ -2,6 +2,8 @@
 
 namespace App\Models\Admin;
 
+use App\Concerns\Audited;
+use App\Contracts\Auditable;
 use Database\Seeders\Admin\RolePermissionSeeder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,8 +25,10 @@ use Spatie\Permission\Models\Permission as SpatiePermission;
  * @property Carbon|null $updated_at
  * @property Collection<int, Role> $roles
  */
-class Permission extends SpatiePermission
+class Permission extends SpatiePermission implements Auditable
 {
+    use Audited;
+
     /**
      * The module a permission belongs to — the first segment of its name.
      */

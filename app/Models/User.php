@@ -2,13 +2,17 @@
 
 namespace App\Models;
 
+use App\Concerns\Audited;
 use App\Concerns\HasStatus;
+use App\Contracts\Auditable;
 use App\Enums\RecordStatus;
 use App\Enums\Theme;
+use App\Observers\ActorObserver;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -42,10 +46,24 @@ use Spatie\Permission\Traits\HasRoles;
 #[Fillable(['name', 'username', 'email', 'password', 'phone', 'employee_code', 'status', 'theme'])]
 #[Hidden(['password', 'remember_token'])]
 #[Appends(['avatar_url'])]
-class User extends Authenticatable
+#[ObservedBy(ActorObserver::class)]
+class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, HasStatus, Notifiable, SoftDeletes;
+    use Audited, HasFactory, HasRoles, HasStatus, Notifiable, SoftDeletes;
+
+    /**
+     * Never written to the trail.
+     *
+     * Strict mode is off, so `$hidden` is NOT honoured by the auditor — the
+     * password hash would otherwise land in `old_values`/`new_values`. A password
+     * change is still recorded, as an `updated` row with no values or, from the
+     * admin screen, as its own `password-reset` event. Sign-in stamps are saved
+     * quietly and excluded so a stray save never diffs them.
+     *
+     * @var list<string>
+     */
+    protected array $auditExclude = ['password', 'remember_token', 'last_login_at', 'last_login_ip'];
 
     /**
      * Get the attributes that should be cast.

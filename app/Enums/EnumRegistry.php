@@ -4,6 +4,7 @@ namespace App\Enums;
 
 use App\Contracts\IdentifiedEnum;
 use App\Contracts\LabelledEnum;
+use App\Enums\Admin\AuditEvent;
 use InvalidArgumentException;
 
 /**
@@ -35,6 +36,9 @@ final class EnumRegistry
         FilterType::class,
         RecordStatus::class,
         Theme::class,
+
+        // Admin
+        AuditEvent::class,
     ];
 
     /**

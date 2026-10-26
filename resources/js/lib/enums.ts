@@ -107,6 +107,44 @@ export const THEME_LABELS: Record<Theme, string> = {
     silk: 'Silk',
 };
 
+export const AUDIT_EVENT = {
+    Created: 'created',
+    Updated: 'updated',
+    Deleted: 'deleted',
+    Restored: 'restored',
+    RolesChanged: 'roles-changed',
+    PermissionsChanged: 'permissions-changed',
+    PasswordReset: 'password-reset',
+    ForceDeleted: 'force-deleted',
+    UserWelcomeMailed: 'user-welcome-mailed',
+    UserPasswordResetMailed: 'user-password-reset-mailed',
+    MailPasswordChanged: 'mail-password-changed',
+    MailTestSent: 'mail-test-sent',
+    LoggedIn: 'logged-in',
+    LoggedOut: 'logged-out',
+    LoginFailed: 'login-failed',
+} as const;
+
+export type AuditEvent = (typeof AUDIT_EVENT)[keyof typeof AUDIT_EVENT];
+
+export const AUDIT_EVENT_LABELS: Record<AuditEvent, string> = {
+    created: 'Created',
+    updated: 'Updated',
+    deleted: 'Deleted',
+    restored: 'Restored',
+    'roles-changed': 'Roles changed',
+    'permissions-changed': 'Permissions changed',
+    'password-reset': 'Password reset by an administrator',
+    'force-deleted': 'Permanently deleted',
+    'user-welcome-mailed': 'Welcome mail sent',
+    'user-password-reset-mailed': 'Password reset mail sent',
+    'mail-password-changed': 'Mail server password changed',
+    'mail-test-sent': 'Test mail sent',
+    'logged-in': 'Signed in',
+    'logged-out': 'Signed out',
+    'login-failed': 'Sign-in failed',
+};
+
 export const THEME_MODES: Record<Theme, 'light' | 'dark'> = {
     system: 'light',
     light: 'light',
