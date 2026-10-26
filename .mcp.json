@@ -1,0 +1,39 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "php",
+            "args": [
+                "artisan",
+                "boost:mcp"
+            ]
+        },
+        "serena": {
+            "type": "stdio",
+            "command": "uvx",
+            "args": [
+                "--from",
+                "git+https://github.com/oraios/serena",
+                "serena",
+                "start-mcp-server",
+                "--context",
+                "ide-assistant",
+                "--project",
+                "D:\\Projects\\laragon\\www\\nexora",
+                "--open-web-dashboard",
+                "false",
+                "--enable-gui-log-window",
+                "false"
+            ],
+            "env": {}
+        },
+        "playwright": {
+            "type": "stdio",
+            "command": "npx",
+            "args": [
+                "-y",
+                "@playwright/mcp@latest"
+            ],
+            "env": {}
+        }
+    }
+}
