@@ -1,10 +1,23 @@
 @import 'tailwindcss';
 
-@import 'tw-animate-css';
+@plugin 'daisyui' {
+    themes: all;
+    logs: false;
+}
+
+/* Apply the dark theme automatically when no `data-theme` has been resolved yet. */
+@plugin 'daisyui/theme' {
+    name: 'dark';
+    prefersdark: true;
+}
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
+/*
+ * `.dark` is toggled on <html> alongside `data-theme` by `use-appearance.tsx`,
+ * so `dark:` utilities keep working for any of daisyUI's 35 themes.
+ */
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -12,132 +25,129 @@
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
-
-    --radius-lg: var(--radius);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-sm: calc(var(--radius) - 4px);
-
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
-
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-
-    --color-chart-1: var(--chart-1);
-    --color-chart-2: var(--chart-2);
-    --color-chart-3: var(--chart-3);
-    --color-chart-4: var(--chart-4);
-    --color-chart-5: var(--chart-5);
-
-    --color-sidebar: var(--sidebar);
-    --color-sidebar-foreground: var(--sidebar-foreground);
-    --color-sidebar-primary: var(--sidebar-primary);
-    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-    --color-sidebar-accent: var(--sidebar-accent);
-    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-    --color-sidebar-border: var(--sidebar-border);
-    --color-sidebar-ring: var(--sidebar-ring);
 }
 
-:root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
-}
-
-.dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+/*
+ * daisyUI owns the palette: it defines --color-base-100/200/300, --color-base-content,
+ * --color-primary/secondary/accent/neutral/info/success/warning/error (+ -content)
+ * and --radius-box/field/selector per `[data-theme]`.
+ *
+ * Only the radius scale is aliased, so hand-written `rounded-sm|md|lg` stays in step
+ * with daisyUI's components under themes that use unusual radii. `@theme inline`
+ * substitutes the value into the utility rather than emitting it at :root, so it
+ * resolves per element and keeps working with nested `data-theme`.
+ */
+@theme inline {
+    --radius-sm: var(--radius-field);
+    --radius-md: var(--radius-field);
+    --radius-lg: var(--radius-box);
 }
 
 @layer base {
     * {
-        @apply border-border;
+        @apply border-base-300;
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-base-100 text-base-content;
     }
+}
+
+/*
+ * daisyUI's `.table` draws horizontal row borders only. Column dividers are added
+ * here, once, for every table in the app — see ARCHITECTURE.md §8.6. Tables and
+ * cells never carry their own border utilities.
+ *
+ * `:not(:last-child)` keeps the last column flush: the list wrapper already draws
+ * the outer frame, and a border here would double it.
+ *
+ * `--color-base-300` is owned by daisyUI per `[data-theme]`, so this tracks the
+ * active theme and matches the weight of the row borders it crosses.
+ */
+@layer components {
+    .table :where(th, td):not(:last-child) {
+        border-right: 1px solid var(--color-base-300);
+    }
+}
+
+/*
+ * daisyUI caps `.modal-box` at `calc(100vh - 5em)`, leaving ~80px of viewport
+ * unused above and below every modal, so the budget is reclaimed for *all* modals
+ * rather than only those that opt into `scrollBody` — see ARCHITECTURE.md §8.7.
+ *
+ * **Unlayered, and it has to be.** daisyUI sets the cap on `.modal-middle >
+ * .modal-box` — a descendant selector, inside its own layer *after* `components`
+ * and `utilities`. A `.modal-box` rule in `@layer components` therefore loses twice
+ * over, on layer order and on specificity, and measures as no change at all. Only
+ * unlayered CSS beats a layered rule outright.
+ *
+ * The cost is that a `max-h-*` utility on one dialog no longer wins either; such a
+ * dialog needs Tailwind's `!` modifier.
+ *
+ * `modal-start` / `modal-end` are deliberately untouched: those are full-height
+ * drawers with `max-height: none`, and capping them would break them.
+ */
+.modal-middle > .modal-box,
+.modal-top > .modal-box,
+.modal-bottom > .modal-box {
+    max-height: calc(100vh - 2rem);
+}
+
+/*
+ * The field layout every form dialog shares — see ARCHITECTURE.md §8.12.
+ *
+ * `field-grid` is the container: one column, becoming **two** at `md` and staying
+ * there. Every column is capped at 24rem, which is also where `max-w-4xl` comes
+ * from — two of these columns plus the gap and the panel's padding. The cap only
+ * bites when a column would otherwise be wider, since `minmax(0, 24rem)` still
+ * shrinks to fit a narrow panel.
+ *
+ * **Two columns is a ceiling on purpose** (inherited from compozit-suite, where
+ * wider grids were tried and found unreadable). A form with many rows scrolls.
+ *
+ * The `md` breakpoint is viewport-based, which is coherent because every settings
+ * dialog is `max-w-4xl`: at 48rem and up there is always room for two columns.
+ */
+@utility field-grid {
+    display: grid;
+    /*
+     * Every cell is as tall as its own content, never as tall as its row.
+     *
+     * Load-bearing: a field group is itself a grid, and a grid taller than its
+     * rows stretches them under `align-content: normal`, so a short field beside
+     * a tall one would have its input pushed below its neighbour's.
+     */
+    align-items: start;
+    /*
+     * The row gap is deliberately half the column gap: a block that claims a
+     * `field-span-*` pays this gap between its own tracks too.
+     */
+    gap: 0.5rem 1.5rem;
+    grid-template-columns: minmax(0, 24rem);
+
+    @media (width >= 48rem) {
+        grid-template-columns: repeat(2, minmax(0, 24rem));
+    }
+}
+
+/** A field that needs the whole row — a textarea, a matrix, an explanatory note. */
+@utility field-wide {
+    grid-column: 1 / -1;
+}
+
+/*
+ * How many rows a block claims in a `field-grid`. Bucketed rather than exact: with
+ * `auto-rows-min` an under-sized bucket self-corrects, because the spanned tracks
+ * grow to fit, and an over-sized one only leaves whitespace.
+ */
+@utility field-span-2 {
+    grid-row: span 2 / span 2;
+}
+
+@utility field-span-3 {
+    grid-row: span 3 / span 3;
+}
+
+@utility field-span-4 {
+    grid-row: span 4 / span 4;
 }

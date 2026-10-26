@@ -15,7 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        /*
+         * Unencrypted so the root template and HandleInertiaRequests can read them
+         * on the next request, and the sidebar and theme render right on first paint.
+         */
+        $middleware->encryptCookies(except: ['theme', 'sidebar_state', 'sidebar_groups']);
 
         $middleware->web(append: [
             HandleAppearance::class,

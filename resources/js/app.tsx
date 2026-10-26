@@ -1,22 +1,38 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Nexora';
 
-void createInertiaApp({
+/**
+ * The pages that render inside the account-settings shell.
+ *
+ * This is an exact list, not a `settings/` prefix, and the distinction is the
+ * point. `SettingsLayout` is not a Settings layout — it is the *account*
+ * layout: a fixed Profile/Security/Appearance nav and a `max-w-xl` column sized
+ * for a short form. Any future `settings/` list screen is full-width and
+ * renders under plain `AppLayout` like its Admin siblings.
+ *
+ * A fourth account page joins by being added here, which is deliberate: it
+ * should be a decision rather than something a filename does by accident.
+ * See ARCHITECTURE.md §8.1.
+ */
+const ACCOUNT_SETTINGS_PAGES = [
+    'settings/profile',
+    'settings/security',
+    'settings/appearance',
+];
+
+createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
         switch (true) {
-            case name === 'welcome':
-                return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
-            case name.startsWith('settings/'):
+            case ACCOUNT_SETTINGS_PAGES.includes(name):
                 return [AppLayout, SettingsLayout];
             default:
                 return AppLayout;
@@ -25,10 +41,10 @@ void createInertiaApp({
     strictMode: true,
     withApp(app) {
         return (
-            <TooltipProvider delayDuration={0}>
+            <>
                 {app}
                 <Toaster />
-            </TooltipProvider>
+            </>
         );
     },
     progress: {

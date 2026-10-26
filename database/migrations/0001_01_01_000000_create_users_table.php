@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            // App\Enums\Theme; null until the user picks one, so the cookie still decides.
+            $table->string('theme')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

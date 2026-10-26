@@ -1,29 +1,44 @@
-import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import { CheckIcon } from 'lucide-react';
-import * as React from 'react';
-
+import type { ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * A native checkbox: better assistive-technology support than Radix's
+ * `button[role="checkbox"]` plus hidden input, and it submits with the form
+ * exactly the same way.
+ */
 function Checkbox({
     className,
+    indeterminate = false,
     ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root>) {
+}: ComponentProps<'input'> & {
+    /**
+     * The third state a "select all" box needs: some of the rows below are ticked,
+     * but not all of them.
+     *
+     * **Applied through a ref, because it cannot be applied any other way.**
+     * `indeterminate` is a DOM *property* with no matching HTML attribute, so
+     * passing it in JSX would render a dead `indeterminate="true"` attribute and
+     * leave the box looking unticked. It is deliberately not part of `checked`:
+     * the box still reports whatever `checked` says when clicked, and the striped
+     * rendering is purely what the reader sees.
+     */
+    indeterminate?: boolean;
+}) {
     return (
-        <CheckboxPrimitive.Root
+        <input
+            type="checkbox"
             data-slot="checkbox"
+            ref={(element) => {
+                if (element !== null) {
+                    element.indeterminate = indeterminate;
+                }
+            }}
             className={cn(
-                'peer size-4 shrink-0 rounded-[4px] border border-input shadow-xs transition-shadow outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:aria-invalid:ring-destructive/40',
+                'peer checkbox checkbox-sm checkbox-primary',
                 className,
             )}
             {...props}
-        >
-            <CheckboxPrimitive.Indicator
-                data-slot="checkbox-indicator"
-                className="flex items-center justify-center text-current transition-none"
-            >
-                <CheckIcon className="size-3.5" />
-            </CheckboxPrimitive.Indicator>
-        </CheckboxPrimitive.Root>
+        />
     );
 }
 

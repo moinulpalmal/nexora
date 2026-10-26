@@ -13,6 +13,10 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            /** `['*']` straight after sign-in means "collapse every group". */
+            collapsedNavGroups: string[];
+            /** The stored `App\Enums\Theme` value for this request. */
+            theme: string;
             [key: string]: unknown;
         };
     }

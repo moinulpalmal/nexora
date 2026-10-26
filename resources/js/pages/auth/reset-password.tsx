@@ -1,4 +1,5 @@
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
@@ -10,18 +11,22 @@ import { update } from '@/routes/password';
 type Props = {
     token: string;
     email: string;
-    passwordRules: string;
 };
 
-export default function ResetPassword({ token, email, passwordRules }: Props) {
+export default function ResetPassword({ token, email }: Props) {
+    const [password, setPassword] = useState('');
+
     return (
         <>
-            <Head title="Reset password" />
+            <Head title="Reset Password" />
 
             <Form
                 {...update.form()}
                 transform={(data) => ({ ...data, token, email })}
+                resetOnError={['password', 'password_confirmation']}
                 resetOnSuccess={['password', 'password_confirmation']}
+                onError={() => setPassword('')}
+                onSuccess={() => setPassword('')}
             >
                 {({ processing, errors }) => (
                     <div className="grid gap-6">
@@ -47,11 +52,14 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                             <PasswordInput
                                 id="password"
                                 name="password"
+                                value={password}
+                                onChange={(event) =>
+                                    setPassword(event.target.value)
+                                }
                                 autoComplete="new-password"
                                 className="mt-1 block w-full"
                                 autoFocus
                                 placeholder="Password"
-                                passwordrules={passwordRules}
                             />
                             <InputError message={errors.password} />
                         </div>
@@ -66,7 +74,6 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                                 autoComplete="new-password"
                                 className="mt-1 block w-full"
                                 placeholder="Confirm password"
-                                passwordrules={passwordRules}
                             />
                             <InputError
                                 message={errors.password_confirmation}

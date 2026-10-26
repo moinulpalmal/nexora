@@ -1,17 +1,20 @@
 import { cva } from 'class-variance-authority';
 import type { VariantProps } from 'class-variance-authority';
-import * as React from 'react';
-
+import type { ComponentProps } from 'react';
 import { cn } from '@/lib/utils';
 
+/**
+ * daisyUI's `alert` lays its children out with `grid-auto-flow: column`, which would
+ * put the icon, title and description in three columns. The explicit grid below keeps
+ * shadcn's icon-plus-stacked-content shape while daisyUI supplies the surface colours.
+ */
 const alertVariants = cva(
-    'relative grid w-full grid-cols-[0_1fr] items-start gap-y-0.5 rounded-lg border px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current',
+    'alert grid w-full grid-flow-row grid-cols-[0_1fr] items-start gap-x-3 gap-y-0.5 px-4 py-3 text-sm has-[>svg]:grid-cols-[calc(var(--spacing)*4)_1fr] [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-current',
     {
         variants: {
             variant: {
-                default: 'bg-background text-foreground',
-                destructive:
-                    'text-destructive-foreground *:data-[slot=alert-description]:text-destructive-foreground/80 [&>svg]:text-current',
+                default: 'bg-base-100 text-base-content',
+                destructive: 'alert-soft alert-error',
             },
         },
         defaultVariants: {
@@ -24,7 +27,7 @@ function Alert({
     className,
     variant,
     ...props
-}: React.ComponentProps<'div'> & VariantProps<typeof alertVariants>) {
+}: ComponentProps<'div'> & VariantProps<typeof alertVariants>) {
     return (
         <div
             data-slot="alert"
@@ -35,7 +38,7 @@ function Alert({
     );
 }
 
-function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
+function AlertTitle({ className, ...props }: ComponentProps<'div'>) {
     return (
         <div
             data-slot="alert-title"
@@ -48,15 +51,12 @@ function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
     );
 }
 
-function AlertDescription({
-    className,
-    ...props
-}: React.ComponentProps<'div'>) {
+function AlertDescription({ className, ...props }: ComponentProps<'div'>) {
     return (
         <div
             data-slot="alert-description"
             className={cn(
-                'col-start-2 grid justify-items-start gap-1 text-sm text-muted-foreground [&_p]:leading-relaxed',
+                'col-start-2 grid justify-items-start gap-1 text-sm opacity-80 [&_p]:leading-relaxed',
                 className,
             )}
             {...props}
