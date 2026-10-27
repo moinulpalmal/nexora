@@ -86,7 +86,8 @@ test('a role still held by a user cannot be deleted', function () {
     $role = Role::findOrCreate('held', 'web');
     User::factory()->create()->assignRole($role);
 
-    assertToast($this->actingAs(userWithPermissions('admin.roles.delete'))->delete(route('admin.roles.destroy', $role)), 'error');
+    // A warning, not an error: the actor can clear it by unassigning the role.
+    assertToast($this->actingAs(userWithPermissions('admin.roles.delete'))->delete(route('admin.roles.destroy', $role)), 'warning');
 
     expect(Role::where('name', 'held')->exists())->toBeTrue();
 });

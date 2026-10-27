@@ -86,7 +86,9 @@ class RoleController extends Controller
         $blocker = $this->roles->deletionBlocker($role);
 
         if ($blocker !== null) {
-            return $this->refuse($blocker);
+            // A held role is a `warning` — the actor can clear it by unassigning
+            // it; the super-admin role is an `error` that no work lifts (§8.8).
+            return $this->refuse($blocker, $role->isSuperAdmin() ? 'error' : 'warning');
         }
 
         $this->roles->delete($role);
@@ -96,9 +98,9 @@ class RoleController extends Controller
         return back();
     }
 
-    protected function refuse(string $message): RedirectResponse
+    protected function refuse(string $message, string $type = 'error'): RedirectResponse
     {
-        Inertia::flash('toast', ['type' => 'error', 'message' => $message]);
+        Inertia::flash('toast', ['type' => $type, 'message' => $message]);
 
         return back();
     }
