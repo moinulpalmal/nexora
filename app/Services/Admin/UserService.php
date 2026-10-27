@@ -6,11 +6,13 @@ use App\Enums\Admin\AuditEvent;
 use App\Enums\RecordStatus;
 use App\Models\Admin\Role;
 use App\Models\User;
+use App\Notifications\Admin\AccountChanged;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * Every write to a user account, and the guards that may refuse one.
@@ -71,11 +73,24 @@ class UserService
     }
 
     /**
+     * Replace a user's roles, and tell them when the set actually changed.
+     *
      * @param  list<string>  $roles
      */
     public function assignRoles(User $user, array $roles): void
     {
-        $this->syncRoles($user, $roles);
+        ['before' => $before, 'after' => $after] = $this->syncRoles($user, $roles);
+
+        if ($before === $after) {
+            return;
+        }
+
+        $this->notifyAccountChanged($user, new AccountChanged(
+            __('Your roles were changed'),
+            $after === []
+                ? __('An administrator removed all your roles.')
+                : __('You now hold: :roles.', ['roles' => implode(', ', $after)]),
+        ));
     }
 
     /**
@@ -83,12 +98,19 @@ class UserService
      *
      * The `updated` row the save writes carries no values (`password` is
      * excluded from the trail), so the act itself is recorded as its own event.
+     * The user is told in the bell, so a reset they did not ask for is visible.
      */
     public function resetPassword(User $user, string $password): void
     {
         $user->forceFill(['password' => $password])->save();
 
         $this->audits->record($user, AuditEvent::PasswordReset);
+
+        $this->notifyAccountChanged($user, new AccountChanged(
+            __('Your password was reset'),
+            __('An administrator set a new password for your account. If you did not expect this, contact them.'),
+            'warning',
+        ));
     }
 
     /**
@@ -275,14 +297,35 @@ class UserService
      * model event, and it is the most escalation-sensitive change there is.
      *
      * @param  list<string>  $roles
+     * @return array{before: list<string>, after: list<string>}
      */
-    private function syncRoles(User $user, array $roles): void
+    private function syncRoles(User $user, array $roles): array
     {
         $before = $this->roleNames($user);
 
         $user->syncRoles($roles);
 
-        $this->audits->recordChange($user, AuditEvent::RolesChanged, ['roles' => $before], ['roles' => $this->roleNames($user)]);
+        $after = $this->roleNames($user);
+
+        $this->audits->recordChange($user, AuditEvent::RolesChanged, ['roles' => $before], ['roles' => $after]);
+
+        return ['before' => $before, 'after' => $after];
+    }
+
+    /**
+     * Tell the user an administrator changed their account.
+     *
+     * Best effort: the change has already happened and must not be undone by a
+     * notification problem (an unreachable Reverb, say), so a failure is
+     * reported and swallowed.
+     */
+    private function notifyAccountChanged(User $user, AccountChanged $notification): void
+    {
+        try {
+            $user->notify($notification);
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 
     /**

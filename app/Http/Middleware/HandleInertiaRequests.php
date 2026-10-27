@@ -66,6 +66,44 @@ class HandleInertiaRequests extends Middleware
             'collapsedNavGroups' => $this->collapsedNavGroups($request),
             'theme' => Theme::forRequest($request)->value,
             'passwordPolicy' => $this->passwordPolicy(),
+
+            /*
+             * The bell's count — always, so the live push can refresh it with
+             * a partial reload of this one prop. `null` for a guest.
+             */
+            'notifications' => Inertia::always(
+                $request->user() === null ? null : ['unread_count' => $request->user()->unreadNotifications()->count()],
+            ),
+
+            'broadcasting' => $this->broadcasting($request),
+        ];
+    }
+
+    /**
+     * Where the browser's Echo client connects, or `null` when there is no live
+     * push (a guest, or a broadcaster other than Reverb).
+     *
+     * Shared at runtime rather than baked into the bundle as `VITE_REVERB_*`, so
+     * moving Reverb to another host or port needs a config change, not a
+     * rebuild. Only the public app key travels; the secret never leaves the
+     * server.
+     *
+     * @return array{key: string, host: string, port: int, scheme: string}|null
+     */
+    private function broadcasting(Request $request): ?array
+    {
+        if ($request->user() === null || config('broadcasting.default') !== 'reverb') {
+            return null;
+        }
+
+        /** @var array{key: ?string, options: array{host: ?string, port: int|string|null, scheme: ?string}} $reverb */
+        $reverb = config('broadcasting.connections.reverb');
+
+        return [
+            'key' => (string) $reverb['key'],
+            'host' => (string) ($reverb['options']['host'] ?? $request->getHost()),
+            'port' => (int) ($reverb['options']['port'] ?? 443),
+            'scheme' => (string) ($reverb['options']['scheme'] ?? 'https'),
         ];
     }
 

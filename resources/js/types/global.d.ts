@@ -18,6 +18,15 @@ declare module '@inertiajs/core' {
             /** The stored `App\Enums\Theme` value for this request. */
             theme: string;
             passwordPolicy: PasswordPolicy;
+            /** The bell's count — `null` for a guest. */
+            notifications: { unread_count: number } | null;
+            /** Where Echo connects for live push; `null` when there is none. */
+            broadcasting: {
+                key: string;
+                host: string;
+                port: number;
+                scheme: string;
+            } | null;
             [key: string]: unknown;
         };
     }
