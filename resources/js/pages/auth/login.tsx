@@ -21,13 +21,21 @@ type Props = {
     quickLoginAccounts: QuickLoginAccount[];
 };
 
-export default function Login({ status, canResetPassword, quickLoginAccounts }: Props) {
+export default function Login({
+    status,
+    canResetPassword,
+    quickLoginAccounts,
+}: Props) {
     const formRef = useRef<FormComponentRef>(null);
 
     /** Fill the (uncontrolled) inputs and submit the real Fortify form. */
     const quickLogin = (username: string) => {
-        const login = document.getElementById('login') as HTMLInputElement | null;
-        const password = document.getElementById('password') as HTMLInputElement | null;
+        const login = document.getElementById(
+            'login',
+        ) as HTMLInputElement | null;
+        const password = document.getElementById(
+            'password',
+        ) as HTMLInputElement | null;
 
         if (!login || !password) {
             return;
@@ -118,7 +126,10 @@ export default function Login({ status, canResetPassword, quickLoginAccounts }: 
             </Form>
 
             {quickLoginAccounts.length > 0 && (
-                <DevQuickLogin accounts={quickLoginAccounts} onSelect={quickLogin} />
+                <DevQuickLogin
+                    accounts={quickLoginAccounts}
+                    onSelect={quickLogin}
+                />
             )}
 
             {status && (

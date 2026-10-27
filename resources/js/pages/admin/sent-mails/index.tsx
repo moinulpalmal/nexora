@@ -113,14 +113,25 @@ export default function SentMailsIndex({
                                 onFilter={setFilter}
                                 cells={[
                                     { type: 'none' },
-                                    { type: 'text', column: 'to_address', label: 'recipient' },
-                                    { type: 'text', column: 'subject', label: 'subject' },
+                                    {
+                                        type: 'text',
+                                        column: 'to_address',
+                                        label: 'recipient',
+                                    },
+                                    {
+                                        type: 'text',
+                                        column: 'subject',
+                                        label: 'subject',
+                                    },
                                     {
                                         type: 'select',
                                         column: 'mailable',
                                         label: 'kind',
                                         className: 'hidden md:table-cell',
-                                        options: [{ value: '', label: 'All' }, ...mailables],
+                                        options: [
+                                            { value: '', label: 'All' },
+                                            ...mailables,
+                                        ],
                                     },
                                     { type: 'none' },
                                 ]}
@@ -141,7 +152,9 @@ export default function SentMailsIndex({
                             {mails.data.map((mail) => (
                                 <tr key={mail.id}>
                                     <td className="text-xs whitespace-nowrap text-base-content/70">
-                                        {new Date(mail.sent_at).toLocaleString()}
+                                        {new Date(
+                                            mail.sent_at,
+                                        ).toLocaleString()}
                                     </td>
                                     <td>{mail.to_address}</td>
                                     <td>{mail.subject ?? '—'}</td>
@@ -169,8 +182,8 @@ export default function SentMailsIndex({
                                                     {mail.subject ?? 'Mail'}
                                                 </DialogTitle>
                                                 <DialogDescription>
-                                                    To {mail.to_address} — exactly
-                                                    as stored.
+                                                    To {mail.to_address} —
+                                                    exactly as stored.
                                                 </DialogDescription>
                                                 {/* Sandboxed (no scripts, no
                                                     forms, opaque origin), and
@@ -178,9 +191,13 @@ export default function SentMailsIndex({
                                                     locked-down CSP: a mail body
                                                     never runs in the app. */}
                                                 <iframe
-                                                    title={mail.subject ?? 'Mail'}
+                                                    title={
+                                                        mail.subject ?? 'Mail'
+                                                    }
                                                     sandbox=""
-                                                    src={SentMailController.show.url(mail.id)}
+                                                    src={SentMailController.show.url(
+                                                        mail.id,
+                                                    )}
                                                     className="mt-4 h-[70vh] w-full rounded-box border border-base-300/70 bg-white"
                                                     data-test="sent-mail-frame"
                                                 />

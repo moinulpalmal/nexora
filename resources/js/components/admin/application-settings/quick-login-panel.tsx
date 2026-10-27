@@ -51,17 +51,23 @@ export default function QuickLoginPanel({
             {({ processing, errors }) => (
                 <>
                     {environmentAllows ? (
-                        <div role="alert" className="alert alert-soft alert-warning">
+                        <div
+                            role="alert"
+                            className="alert alert-soft alert-warning"
+                        >
                             <TriangleAlert className="size-5" />
                             <span className="text-xs">
                                 While on, anyone who can open the login page can
                                 sign in as these accounts — a super admin among
-                                them — with one click. Switching it off hides the
-                                buttons; it does not change any password.
+                                them — with one click. Switching it off hides
+                                the buttons; it does not change any password.
                             </span>
                         </div>
                     ) : (
-                        <div role="note" className="alert alert-soft alert-info">
+                        <div
+                            role="note"
+                            className="alert alert-soft alert-info"
+                        >
                             <Lock className="size-5" />
                             <span className="text-xs">
                                 This is the <code>{environment}</code>{' '}
@@ -109,7 +115,8 @@ export default function QuickLoginPanel({
                                                 </span>
                                             ) : (
                                                 <span className="badge badge-soft badge-sm">
-                                                    Missing or inactive — no button
+                                                    Missing or inactive — no
+                                                    button
                                                 </span>
                                             )}
                                         </td>

@@ -62,7 +62,10 @@ export default function ApplicationSettings({ sections }: Props) {
         () =>
             (
                 [
-                    sections.mail && { key: 'mail' as const, label: 'Mail Server' },
+                    sections.mail && {
+                        key: 'mail' as const,
+                        label: 'Mail Server',
+                    },
                     sections['quick-login'] && {
                         key: 'quick-login' as const,
                         label: 'Quick Login',
@@ -74,7 +77,9 @@ export default function ApplicationSettings({ sections }: Props) {
         [sections],
     );
 
-    const requestedTab = new URLSearchParams(url.split('?')[1] ?? '').get('tab');
+    const requestedTab = new URLSearchParams(url.split('?')[1] ?? '').get(
+        'tab',
+    );
     const activeTab =
         tabs.find((tab) => tab.key === requestedTab)?.key ?? tabs[0]?.key;
 
@@ -122,9 +127,10 @@ export default function ApplicationSettings({ sections }: Props) {
                             <MailPanel {...sections.mail} />
                         )}
 
-                        {activeTab === 'quick-login' && sections['quick-login'] && (
-                            <QuickLoginPanel {...sections['quick-login']} />
-                        )}
+                        {activeTab === 'quick-login' &&
+                            sections['quick-login'] && (
+                                <QuickLoginPanel {...sections['quick-login']} />
+                            )}
                     </>
                 )}
             </div>
