@@ -6,6 +6,7 @@ use App\Enums\Theme;
 use App\Listeners\CollapseNavGroupsOnLogin;
 use App\Models\Admin\Role;
 use App\Models\User;
+use App\Services\Training\TrainingRegistry;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
@@ -76,6 +77,16 @@ class HandleInertiaRequests extends Middleware
             ),
 
             'broadcasting' => $this->broadcasting($request),
+
+            /*
+             * The guide covering this screen, for the header's help button —
+             * always, because the layout draws the button and no page's
+             * partial reload names this prop. The guide body is not shared;
+             * the dialog fetches it from `training.panel` when it opens.
+             */
+            'training' => Inertia::always(
+                $request->user() === null ? null : TrainingRegistry::forRoute($request->route()?->getName()),
+            ),
         ];
     }
 

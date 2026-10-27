@@ -81,6 +81,12 @@
             "@types:check",
             "@php artisan test"
         ],
+        "training:screens": [
+            "Composer\\Config::disableProcessTimeout",
+            "@putenv TRAINING_SCREENS=1",
+            "npm run build",
+            "@php vendor/bin/pest -c phpunit.browser.xml --group=training-screens"
+        ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
             "@php artisan package:discover --ansi"

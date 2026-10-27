@@ -1,4 +1,5 @@
 import type { Auth, PasswordPolicy } from '@/types/auth';
+import type { TrainingScreen } from '@/types/training';
 
 declare module 'react' {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -27,6 +28,8 @@ declare module '@inertiajs/core' {
                 port: number;
                 scheme: string;
             } | null;
+            /** The guide to this screen, for the header's **?** — `null` when none covers it. */
+            training: TrainingScreen | null;
             [key: string]: unknown;
         };
     }

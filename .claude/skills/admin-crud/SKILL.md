@@ -86,6 +86,7 @@ resources/js/types/<module>.ts                   <X>ListItem, <X>Filters
 resources/js/pages/<module>/<x>/index.tsx
 resources/js/components/<module>/<x>-form-dialog.tsx
 resources/js/components/app-sidebar.tsx          nav entry
+config/training.php                              guide registry entry (pending until written)
 database/factories/<Module>/<X>Factory.php
 tests/Feature/<Module>/<X>Test.php
 ```
@@ -185,6 +186,10 @@ php artisan wayfinder:generate --with-form
 - [ ] `EnumRegistry` + `php artisan enums:sync` (if the page uses an enum).
 - [ ] `app-sidebar.tsx` nav entry behind `useCan('<module>.<x>.view')`.
 - [ ] `types/<module>.ts` and the `types/index.ts` re-export.
+- [ ] `config/training.php` entry for the screen (`'status' => 'pending'`, `'shots' => []`), and any
+      new non-screen GET route (JSON, file, redirect) in `ignore_routes` — `TrainingGapsTest` fails
+      the suite otherwise. Better: write the guide and its screenshot recipe now
+      (`documentation/training.md` §7).
 - [ ] `php artisan migrate` and `php artisan db:seed --class=Database\\Seeders\\Admin\\RolePermissionSeeder`.
 - [ ] `php artisan wayfinder:generate --with-form`.
 - [ ] `documentation/<module>.md` — the surface's section.

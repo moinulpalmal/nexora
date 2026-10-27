@@ -48,7 +48,7 @@ app/
   Actions/Fortify/            ResetUserPassword
   Concerns/                   Model & request traits: Audited, HasStatus, Listable,
                               ProvidesOptions, *ValidationRules, RoleAssignmentRules
-  Console/Commands/           SyncEnums (`php artisan enums:sync`)
+  Console/Commands/           SyncEnums (`php artisan enums:sync`), TrainingGaps (`training:gaps`)
   Contracts/                  Auditable, IdentifiedEnum, LabelledEnum
   Enums/                      FilterType, RecordStatus, Theme, EnumRegistry (module-less)
   Enums/Admin/                AuditEvent, MailEncryption, MailTransport
@@ -57,6 +57,7 @@ app/
   Http/Controllers/Admin/     User, Role, Permission, AuditLog, ApplicationSetting,
                               MailSetting, QuickLoginSetting, SentMail
   Http/Controllers/Settings/  Profile, Security, Appearance (the user's own account)
+  Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Middleware/            EnsureUserIsActive, HandleAppearance, HandleInertiaRequests
   Http/Requests/              ListRequest (module-less) + Admin/, Settings/
   Listeners/                  CollapseNavGroupsOnLogin, StampLastLogin (module-less)
@@ -70,12 +71,18 @@ app/
   Services/Admin/             UserService, RoleService, PermissionService, PermissionDescriptions,
                               AuditRecorder, AuditLogService, MailSettingService,
                               QuickLoginService, UserCredentialMailer
-config/                       audit.php, permission.php, reverb.php, broadcasting.php (+ Laravel's)
+  Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
+config/                       audit.php, permission.php, reverb.php, broadcasting.php,
+                              training.php (the guide registry) (+ Laravel's)
 database/
   migrations/                 flat — the migrator does not recurse
   seeders/Admin/              RolePermissionSeeder, SuperAdminSeeder, DemoUserSeeder
+public/
+  images/training/            guide screenshots, {key}/{shot}.png, committed. Never public/training/:
+                              Apache would serve that folder instead of the /training route
 resources/
-  css/app.css                 Tailwind + daisyUI, field-grid utilities
+  css/app.css                 Tailwind + daisyUI, field-grid utilities, the Nikosh @font-face
+  fonts/nikosh.woff2          Bangla font — a repaired copy; never replace with a fresh download (§9.5)
   views/app.blade.php         root template (theme before first paint)
   views/mail/                 layout.blade.php + admin/*.blade.php
   js/
@@ -85,6 +92,8 @@ resources/
     components/shared/        used by two or more modules (list toolbar, pagination, …)
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
+    components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
+                              table of contents; guides/{general,admin,settings,shared}/ (§5)
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
     hooks/                    use-can, use-list-filters, use-form-dialog, use-appearance, …
     layouts/                  app, auth, settings
@@ -95,11 +104,13 @@ routes/
   web.php                     `/`, dashboard, notifications; requires admin.php, settings.php
   admin.php                   the Admin module
   settings.php                the user's own account settings
+  training.php                the in-app manual (ungated)
   channels.php                private broadcast channels
 tests/
   Feature/                    root: apparatus tests (Listable, EnumRegistry, PasswordPolicy, …)
-  Feature/Admin/ Auth/ Settings/
-  Browser/                    Pest browser tests (§13.2)
+  Feature/Admin/ Auth/ Settings/ Training/
+  Browser/                    Pest browser tests (§13.2); Browser/Training/ holds the help-dialog
+                              test and the screenshot recipes
   Pest.php, TestCase.php      safety guards and helpers
 documentation/                module reference docs (§14)
 .claude/                      settings.json (hooks), hooks/, skills/
@@ -134,6 +145,7 @@ there; it is administered by the Admin module.
 | Platform (shell) | ✅ | root of each layer | `routes/web.php` | — | `/` | `pages/dashboard.tsx`, `pages/auth/*` |
 | **Admin** | ✅ | `Admin` | `routes/admin.php` | `admin.` | `admin/` | `pages/admin/*` |
 | **Settings** (own account) | ✅ | `Settings` | `routes/settings.php` | `profile.`, `security.`, `appearance.`, `user-password.` | `settings/` | `pages/settings/*` |
+| **Training** (in-app manual) | ✅ | `Training` | `routes/training.php` | `training.` | `training/` | `pages/training/*` |
 
 **Admin** owns: users (create, edit, deactivate, soft delete, restore, force delete, set password,
 assign roles, avatar), roles (with the permission picker), the read-only permission catalogue, the
@@ -143,6 +155,16 @@ reference: [`documentation/admin.md`](documentation/admin.md).
 **Settings** is the signed-in user's own account — profile (photo, name, phone, username, email),
 password and theme. It is not a place for application configuration; that is Admin → Application
 Settings. Reference: [`documentation/settings.md`](documentation/settings.md).
+
+**Training** is the in-app manual: one guide per screen in English and Bangla, read at `/training`,
+`/training/{key}` and in the header's **?** dialog. It serves every module and belongs to none, so it
+is its own module (owner, 2026-10-27, ported from compozit). It owns no models, migrations or
+permissions — **any signed-in user reads any guide**, including the guide to a screen they cannot open
+yet. Guides are **TSX files in git**, not database rows (both languages are required props, so a
+one-language guide fails the type check); the registry is `config/training.php`; screenshots are
+captured from invented data by `composer training:screens`. **Every GET screen must be registered**
+(`pending` is enough) or `TrainingGapsTest` fails the suite. Reference:
+[`documentation/training.md`](documentation/training.md).
 
 ## 6. Naming conventions
 
@@ -200,7 +222,8 @@ compozit)*.
 
 ### 6.6 TypeScript types
 
-`types/index.ts` re-exports one file per area (`auth.ts`, `admin.ts`, `navigation.ts`, `ui.ts`).
+`types/index.ts` re-exports one file per area (`auth.ts`, `admin.ts`, `navigation.ts`, `training.ts`,
+`ui.ts`).
 Shared Inertia props are typed in `types/global.d.ts` (`InertiaConfig.sharedPageProps`).
 
 ## 7. Request lifecycle
@@ -236,7 +259,10 @@ to that list, deliberately.
 
 `components/app-sidebar.tsx` builds one group per module (`Platform`, `Admin`); each link is included
 only when `useCan('{module}.{resource}.view')` passes, and an empty group is not rendered. **Hiding a
-link is convenience, not authorization.** Groups collapse; the state lives in the `sidebar_groups`
+link is convenience, not authorization.** The one exception is **Training** (Platform, under
+Dashboard), which has no `useCan` because the manual is open to everyone. The header's **?**
+(`TrainingHelpButton`, beside the bell in `app-sidebar-header.tsx`) is not a nav item; it renders only
+when the `training` prop names a guide for the screen. Groups collapse; the state lives in the `sidebar_groups`
 cookie (unencrypted, read server-side into `collapsedNavGroups`) and every group starts collapsed after
 sign-in (`CollapseNavGroupsOnLogin`).
 
@@ -374,8 +400,18 @@ deleting is a separate, soft, restorable verb.
 
 `HandleInertiaRequests::share()`: `name`, `auth` (always: `user`, `permissions`), `sidebarOpen`,
 `collapsedNavGroups`, `theme`, `passwordPolicy`, `notifications` (always: `unread_count`),
-`broadcasting` (Reverb key/host/port/scheme or `null`). **A prop that affects rendering after a
+`broadcasting` (Reverb key/host/port/scheme or `null`), `training` (always: `{key, title_en,
+title_bn, status}` of the guide covering this route, or `null` — the guide body itself is fetched
+from `training.panel` only when the **?** dialog opens). **A prop that affects rendering after a
 partial reload must be `Inertia::always()`.**
+
+**Bangla text** renders in **Nikosh**, self-hosted at `resources/fonts/nikosh.woff2` and second in
+`--font-sans`, limited by `unicode-range` to the Bengali block so English stays Instrument Sans and a
+page with no Bangla never downloads it (owner, 2026-10-27). The file is compozit's repaired copy: the
+widely circulated TTF has a `name` table Chrome's font sanitiser rejects. **It is referenced by a
+relative URL so Vite owns it** (served in dev, fingerprinted into `public/build`): compozit's
+`public/fonts/` + absolute `/fonts/…` resolves against the Vite dev server, which 404s, and dev
+silently fell back to the system font (found 2026-10-27).
 
 **Theme:** `App\Enums\Theme` (35 daisyUI themes + `system`). `users.theme` is authoritative;
 `HandleAppearance` re-plants the unencrypted `theme` cookie on every authenticated request so guest
@@ -429,7 +465,12 @@ them (owner, 2026-10-26). The buttons submit the real login form.
 10. Page `pages/{module}/{resource}/index.tsx` + form dialog with `FormDialogFooter`.
 11. Sidebar link gated by `useCan`.
 12. Feature tests (access, list, each write, each guard, audit) — `tests/Feature/{Module}/`.
-13. Update `documentation/{module}.md`; update this file only if a convention changed.
+13. **Training entry**: every new GET screen gets an entry in `config/training.php`, `status =>
+    'pending'` until its guide is written; a GET route that is not a screen (JSON, a file, a redirect)
+    goes in `ignore_routes`. `TrainingGapsTest` fails the suite otherwise — except for a
+    `Route::inertia()` screen, which the gate cannot see and must be remembered by hand. Write the
+    guide and its screenshots in the same change or the next ([`documentation/training.md`](documentation/training.md) §7).
+14. Update `documentation/{module}.md`; update this file only if a convention changed.
 
 The `admin-crud` Claude skill (`.claude/skills/admin-crud`) walks this path.
 
@@ -442,7 +483,9 @@ The `admin-crud` Claude skill (`.claude/skills/admin-crud`) walks this path.
    `tests/Feature/{Module}`.
 4. Its module help in `PermissionDescriptions::MODULES`, its role rules in `RolePermissionSeeder`.
 5. A sidebar group in `app-sidebar.tsx`.
-6. A row in [§5](#5-module-registry) and the tree in [§3](#3-top-level-layout);
+6. Each screen registered in `config/training.php` (`pending` is enough), with a section for the
+   module in `training.sections` if it needs one.
+7. A row in [§5](#5-module-registry) and the tree in [§3](#3-top-level-layout);
    `documentation/{module}.md`.
 
 ## 12. Keeping this file in sync
@@ -476,6 +519,8 @@ this file has no pending edits, or when a file lands in a module folder this fil
 | `composer ci:check` | ESLint, Prettier, `tsc`, Pint, PHPStan L7, Pest |
 | `php artisan enums:sync` | regenerate `lib/enums.ts` |
 | `php artisan wayfinder:generate --with-form` | regenerate Wayfinder output |
+| `php artisan training:gaps` | list every screen, guide, screenshot or translation the manual is missing (always exits 0; the gate is `TrainingGapsTest`) |
+| `composer training:screens` | build, then recapture every guide screenshot (`TRAINING_SCREENS=1`, group `training-screens`) |
 
 ### 13.1 The suite never touches the development database
 
@@ -489,14 +534,17 @@ file under `database/` *(from compozit, where it happened twice)*.
 `tests/Browser/` with `pestphp/pest-plugin-browser`, run through `phpunit.browser.xml` (file-backed
 SQLite, file sessions). The suite holds only what a feature test cannot see — the shared standards,
 each proved once on one surface: `FormDialogStandardTest` (§8.10, on roles), `ListRefreshTest` (§8.6
-refresh triggers, on roles), `AppearanceThemeTest` (§9.5 theme persistence and `ThemeSync`). Its
+refresh triggers, on roles), `AppearanceThemeTest` (§9.5 theme persistence and `ThemeSync`),
+`Training/TrainingHelpDialogTest` (the **?** dialog, the language toggle, the manual's search).
+`Training/CaptureScreenshotsTest` is not a test of behaviour: the screenshot recipes, skipped unless
+`TRAINING_SCREENS=1`. Its
 Chromium must match the installed `playwright` package — `npx playwright install chromium` after an
 npm update, or every test fails with "Playwright is outdated". The Playwright MCP server is used for
 manual verification ([CLAUDE.md](CLAUDE.md)).
 
 ## 14. Module reference documentation
 
-`documentation/` holds one reference per module (`admin.md`, `settings.md`) plus
+`documentation/` holds one reference per module (`admin.md`, `settings.md`, `training.md`) plus
 `frontend.md` (UI standards and the component catalogue) and `setup-and-deployment.md`. **This file
 answers "where does it go and what is it called"; a module doc answers "what does it do and why".** A
 module doc links here rather than repeating it.

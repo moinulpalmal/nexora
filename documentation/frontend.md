@@ -124,6 +124,14 @@ All 35 daisyUI themes plus **System**. The theme is set on `<html data-theme>` b
 before first paint and kept in step by `ThemeSync`; components must not read the theme to choose
 colours — use daisyUI classes and it follows automatically.
 
+## 6.1 Training and Bangla text
+
+`components/training/` is the in-app manual: the vocabulary every guide is written in, the guide
+loader, the EN / বাংলা toggle, the table of contents and the header's **?** (`TrainingHelpButton`,
+beside the bell in `app-sidebar-header.tsx`). A guide uses the vocabulary and nothing else —
+[`training.md`](training.md) §4. Bangla renders in the self-hosted **Nikosh** font, limited by
+`unicode-range` to the Bengali block, so English stays Instrument Sans (`resources/css/app.css`).
+
 ## 7. Conventions
 
 - Imports alphabetised, type imports separate (`import type`); `curly` braces always (ESLint).
@@ -131,3 +139,5 @@ colours — use daisyUI classes and it follows automatically.
 - Pages: `pages/{module}/{resource}/index.tsx`; module components in `components/{module}/`; promote
   to `shared/` when a second module needs it.
 - Never edit `resources/js/actions|routes|wayfinder` or `lib/enums.ts` — they are generated.
+- A changed screen means a changed guide: read its guide in `components/training/guides/` against
+  the new behaviour, and recapture its screenshots ([`training.md`](training.md) §6).

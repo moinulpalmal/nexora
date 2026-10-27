@@ -20,9 +20,36 @@
  */
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Nikosh — the Bangladesh Government's standard Bangla font, for the training
+ * guides' Bangla (owner, 2026-10-27). Instrument Sans has no Bangla glyphs.
+ * Self-hosted (it is not on Bunny Fonts), and limited to the Bengali range so
+ * English stays Instrument Sans and a page with no Bangla never downloads it.
+ *
+ * A relative URL, so Vite owns the file: it serves it in dev and fingerprints
+ * it into public/build. An absolute `/fonts/…` resolves against the Vite dev
+ * server, which does not serve Laravel's public/, so dev fell back to the
+ * system font (found 2026-10-27).
+ *
+ * The file is compozit-suite's repaired copy: the widely circulated Nikosh TTF
+ * carries a malformed `name` table that Chrome's font sanitiser (OTS) rejects
+ * outright, so it was rebuilt with fontTools and converted to woff2. Replacing
+ * it with a fresh download brings the rejection back.
+ */
+@font-face {
+    font-family: 'Nikosh';
+    src: url('../fonts/nikosh.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0980-09FF, U+200C-200D, U+25CC;
+    /* Nikosh draws small beside Instrument Sans. */
+    size-adjust: 135%;
+}
+
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Instrument Sans', 'Nikosh', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 }

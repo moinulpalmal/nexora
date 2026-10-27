@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import {
+    GraduationCap,
     History,
     KeyRound,
     LayoutGrid,
@@ -29,6 +30,7 @@ import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as sentMailsIndex } from '@/routes/admin/sent-mails';
 import { index as usersIndex } from '@/routes/admin/users';
+import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
@@ -36,6 +38,16 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    /*
+     * The one link with no `useCan` guard: the manual is open to every
+     * signed-in user, including for screens they cannot open yet
+     * (ARCHITECTURE.md §8.3).
+     */
+    {
+        title: 'Training',
+        href: trainingIndex(),
+        icon: GraduationCap,
     },
 ];
 
