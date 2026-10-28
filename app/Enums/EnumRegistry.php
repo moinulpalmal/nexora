@@ -7,6 +7,9 @@ use App\Contracts\LabelledEnum;
 use App\Enums\Admin\AuditEvent;
 use App\Enums\Admin\MailEncryption;
 use App\Enums\Admin\MailTransport;
+use App\Enums\Imports\DuplicateAction;
+use App\Enums\Imports\ImportStatus;
+use App\Enums\Imports\SheetFileType;
 use InvalidArgumentException;
 
 /**
@@ -43,6 +46,11 @@ final class EnumRegistry
         AuditEvent::class,
         MailEncryption::class,
         MailTransport::class,
+
+        // Imports — the module-less spreadsheet engine (ARCHITECTURE.md §9.13)
+        DuplicateAction::class,
+        ImportStatus::class,
+        SheetFileType::class,
     ];
 
     /**

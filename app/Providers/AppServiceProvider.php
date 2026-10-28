@@ -7,6 +7,8 @@ use App\Models\Admin\MailSetting;
 use App\Models\Admin\Permission;
 use App\Models\Admin\QuickLoginSetting;
 use App\Models\Admin\Role;
+use App\Models\ImportLimit;
+use App\Models\SheetImport;
 use App\Models\User;
 use App\Services\Admin\MailSettingService;
 use Carbon\CarbonImmutable;
@@ -40,6 +42,8 @@ class AppServiceProvider extends ServiceProvider
         'mail-setting' => MailSetting::class,
         'quick-login-setting' => QuickLoginSetting::class,
         'branding-setting' => BrandingSetting::class,
+        'sheet-import' => SheetImport::class,
+        'import-limit' => ImportLimit::class,
     ];
 
     /**

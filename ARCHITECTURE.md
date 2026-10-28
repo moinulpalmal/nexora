@@ -41,6 +41,7 @@ their **email or username** (owner, 2026-10-26).
 | RBAC | `spatie/laravel-permission` v8, teams off | Permission-gated routes, super-admin `Gate::before` ([§9.1](#91-rbac-roles--permissions)) |
 | Audit | `owen-it/laravel-auditing` 14.0.6 | Same package and model shape as compozit ([§9.3](#93-audit-logging)) |
 | Live push | Laravel Reverb + `@laravel/echo-react` | The notification bell ([§9.7](#97-notifications--broadcasting)) |
+| Spreadsheets | `phpoffice/phpspreadsheet` (read), `openspout/openspout` (write) | The mapped-import engine ([§9.13](#913-spreadsheet-imports)) — reading every worksheet of an `.xlsx`/`.xls`, and writing the template and rejected-rows workbooks (owner, 2026-10-28) |
 | Database | MySQL (development, `nexora`), in-memory SQLite (tests) | [§13.1](#131-the-suite-never-touches-the-development-database) |
 | Build | Vite 8, ESLint 9, Prettier 3 | Standard Vite rather than the starter's vite-plus, to match compozit (owner, 2026-10-26) |
 | Tests | Pest 5 (+ browser plugin), PHPStan level 7 (Larastan), Pint | [§13](#13-commands) |
@@ -56,20 +57,25 @@ app/
   Contracts/                  Auditable, IdentifiedEnum, LabelledEnum
   Enums/                      FilterType, RecordStatus, Theme, EnumRegistry (module-less)
   Enums/Admin/                AuditEvent, MailEncryption, MailTransport
+  Enums/Imports/              DuplicateAction, ImportStatus, SheetFileType (§9.13)
   Exceptions/Admin/           MailNotConfiguredException
+  Exceptions/Imports/         SheetImportException
   Http/Controllers/           HomeController, NotificationController (module-less)
   Http/Controllers/Admin/     User, Role, Permission, AuditLog, ApplicationSetting,
                               MailSetting, QuickLoginSetting, BrandingSetting, SentMail
   Http/Controllers/Settings/  Profile, Security, Appearance (the user's own account)
+  Http/Controllers/Imports/   SheetImportController — the abstract base every importer extends
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5)
   Http/Middleware/            EnsureUserIsActive, HandleAppearance, HandleInertiaRequests
-  Http/Requests/              ListRequest (module-less) + Admin/, Settings/
+  Http/Requests/              ListRequest (module-less) + Admin/, Settings/,
+                              Imports/ (ImportConfirmRequest, shared by every importer)
   Listeners/                  CollapseNavGroupsOnLogin, StampLastLogin (module-less)
   Listeners/Admin/            RecordLogin, RecordLogout, RecordFailedLogin, RecordSentMail
   Mail/Admin/                 UserWelcomeMail, UserPasswordResetMail, MailSettingTestMail
-  Models/User.php             (the one model at the root — Laravel's auth convention)
+  Models/User.php             (at the root — Laravel's auth convention)
+  Models/SheetImport.php, ImportLimit.php   (at the root — the import engine's own records, §9.13)
   Models/Admin/               Role, Permission, AuditLog, MailSetting, QuickLoginSetting,
                               BrandingSetting, SentMail
   Notifications/Admin/        AccountChanged
@@ -79,8 +85,10 @@ app/
                               AuditRecorder, AuditLogService, MailSettingService,
                               QuickLoginService, BrandingService, UserCredentialMailer
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
+  Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
+                              ImportBlueprint, ImportRegistry, the DTOs ImportLimits/Outcome/Preview
 config/                       audit.php, permission.php, reverb.php, broadcasting.php,
-                              training.php (the guide registry) (+ Laravel's)
+                              training.php (the guide registry), sheet-import.php (+ Laravel's)
 database/
   migrations/                 flat — the migrator does not recurse
   seeders/Admin/              RolePermissionSeeder, SuperAdminSeeder, DemoUserSeeder
@@ -107,7 +115,7 @@ resources/
     layouts/                  app, auth, settings
     lib/                      utils (cn), daisy-class-groups, themes, echo, enums (GENERATED)
     pages/                    one file per Inertia page, path mirrors the URL (§6.4)
-    types/                    index.ts re-exports auth, admin, navigation, ui
+    types/                    index.ts re-exports auth, admin, imports, navigation, training, ui
 routes/
   web.php                     `/`, dashboard, notifications; requires admin.php, settings.php
   admin.php                   the Admin module
@@ -118,6 +126,8 @@ routes/
 tests/
   Feature/                    root: apparatus tests (Listable, EnumRegistry, PasswordPolicy, …)
   Feature/Admin/ Auth/ Settings/ Training/ ProjectManagement/ Accounting/ Hrm/
+  Feature/Imports/            the import engine (§9.13), proved against Fixtures/Imports/
+  Fixtures/Imports/           stand-in importers (model, blueprint, controller, routes) for those tests
   Browser/                    Pest browser tests (§13.2); Browser/Training/ holds the help-dialog
                               test and the screenshot recipes
   Pest.php, TestCase.php      safety guards and helpers
@@ -144,6 +154,15 @@ Anything that belongs to no module sits **at the root of its layer**: `ListReque
 `FilterType`, `RecordStatus`, `Theme`, `HomeController`, `NotificationController`,
 `CollapseNavGroupsOnLogin`. A file moves into a module folder only when exactly one module owns it.
 
+**`Imports/` is the one infrastructure folder that looks like a module and is not** *(from compozit;
+owner, 2026-10-28)*. The spreadsheet-import engine ([§9.13](#913-spreadsheet-imports)) serves every
+module and belongs to none, but it is a dozen classes, so it gets an `Imports/` folder in each layer it
+touches (`Services`, `Enums`, `Exceptions`, `Http/Controllers`, `Http/Requests`) instead of crowding
+the roots. It has no route file, no permissions and no pages of its own: each importer's routes,
+permission and blueprint live in the module that owns the table. Its two models sit at the root of
+`Models/`, and its value objects live beside it in `Services/Imports/` rather than in a separate
+DTO layer.
+
 `App\Models\User` stays at the root of `Models/` because the auth stack, Fortify and spatie expect it
 there; it is administered by the Admin module.
 
@@ -169,8 +188,8 @@ follow [§11](#11-adding-a-new-module) for the rest and switch the status to ✅
 
 **Admin** owns: users (create, edit, deactivate, soft delete, restore, force delete, set password,
 assign roles, avatar), roles (with the permission picker), the read-only permission catalogue, the
-audit log viewer, the Application Settings hub (Mail Server, Quick Login, Branding tabs) and Sent
-Mails. Full
+audit log viewer, the Application Settings hub (Mail Server, Quick Login, Branding, Import Limits tabs)
+and Sent Mails. Full
 reference: [`documentation/admin.md`](documentation/admin.md).
 
 **Settings** is the signed-in user's own account — profile (photo, name, phone, username, email),
@@ -267,8 +286,8 @@ compozit)*.
 
 ### 6.6 TypeScript types
 
-`types/index.ts` re-exports one file per area (`auth.ts`, `admin.ts`, `navigation.ts`, `training.ts`,
-`ui.ts`).
+`types/index.ts` re-exports one file per area (`auth.ts`, `admin.ts`, `imports.ts`, `navigation.ts`,
+`training.ts`, `ui.ts`).
 Shared Inertia props are typed in `types/global.d.ts` (`InertiaConfig.sharedPageProps`).
 
 ## 7. Request lifecycle
@@ -539,6 +558,70 @@ reaches the ledger only when an accountant approves it, and **the source record 
 voucher is posted**. Billing works the same way in the other direction: Projects raises a *billing
 request*, and Accounting turns it into a sales invoice.
 
+### 9.13 Spreadsheet imports
+
+*(ported from compozit; owner, 2026-10-28)* One module-less engine, `app/Services/Imports/`, turns an
+uploaded `.xlsx`/`.xls` into rows of any master table: **upload → map → confirm**. A table opts in
+with one `{Model}ImportBlueprint` (next to its service) registered in `ImportRegistry::BLUEPRINTS`, a
+`{Model}ImportController extends Imports\SheetImportController` (a key, a list route, a three-line
+`store()`), its own upload request, and its routes. No importer writes its own dialog: the list page
+renders `components/shared/sheet-import-dialog.tsx` and `pending-import-banner.tsx`.
+
+- **Every worksheet is read; row 1 of each tab is that tab's header.** A tab with no header row or no
+  data is skipped with a warning; two identical headers, or a tab past the column cap, refuse the
+  file. Each tab is **mapped separately** by the uploader, and the posted map is keyed by the
+  workbook's own worksheet index (`map[index][field]`).
+- **Confirming is all-or-nothing across every selected tab**, in one transaction: one bad row refuses
+  the file and the import stays `pending` for another try. In-file duplicates are detected across tabs.
+  The one exception is a blueprint implementing **`ImportRowWriter`**: it reviews first (a dry run),
+  writes the good rows itself and reports the rest, with a downloadable workbook of the rejects.
+- **Existing rows are found with one query, written with `upsert()`** in chunks — so the engine stamps
+  `inserted_by` / `last_updated_by` itself and suppresses per-row audits (`withoutAuditing()`, declared
+  on `App\Contracts\Auditable` for that reason). **The audit records the decision, not the rows**:
+  `sheet-import` `created` (staged), `updated` (confirmed with its `column_map`, or cancelled).
+- **Only the uploader confirms**; anyone with the importer's permission may cancel a pending import.
+  Both guards live in `ImportConfirmRequest::authorize()` / the controller, and both answer 404.
+- **Each importer has its own `{module}.{resource}.import` permission** — writing a thousand rows from
+  a file is a different decision from creating one on a form. Routes, declared **before** the resource
+  route so `import` is not captured as `{x}`: `POST {x}/import` (`.import.store`),
+  `POST {x}/imports/{sheetImport}/confirm`, `DELETE {x}/imports/{sheetImport}`, `GET {x}/import/template`,
+  and for a row writer `POST …/review` and `GET …/rejects`. The two GET routes are not screens and go
+  in `config/training.php → ignore_routes`.
+- **Company:** `sheet_imports.company_id` is **pre-wired** (nullable, no foreign key until the Company
+  master exists, [§9.10](#910-multi-company-planned)). A blueprint answering `isCompanyScoped()` gets
+  `company_id` in its uniqueness check, its written rows and its upsert key; its controller resolves
+  the **selected** company in `companyIdFor()` — never from the request body — and staging refuses
+  without one. A second scope (`scopeField()`) is generic.
+- **Limits:** rows (workbook-wide), columns (per tab) and worksheets are read from the `import_limits`
+  row (Admin → Application Settings → Import Limits, super-admin only), falling back to
+  `config/sheet-import.php`; `max_file_size_kb` stays in config because PHP's upload limit bounds it.
+  Uploads are kept on the `local` disk under `sheet-imports/`.
+- **No shipped table imports yet.** The engine is proved in `tests/Feature/Imports/` against fixture
+  importers in `tests/Fixtures/Imports/`; the first real importer becomes the reference the
+  `master-crud` skill points at.
+
+### 9.14 Master data and deletion guards
+
+*(owner, 2026-10-28)* A **master table** is reference data other records point at — companies,
+departments, designations, customers, the chart of accounts. Each belongs to the module that owns its
+subject ([§5](#5-module-registry)); there is no shared "master data" module. The `master-crud` skill
+builds them.
+
+**A foreign key into master data owes a guard, and it is always the same pair:**
+
+- `restrictOnDelete()` on the foreign key, so the database refuses the delete whatever happens above
+  it; **and**
+- a clause in the referenced table's service `deletionBlocker(): ?string`, returning a sentence that
+  names what still uses the row ("Used by 3 employees. Move them first.") — so a person is told which
+  table to go and fix, as a `warning` toast, instead of being shown a constraint error.
+
+The blocker counts with any company scope removed: whether a row is in use is a question about the
+database, not about what the actor can see, and a hidden row blocks the delete just as hard. A child
+that is *part of* its parent (a parent's code rows) cascades instead and owes no guard. A table that
+nothing references yet ships **without** a blocker, and says so in its service's docblock — a blocker
+that can only return `null` reads as a guard while guarding nothing. Blockers live in the service,
+never a policy ([§9.1](#91-rbac-roles--permissions)).
+
 ## 10. Adding a feature to an existing module
 
 1. Migration (`php artisan make:migration`), with `inserted_by`/`last_updated_by` and `status` where
@@ -563,7 +646,10 @@ request*, and Accounting turns it into a sales invoice.
     guide and its screenshots in the same change or the next ([`documentation/training.md`](documentation/training.md) §7).
 14. Update `documentation/{module}.md`; update this file only if a convention changed.
 
-The `admin-crud` Claude skill (`.claude/skills/admin-crud`) walks this path.
+Two Claude skills walk this path (owner, 2026-10-28): **`master-crud`** for a master table in an ERP
+module — shape, company scoping, spreadsheet import and the deletion guards of
+[§9.14](#914-master-data-and-deletion-guards) — and **`admin-crud`** for an Admin system surface
+(users, roles and the like).
 
 ## 11. Adding a new module
 

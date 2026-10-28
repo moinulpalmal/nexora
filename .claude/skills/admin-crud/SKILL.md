@@ -1,6 +1,6 @@
 ---
 name: admin-crud
-description: Build or complete a CRUD surface in Nexora — migration, model, form requests, service with its guards, controller, routes and permissions, Inertia list page with form dialogs, sidebar entry, factory, tests and every satellite registration — matching the Admin users/roles surfaces. Invoke explicitly with /admin-crud when adding a new managed table (in Admin or any later module) or finishing a half-built one.
+description: Build or complete a CRUD surface in Nexora — migration, model, form requests, service with its guards, controller, routes and permissions, Inertia list page with form dialogs, sidebar entry, factory, tests and every satellite registration — matching the Admin users/roles surfaces. Invoke explicitly with /admin-crud when adding or finishing an Admin system surface (users, roles and the like). For master/reference data in an ERP module — departments, designations, customers, the chart of accounts, companies — use /master-crud instead, which adds company scoping, spreadsheet import and the §9.14 deletion guards.
 disable-model-invocation: true
 ---
 

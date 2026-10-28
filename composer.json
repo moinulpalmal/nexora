@@ -17,7 +17,9 @@
         "laravel/reverb": "^1.12",
         "laravel/tinker": "^3.0",
         "laravel/wayfinder": "^0.1.14",
+        "openspout/openspout": "^5.12",
         "owen-it/laravel-auditing": "14.0.6",
+        "phpoffice/phpspreadsheet": "^5.9",
         "spatie/laravel-permission": "^8.3"
     },
     "require-dev": {

@@ -1,6 +1,7 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
 import BrandingPanel from '@/components/admin/application-settings/branding-panel';
+import ImportLimitsPanel from '@/components/admin/application-settings/import-limits-panel';
 import MailPanel from '@/components/admin/application-settings/mail-panel';
 import QuickLoginPanel from '@/components/admin/application-settings/quick-login-panel';
 import Heading from '@/components/heading';
@@ -41,13 +42,21 @@ type BrandingSection = {
     updatedAt: string | null;
 };
 
-type TabKey = 'mail' | 'quick-login' | 'branding';
+type ImportLimitsSection = {
+    limits: { max_rows: number; max_columns: number; max_sheets: number };
+    maxFileSizeKb: number;
+    updatedBy: string | null;
+    updatedAt: string | null;
+};
+
+type TabKey = 'mail' | 'quick-login' | 'branding' | 'import-limits';
 
 type Props = {
     sections: {
         mail: MailSection | null;
         'quick-login': QuickLoginSection | null;
         branding: BrandingSection | null;
+        'import-limits': ImportLimitsSection | null;
     };
 };
 
@@ -83,6 +92,10 @@ export default function ApplicationSettings({ sections }: Props) {
                         key: 'branding' as const,
                         label: 'Branding',
                     },
+                    sections['import-limits'] && {
+                        key: 'import-limits' as const,
+                        label: 'Import Limits',
+                    },
                 ] as const
             ).filter((tab): tab is { key: TabKey; label: string } =>
                 Boolean(tab),
@@ -112,7 +125,7 @@ export default function ApplicationSettings({ sections }: Props) {
             <div className="flex h-full flex-1 flex-col gap-6 p-4">
                 <Heading
                     title="Application Settings"
-                    description="Software-level setup: how mail goes out, the development quick login, and the logo and favicon."
+                    description="Software-level setup: how mail goes out, the development quick login, the logo and favicon, and the spreadsheet import limits."
                 />
 
                 {tabs.length === 0 ? (
@@ -148,6 +161,13 @@ export default function ApplicationSettings({ sections }: Props) {
                         {activeTab === 'branding' && sections.branding && (
                             <BrandingPanel {...sections.branding} />
                         )}
+
+                        {activeTab === 'import-limits' &&
+                            sections['import-limits'] && (
+                                <ImportLimitsPanel
+                                    {...sections['import-limits']}
+                                />
+                            )}
                     </>
                 )}
             </div>

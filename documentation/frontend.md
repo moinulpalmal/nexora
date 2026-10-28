@@ -42,6 +42,9 @@
 | `confirm-action-dialog` / `confirm-delete-dialog` | a confirmation that submits a Wayfinder form |
 | `form-dialog-footer` | Cancel / Save & add another / Save & close |
 | `password-policy-checklist` | the live password rules (from the `passwordPolicy` shared prop) |
+| `sheet-import-dialog` | every spreadsheet import's upload → map → confirm dialog; one per list page, never copied ([`ARCHITECTURE.md` §9.13](../ARCHITECTURE.md#913-spreadsheet-imports)) |
+| `pending-import-banner` | reopens or cancels the uploader's staged import |
+| `import-result-panel` / `import-reject-list` | a partial import's rejected rows, with the download |
 
 ## 4. Hooks
 

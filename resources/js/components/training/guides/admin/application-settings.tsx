@@ -18,16 +18,16 @@ import { MAIL_ENCRYPTION_LABELS, MAIL_TRANSPORT_LABELS } from '@/lib/enums';
 
 /**
  * Admin → Application Settings (`admin.application-settings.edit`) — the
- * Mail Server, Quick Login and Branding tabs.
- * Source: documentation/admin.md §5, ARCHITECTURE.md §9.4, §9.9, §9.5.
+ * Mail Server, Quick Login, Branding and Import Limits tabs.
+ * Source: documentation/admin.md §5, ARCHITECTURE.md §9.4, §9.9, §9.5, §9.13.
  */
 export default function ApplicationSettingsGuide() {
     return (
         <Guide>
             <GuideSection kind="purpose">
                 <Para
-                    en="Setup for the whole application, one tab per setting: how mail goes out (Mail Server), the one-click sign-in buttons used while developing (Quick Login), and the logo and browser-tab icon (Branding)."
-                    bn="পুরো অ্যাপ্লিকেশনের সেটআপ, প্রতিটি সেটিংয়ের জন্য একটি ট্যাব: ইমেইল কীভাবে যায় (Mail Server), ডেভেলপমেন্টের সময় ব্যবহৃত এক-ক্লিকে সাইন-ইনের বোতাম (Quick Login), আর লোগো ও ব্রাউজার ট্যাবের আইকন (Branding)।"
+                    en="Setup for the whole application, one tab per setting: how mail goes out (Mail Server), the one-click sign-in buttons used while developing (Quick Login), the logo and browser-tab icon (Branding), and how big an uploaded spreadsheet may be (Import Limits)."
+                    bn="পুরো অ্যাপ্লিকেশনের সেটআপ, প্রতিটি সেটিংয়ের জন্য একটি ট্যাব: ইমেইল কীভাবে যায় (Mail Server), ডেভেলপমেন্টের সময় ব্যবহৃত এক-ক্লিকে সাইন-ইনের বোতাম (Quick Login), লোগো ও ব্রাউজার ট্যাবের আইকন (Branding), আর আপলোড করা স্প্রেডশিট কত বড় হতে পারে (Import Limits)।"
                 />
             </GuideSection>
 
@@ -43,9 +43,11 @@ export default function ApplicationSettingsGuide() {
                             until someone grants them — and{' '}
                             <Ui>admin.branding.view</Ui> /{' '}
                             <Ui>admin.branding.update</Ui>, which the admin role
-                            holds. The page opens with any view permission; a
-                            tab you cannot read is not there, and without the
-                            update permission a tab is read-only.
+                            holds, and <Ui>admin.import-limits.view</Ui> /{' '}
+                            <Ui>admin.import-limits.update</Ui>, super admin
+                            only. The page opens with any view permission; a tab
+                            you cannot read is not there, and without the update
+                            permission a tab is read-only.
                         </>
                     }
                     bn={
@@ -58,10 +60,12 @@ export default function ApplicationSettingsGuide() {
                             পর্যন্ত এগুলো কেবল সুপার অ্যাডমিনের — এবং{' '}
                             <Ui>admin.branding.view</Ui> /{' '}
                             <Ui>admin.branding.update</Ui>, যা অ্যাডমিন রোলের
-                            আছে। যেকোনো একটি view পারমিশন থাকলেই পাতাটি খোলে; যে
-                            ট্যাব পড়ার অনুমতি নেই সেটি দেখা যায় না, আর update
-                            পারমিশন না থাকলে ট্যাবটি শুধু দেখা যায়, বদলানো যায়
-                            না।
+                            আছে, এবং <Ui>admin.import-limits.view</Ui> /{' '}
+                            <Ui>admin.import-limits.update</Ui>, কেবল সুপার
+                            অ্যাডমিনের। যেকোনো একটি view পারমিশন থাকলেই পাতাটি
+                            খোলে; যে ট্যাব পড়ার অনুমতি নেই সেটি দেখা যায় না,
+                            আর update পারমিশন না থাকলে ট্যাবটি শুধু দেখা যায়,
+                            বদলানো যায় না।
                         </>
                     }
                 />
@@ -202,6 +206,29 @@ export default function ApplicationSettingsGuide() {
                         }
                     />
                 </Steps>
+
+                <SubHeading en="Import Limits" bn="Import Limits" />
+                <Steps>
+                    <Step
+                        en={
+                            <>
+                                On the <Ui>Import Limits</Ui> tab, change the
+                                row, column or worksheet cap and press{' '}
+                                <Ui>Save</Ui>. The next spreadsheet uploaded
+                                anywhere in the application is read under the
+                                new caps.
+                            </>
+                        }
+                        bn={
+                            <>
+                                <Ui>Import Limits</Ui> ট্যাবে সারি, কলাম বা
+                                ওয়ার্কশিটের সীমা বদলে <Ui>Save</Ui> চাপুন।
+                                অ্যাপ্লিকেশনের যেকোনো জায়গায় এরপর যে
+                                স্প্রেডশিট আপলোড হবে, তা নতুন সীমায় পড়া হবে।
+                            </>
+                        }
+                    />
+                </Steps>
             </GuideSection>
 
             <GuideSection kind="fields">
@@ -273,6 +300,21 @@ export default function ApplicationSettingsGuide() {
                         en="The small icon in the browser tab. A square PNG, or an ICO, up to 256 KB. Without one, the tab uses the logo; without either, the default icon."
                         bn="ব্রাউজার ট্যাবের ছোট আইকন। বর্গাকার PNG, অথবা ICO, ২৫৬ KB পর্যন্ত। না থাকলে ট্যাবে লোগো দেখায়; দুটোর কোনোটিই না থাকলে ডিফল্ট আইকন।"
                     />
+                    <Field
+                        label="Maximum rows per workbook"
+                        en="Counted across every tab of one file; blank rows do not count. A bigger file is refused with the tab where the count ran out."
+                        bn="একটি ফাইলের সব ট্যাব মিলিয়ে গোনা হয়; ফাঁকা সারি গোনা হয় না। এর চেয়ে বড় ফাইল প্রত্যাখ্যান করা হয়, কোন ট্যাবে গিয়ে সীমা ছাড়িয়েছে তা জানিয়ে।"
+                    />
+                    <Field
+                        label="Maximum columns per sheet"
+                        en="Counted to the last column that holds data, on each tab separately."
+                        bn="প্রতিটি ট্যাবে আলাদাভাবে, ডেটা থাকা শেষ কলাম পর্যন্ত গোনা হয়।"
+                    />
+                    <Field
+                        label="Maximum worksheets per workbook"
+                        en="How many tabs one uploaded file may carry."
+                        bn="একটি আপলোড করা ফাইলে সর্বোচ্চ কয়টি ট্যাব থাকতে পারে।"
+                    />
                 </Fields>
             </GuideSection>
 
@@ -317,6 +359,11 @@ export default function ApplicationSettingsGuide() {
                     en="A PNG favicon must be as wide as it is tall. Crop it, or upload an ICO."
                     bn="PNG ফেভিকনের প্রস্থ ও উচ্চতা সমান হতে হবে। ছবিটি কেটে বর্গাকার করুন, অথবা একটি ICO আপলোড করুন।"
                 />
+                <Message
+                    text="Import limits saved."
+                    en="The next upload is read under the new caps."
+                    bn="পরের আপলোড নতুন সীমায় পড়া হবে।"
+                />
             </GuideSection>
 
             <GuideSection kind="mistakes">
@@ -339,6 +386,11 @@ export default function ApplicationSettingsGuide() {
                     tone="warn"
                     en="SVG images are refused — an SVG can carry code. Export the logo as a PNG with a transparent background instead."
                     bn="SVG ছবি গ্রহণ করা হয় না — একটি SVG-এর ভেতরে কোড থাকতে পারে। এর বদলে লোগোটি স্বচ্ছ পটভূমির PNG হিসেবে এক্সপোর্ট করুন।"
+                />
+                <Callout
+                    tone="warn"
+                    en="The file-size cap shown on the Import Limits tab cannot be changed there: the server's own upload limit bounds it. Ask whoever runs the server."
+                    bn="Import Limits ট্যাবে দেখানো ফাইলের আকারের সীমা সেখান থেকে বদলানো যায় না: সার্ভারের নিজের আপলোড সীমা এটি বেঁধে দেয়। যিনি সার্ভার চালান তাঁকে বলুন।"
                 />
             </GuideSection>
 

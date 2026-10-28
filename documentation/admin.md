@@ -20,6 +20,7 @@
 | f. Application Settings → Quick Login | `Admin\QuickLoginSettingController`, `Admin\QuickLoginService` | same page | `admin.quick-login.{view,update}` ★ |
 | g. Sent Mails | `Admin\SentMailController` | `pages/admin/sent-mails/index.tsx` | `admin.sent-mails.view` ★ |
 | h. Application Settings → Branding | `Admin\BrandingSettingController`, `Admin\BrandingService` | `pages/admin/application-settings.tsx` | `admin.branding.{view,update}` |
+| i. Application Settings → Import Limits | `Admin\ImportLimitController`, `Admin\ImportLimitService` | same page | `admin.import-limits.{view,update}` ★ |
 
 ★ `SUPER_ADMIN_ONLY` — no role receives it by rule; an administrator can still grant it by hand.
 
@@ -123,6 +124,7 @@ its sentence, and the code that checks it — `PermissionDescriptionsTest` fails
 | `admin.mail-settings.view` / `update` ★ | Mail Server tab, test mail |
 | `admin.quick-login.view` / `update` ★ | Quick Login tab |
 | `admin.branding.view` / `update` | Branding tab: upload or remove the logo and favicon |
+| `admin.import-limits.view` / `update` ★ | Import Limits tab: the caps every spreadsheet import is read under |
 | `admin.sent-mails.view` ★ | Sent Mails |
 
 ### 3.2 Seeded roles
@@ -151,7 +153,7 @@ super-admin role cannot be edited or deleted (`error`). Every grant change is au
 ## 4. The audit trail
 
 - Every create/update/delete/restore of `User`, `Role`, `Permission`, `MailSetting`,
-  `QuickLoginSetting`, `BrandingSetting` is recorded with old and new values; secrets (`password`, `remember_token`, the
+  `QuickLoginSetting`, `BrandingSetting`, `ImportLimit` is recorded with old and new values; secrets (`password`, `remember_token`, the
   SMTP password) never are.
 - Also recorded: role and permission grants, administrator password resets, force deletes, mails
   queued, the mail-server password changing, test mails, sign-ins, sign-outs and failed sign-ins (the
@@ -204,6 +206,23 @@ The application's **logo** and the **favicon** in the browser tab (owner, 2026-1
   `<link rel="icon">`; they are cached (`BrandingService::urls()`) and every save forgets the cache.
 - `admin.branding.{view,update}` are **not** super-admin-only: the `admin` role holds both by rule.
 
+### 5.4 Import Limits
+
+The caps the spreadsheet-import engine reads every upload under
+([`ARCHITECTURE.md` §9.13](../ARCHITECTURE.md#913-spreadsheet-imports)): **maximum rows per workbook**
+(counted across every tab, blank rows excluded), **maximum columns per sheet** and **maximum
+worksheets per workbook**. Each is at least 1 — there is no "unlimited" — and at most 100,000 / 1,000 /
+100.
+
+- One row in `import_limits` (`App\Models\ImportLimit`, at the root of `Models/` because the engine
+  owns it). **Not seeded**: until the first save the defaults in `config/sheet-import.php` apply, and
+  the first save creates the row.
+- The **file-size cap** is shown but not editable: PHP's own `upload_max_filesize` bounds it, so it
+  stays in `config/sheet-import.php` (`max_file_size_kb`) to be changed together with the PHP
+  configuration.
+- `admin.import-limits.{view,update}` are `SUPER_ADMIN_ONLY`: a higher cap lets one upload take more of
+  the server's memory.
+
 ## 6. Sent Mails
 
 Every mail the mailer handed over, newest first, filterable by recipient, subject and kind; the eye
@@ -218,7 +237,7 @@ their password. It is best effort: if it cannot be sent, the change still stands
 ## 8. Extending Admin
 
 Follow [`ARCHITECTURE.md` §10](../ARCHITECTURE.md#10-adding-a-feature-to-an-existing-module) or invoke
-the `admin-crud` skill. A new Application Settings tab: a singleton model (`SINGLETON_ID = 1`,
+the `admin-crud` skill — or `master-crud` for a master table Admin owns, such as Companies. A new Application Settings tab: a singleton model (`SINGLETON_ID = 1`,
 `current()`), its `.view`/`.update` pair, a section method in `ApplicationSettingController::edit()`,
 a panel in `components/admin/application-settings/`, and a tab entry in the page.
 
@@ -226,8 +245,10 @@ a panel in `components/admin/application-settings/`, and a tab entry in the page
 
 `tests/Feature/Admin/`: `UserTest`, `RoleTest`, `PermissionCatalogueTest`, `RbacTest`,
 `PermissionDescriptionsTest`, `AuditTrailTest`, `AuditLogViewerTest`, `ApplicationSettingTest`,
-`BrandingSettingTest`, `SentMailTest`. Helpers in `tests/Pest.php`: `userWithPermissions(...)`, `superAdmin()`,
-`assertToast($response, $type)`, `compliantPassword()`, `fakeBreachedPasswordLookup()`. Audit
+`BrandingSettingTest`, `ImportLimitTest`, `SentMailTest`. The import engine itself is proved in
+`tests/Feature/Imports/` against fixture importers in `tests/Fixtures/Imports/`. Helpers in `tests/Pest.php`: `userWithPermissions(...)`, `superAdmin()`,
+`assertToast($response, $type)`, `compliantPassword()`, `fakeBreachedPasswordLookup()`,
+`workbookFixture([...])` / `uploadedWorkbook([...])` (an `.xlsx` built from `[tab => rows]`). Audit
 assertions turn auditing on with `config(['audit.console' => true])` after the fixtures.
 
 ## 10. Planned: Companies

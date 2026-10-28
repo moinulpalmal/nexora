@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ApplicationSettingController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandingSettingController;
+use App\Http\Controllers\Admin\ImportLimitController;
 use App\Http\Controllers\Admin\MailSettingController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\QuickLoginSettingController;
@@ -79,7 +80,7 @@ Route::middleware(['auth', 'auth.session'])
 
         // The settings hub opens for either tab's `.view`; each tab saves on its own route.
         Route::get('application-settings', [ApplicationSettingController::class, 'edit'])
-            ->middleware('permission:admin.mail-settings.view|admin.quick-login.view|admin.branding.view')
+            ->middleware('permission:admin.mail-settings.view|admin.quick-login.view|admin.branding.view|admin.import-limits.view')
             ->name('application-settings.edit');
 
         Route::put('application-settings/mail', [MailSettingController::class, 'update'])
@@ -102,6 +103,10 @@ Route::middleware(['auth', 'auth.session'])
             ->whereIn('image', ['logo', 'favicon'])
             ->middleware('permission:admin.branding.update')
             ->name('branding.destroy');
+
+        Route::put('application-settings/import-limits', [ImportLimitController::class, 'update'])
+            ->middleware('permission:admin.import-limits.update')
+            ->name('import-limits.update');
 
         Route::get('sent-mails', [SentMailController::class, 'index'])
             ->middleware('permission:admin.sent-mails.view')

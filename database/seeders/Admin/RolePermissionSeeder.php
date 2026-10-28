@@ -46,6 +46,7 @@ class RolePermissionSeeder extends Seeder
         'admin.mail-settings' => ['view', 'update'],
         'admin.quick-login' => ['view', 'update'],
         'admin.branding' => ['view', 'update'],
+        'admin.import-limits' => ['view', 'update'],
         'admin.sent-mails' => ['view'],
 
         // One overview per ERP module; each opens the module's dashboard.
@@ -59,8 +60,9 @@ class RolePermissionSeeder extends Seeder
      *
      * Each one is a read or a switch that is sensitive in itself: the audit trail
      * is every recorded value in the application, the mail settings hold SMTP
-     * credentials, the sent-mail log shows every recipient's mail, and quick
-     * login signs anyone in as anyone. An administrator can still grant one to a
+     * credentials, the sent-mail log shows every recipient's mail, quick
+     * login signs anyone in as anyone, and the import limits decide how much
+     * memory one upload may take from the server. An administrator can still grant one to a
      * role by hand; this only keeps the rules below from handing them out.
      *
      * @var list<string>
@@ -71,6 +73,8 @@ class RolePermissionSeeder extends Seeder
         'admin.mail-settings.update',
         'admin.quick-login.view',
         'admin.quick-login.update',
+        'admin.import-limits.view',
+        'admin.import-limits.update',
         'admin.sent-mails.view',
     ];
 

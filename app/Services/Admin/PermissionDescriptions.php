@@ -53,6 +53,8 @@ class PermissionDescriptions
         'admin.quick-login.update' => ['summary' => 'Switch development quick login on or off.', 'note' => self::SUPER_ADMIN_ONLY.' Never shown outside local and testing environments.', 'where' => 'Admin → Application Settings → Quick Login'],
         'admin.branding.view' => ['summary' => 'See the uploaded logo and favicon.', 'where' => 'Admin → Application Settings → Branding'],
         'admin.branding.update' => ['summary' => 'Upload or remove the logo and the browser-tab favicon.', 'note' => 'Changes what every user sees in the sidebar, on the login page and in the browser tab.', 'where' => 'Admin → Application Settings → Branding'],
+        'admin.import-limits.view' => ['summary' => 'See the row, column and worksheet caps every spreadsheet import is read under.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Application Settings → Import Limits'],
+        'admin.import-limits.update' => ['summary' => 'Change the row, column and worksheet caps for spreadsheet imports.', 'note' => self::SUPER_ADMIN_ONLY.' A higher cap lets one upload use more server memory.', 'where' => 'Admin → Application Settings → Import Limits'],
         'admin.sent-mails.view' => ['summary' => 'See every mail the application sent, with its status and a preview.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Sent Mails'],
 
         'projects.dashboard.view' => ['summary' => 'Open the Projects overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Projects → Overview'],

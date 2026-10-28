@@ -44,4 +44,17 @@ interface Auditable extends PackageAuditable
      * ordinary save as another custom event.
      */
     public function clearCustomAudit(): void;
+
+    /**
+     * Run a callback with this model's auditing switched off.
+     *
+     * Declared here because the package puts it on its *trait* — the same gap
+     * as the custom-audit properties above. The spreadsheet-import engine needs
+     * it from a class-string, to keep a bulk `upsert()` from writing one audit
+     * row per imported row (ARCHITECTURE.md §9.13). No return type, to stay
+     * compatible with the package's own declaration.
+     *
+     * @return mixed
+     */
+    public static function withoutAuditing(callable $callback, bool $globally = false);
 }

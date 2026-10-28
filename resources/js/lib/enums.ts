@@ -173,6 +173,46 @@ export const MAIL_TRANSPORT_LABELS: Record<MailTransport, string> = {
     log: "Log only (don't send)",
 };
 
+export const DUPLICATE_ACTION = {
+    Skip: 'skip',
+    Update: 'update',
+} as const;
+
+export type DuplicateAction =
+    (typeof DUPLICATE_ACTION)[keyof typeof DUPLICATE_ACTION];
+
+export const DUPLICATE_ACTION_LABELS: Record<DuplicateAction, string> = {
+    skip: 'Skip existing rows',
+    update: 'Update existing rows',
+};
+
+export const IMPORT_STATUS = {
+    Pending: 'pending',
+    Confirmed: 'confirmed',
+    Cancelled: 'cancelled',
+} as const;
+
+export type ImportStatus = (typeof IMPORT_STATUS)[keyof typeof IMPORT_STATUS];
+
+export const IMPORT_STATUS_LABELS: Record<ImportStatus, string> = {
+    pending: 'Pending',
+    confirmed: 'Confirmed',
+    cancelled: 'Cancelled',
+};
+
+export const SHEET_FILE_TYPE = {
+    Xlsx: 'xlsx',
+    Xls: 'xls',
+} as const;
+
+export type SheetFileType =
+    (typeof SHEET_FILE_TYPE)[keyof typeof SHEET_FILE_TYPE];
+
+export const SHEET_FILE_TYPE_LABELS: Record<SheetFileType, string> = {
+    xlsx: 'XLSX',
+    xls: 'XLS',
+};
+
 export const THEME_MODES: Record<Theme, 'light' | 'dark'> = {
     system: 'light',
     light: 'light',

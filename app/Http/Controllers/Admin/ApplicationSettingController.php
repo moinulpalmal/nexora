@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\BrandingSetting;
 use App\Models\Admin\MailSetting;
 use App\Models\Admin\QuickLoginSetting;
+use App\Models\ImportLimit;
 use App\Models\User;
 use App\Services\Admin\BrandingService;
 use App\Services\Admin\QuickLoginService;
@@ -40,6 +41,7 @@ class ApplicationSettingController extends Controller
                 'mail' => $user->can('admin.mail-settings.view') ? $this->mailSection($user) : null,
                 'quick-login' => $user->can('admin.quick-login.view') ? $this->quickLoginSection() : null,
                 'branding' => $user->can('admin.branding.view') ? $this->brandingSection() : null,
+                'import-limits' => $user->can('admin.import-limits.view') ? $this->importLimitsSection() : null,
             ],
         ]);
     }
@@ -105,6 +107,25 @@ class ApplicationSettingController extends Controller
             'faviconUrl' => $setting->favicon_path === null ? null : $disk->url($setting->favicon_path),
             'updatedBy' => $setting->lastUpdatedBy?->name,
             'updatedAt' => $setting->last_updated_by !== null ? $setting->updated_at?->toIso8601String() : null,
+        ];
+    }
+
+    /**
+     * The import engine's caps, or the config defaults until the first save.
+     * `maxFileSizeKb` is shown read-only: it stays in `config/sheet-import.php`
+     * because PHP's own upload limits bound it (ARCHITECTURE.md §9.13).
+     *
+     * @return array<string, mixed>
+     */
+    private function importLimitsSection(): array
+    {
+        $limits = ImportLimit::current()->loadMissing('lastUpdatedBy:id,name');
+
+        return [
+            'limits' => $limits->limits()->toArray(),
+            'maxFileSizeKb' => (int) config('sheet-import.limits.max_file_size_kb'),
+            'updatedBy' => $limits->lastUpdatedBy?->name,
+            'updatedAt' => $limits->last_updated_by !== null ? $limits->updated_at?->toIso8601String() : null,
         ];
     }
 }

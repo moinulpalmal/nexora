@@ -6,8 +6,11 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Client\Factory;
 use Illuminate\Http\Client\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Testing\TestResponse;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
@@ -131,6 +134,47 @@ function superAdmin(): User
     app(PermissionRegistrar::class)->forgetCachedPermissions();
 
     return $user;
+}
+
+/**
+ * Write an `.xlsx` from `[tabName => rows]` and return its path. An empty row
+ * list is a tab with nothing on it at all.
+ *
+ * Import tests build their workbooks here rather than committing binary
+ * fixtures, so the sheet a test proves is stated next to the assertion about it.
+ *
+ * @param  array<string, list<list<string|int|null>>>  $tabs
+ */
+function workbookFixture(array $tabs): string
+{
+    $path = sys_get_temp_dir().'/workbook-'.uniqid().'.xlsx';
+
+    $spreadsheet = new Spreadsheet;
+    $spreadsheet->removeSheetByIndex(0);
+
+    foreach ($tabs as $title => $rows) {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle($title);
+
+        if ($rows !== []) {
+            $sheet->fromArray($rows, null, 'A1');
+        }
+    }
+
+    (new Xlsx($spreadsheet))->save($path);
+
+    return $path;
+}
+
+/**
+ * {@see workbookFixture()} as an upload, for posting to an importer's
+ * `import.store` route.
+ *
+ * @param  array<string, list<list<string|int|null>>>  $tabs
+ */
+function uploadedWorkbook(array $tabs, string $name = 'workbook.xlsx'): UploadedFile
+{
+    return new UploadedFile(workbookFixture($tabs), $name, null, null, true);
 }
 
 /**
