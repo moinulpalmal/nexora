@@ -28,3 +28,6 @@ Route::middleware(['auth'])->group(function () {
 require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';
 require __DIR__.'/training.php';
+require __DIR__.'/projects.php';
+require __DIR__.'/accounting.php';
+require __DIR__.'/hrm.php';

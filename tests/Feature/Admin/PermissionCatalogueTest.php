@@ -22,7 +22,12 @@ test('the catalogue lists permissions with their help and holders', function () 
             ->where('permissions.data.0.name', 'admin.users.assign-roles')
             ->where('permissions.data.0.help.curated', true)
             ->where('permissions.data.0.roles', ['admin', 'super-admin'])
-            ->where('modules', [['value' => 'admin', 'label' => 'Admin']]),
+            ->where('modules', [
+                ['value' => 'accounting', 'label' => 'Accounts'],
+                ['value' => 'admin', 'label' => 'Admin'],
+                ['value' => 'hrm', 'label' => 'HRM'],
+                ['value' => 'projects', 'label' => 'Projects'],
+            ]),
         );
 });
 

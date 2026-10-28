@@ -97,7 +97,6 @@ export default function PermissionPicker({
                                 <HoverCard
                                     content={
                                         <ModuleHelpCard
-                                            module={module}
                                             help={moduleHelp[module]}
                                         />
                                     }

@@ -58,5 +58,5 @@ test('an unknown action falls back to the action itself', function () {
 
 test('an unknown module gets a generic sentence', function () {
     expect(app(PermissionDescriptions::class)->forModule('quality-control'))
-        ->toBe(['summary' => 'Permissions for the quality control module.', 'where' => null]);
+        ->toBe(['label' => 'Quality control', 'summary' => 'Permissions for the quality control module.', 'where' => null]);
 });

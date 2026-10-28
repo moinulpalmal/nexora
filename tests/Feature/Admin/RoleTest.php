@@ -20,10 +20,11 @@ test('the roles list renders with counts and the grouped picker', function () {
         ->assertOk()
         ->assertInertia(fn ($page) => $page
             ->component('admin/roles/index')
-            ->has('roles.data', 3)
+            ->has('roles.data', 6)
             ->has('permissions.admin')
             ->has('moduleHelp.admin')
-            ->where('roles.data.0.name', 'admin'),
+            ->where('moduleHelp.hrm.label', 'HRM')
+            ->where('roles.data.0.name', 'accountant'),
         );
 });
 

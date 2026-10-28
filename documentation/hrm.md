@@ -4,6 +4,10 @@
 > (owner, 2026-10-28). It describes *what* the module will do and *why*; where things will live and
 > what they are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is
 > built, this file becomes its reference and the planned parts shrink as they ship.
+>
+> **🧪 POC overview:** `/hrm` (`hrm.dashboard`, permission `hrm.dashboard.view`) shows sample data
+> under a Preview banner. Its page body and `components/hrm/sample-data.ts` are throwaway; the route,
+> permission and role stay ([`ARCHITECTURE.md` §5](../ARCHITECTURE.md#5-module-registry)).
 
 ---
 

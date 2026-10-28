@@ -20,7 +20,7 @@ test('the seeder creates the catalogue and is idempotent', function () {
     $roles = Role::count();
 
     expect($permissions)->toBe(count(RolePermissionSeeder::names()))
-        ->and(Role::pluck('name')->sort()->values()->all())->toBe(['admin', Role::SUPER_ADMIN, 'viewer']);
+        ->and(Role::pluck('name')->sort()->values()->all())->toBe(['accountant', 'admin', 'hr-officer', 'project-manager', Role::SUPER_ADMIN, 'viewer']);
 
     $this->seed(RolePermissionSeeder::class);
 
@@ -147,6 +147,20 @@ test('the super admin seeder refuses to run in production without a password', f
 test('the demo seeder gives one account per non-super role', function () {
     $this->seed([RolePermissionSeeder::class, DemoUserSeeder::class]);
 
-    expect(User::where('username', 'admin')->sole()->hasRole('admin'))->toBeTrue()
-        ->and(User::where('username', 'viewer')->sole()->hasRole('viewer'))->toBeTrue();
+    foreach (DemoUserSeeder::ACCOUNTS as $username => $account) {
+        expect(User::where('username', $username)->sole()->hasRole($account['role']))->toBeTrue();
+    }
+
+    expect(DemoUserSeeder::ACCOUNTS)->toHaveCount(Role::where('name', '!=', Role::SUPER_ADMIN)->count());
+});
+
+test('each module role holds its own module and nothing else', function () {
+    $this->seed(RolePermissionSeeder::class);
+
+    foreach (['project-manager' => 'projects.', 'accountant' => 'accounting.', 'hr-officer' => 'hrm.'] as $role => $prefix) {
+        $names = Role::findByName($role)->permissions->pluck('name');
+
+        expect($names)->not->toBeEmpty()
+            ->and($names->every(fn (string $name): bool => str_starts_with($name, $prefix)))->toBeTrue();
+    }
 });

@@ -130,6 +130,12 @@ its sentence, and the code that checks it — `PermissionDescriptionsTest` fails
 | `super-admin` | everything | passes every check via `Gate::before`; cannot be edited or deleted |
 | `admin` | every `admin.*` and `settings.*` except ★ | day-to-day administration |
 | `viewer` | every `*.view` except ★ | read-only |
+| `project-manager` | every `projects.*` | the Projects module |
+| `accountant` | every `accounting.*` | the Accounting module (menu: Accounts) |
+| `hr-officer` | every `hrm.*` | the HRM module |
+
+Each non-super role has a demo account outside production (`admin`, `viewer`, `pm`, `accountant`,
+`hr`, password `password`), offered by Quick Login.
 
 The rules are prefixes/suffixes, so a permission added later reaches the right roles on the next seed.
 

@@ -44,7 +44,7 @@ class PermissionService
             ->map(fn (string $name): string => explode('.', $name)[0])
             ->unique()
             ->sort()
-            ->map(fn (string $module): array => ['value' => $module, 'label' => ucfirst($module)])
+            ->map(fn (string $module): array => ['value' => $module, 'label' => $this->descriptions->forModule($module)['label']])
             ->all());
     }
 

@@ -4,6 +4,10 @@
 > 2026-10-28). It describes *what* the module will do and *why*; where things will live and what they
 > are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is built, this
 > file becomes its reference and the planned parts shrink as they ship.
+>
+> **🧪 POC overview:** `/accounting` (`accounting.dashboard`, permission `accounting.dashboard.view`) shows sample data
+> under a Preview banner. Its page body and `components/accounting/sample-data.ts` are throwaway; the route,
+> permission and role stay ([`ARCHITECTURE.md` §5](../ARCHITECTURE.md#5-module-registry)).
 
 ---
 

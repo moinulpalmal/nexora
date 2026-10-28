@@ -39,6 +39,7 @@ export type PermissionHelp = {
 
 /** Help for one module — `PermissionDescriptions::forModule()`. */
 export type ModuleHelp = {
+    label: string;
     summary: string;
     where: string | null;
 };

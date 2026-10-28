@@ -36,16 +36,10 @@ export function PermissionHelpCard({
 /**
  * The body of a module heading's hover card.
  */
-export function ModuleHelpCard({
-    module,
-    help,
-}: {
-    module: string;
-    help: ModuleHelp;
-}) {
+export function ModuleHelpCard({ help }: { help: ModuleHelp }) {
     return (
         <div className="grid gap-1.5">
-            <p className="text-sm font-semibold capitalize">{module}</p>
+            <p className="text-sm font-semibold">{help.label}</p>
 
             <p className="text-base-content/80">{help.summary}</p>
 

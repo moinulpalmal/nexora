@@ -18,7 +18,7 @@ test('a route resolves to the guide that covers it', function () {
 test('the table of contents follows the sidebar: its groups in order, and their screens in order', function () {
     $grouped = TrainingRegistry::grouped();
 
-    expect(array_column($grouped, 'key'))->toBe(['general', 'admin', 'settings'])
+    expect(array_column($grouped, 'key'))->toBe(['general', 'admin', 'settings', 'projects', 'accounting', 'hrm'])
         ->and(array_sum(array_map(fn (array $section): int => count($section['pages']), $grouped)))->toBe(count(config('training.pages')))
         ->and(array_column($grouped[1]['pages'], 'key'))->toBe([
             'admin.users', 'admin.roles', 'admin.permissions', 'admin.audit-logs', 'admin.sent-mails', 'admin.application-settings',

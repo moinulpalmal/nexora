@@ -62,6 +62,8 @@ app/
                               MailSetting, QuickLoginSetting, SentMail
   Http/Controllers/Settings/  Profile, Security, Appearance (the user's own account)
   Http/Controllers/Training/  TrainingController (index, show, panel)
+  Http/Controllers/ProjectManagement/, Accounting/, Hrm/
+                              DashboardController each — the 🧪 POC overviews (§5)
   Http/Middleware/            EnsureUserIsActive, HandleAppearance, HandleInertiaRequests
   Http/Requests/              ListRequest (module-less) + Admin/, Settings/
   Listeners/                  CollapseNavGroupsOnLogin, StampLastLogin (module-less)
@@ -96,6 +98,7 @@ resources/
     components/shared/        used by two or more modules (list toolbar, pagination, …)
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
+    components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
                               table of contents; guides/{general,admin,settings,shared}/ (§5)
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
@@ -109,10 +112,11 @@ routes/
   admin.php                   the Admin module
   settings.php                the user's own account settings
   training.php                the in-app manual (ungated)
+  projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each)
   channels.php                private broadcast channels
 tests/
   Feature/                    root: apparatus tests (Listable, EnumRegistry, PasswordPolicy, …)
-  Feature/Admin/ Auth/ Settings/ Training/
+  Feature/Admin/ Auth/ Settings/ Training/ ProjectManagement/ Accounting/ Hrm/
   Browser/                    Pest browser tests (§13.2); Browser/Training/ holds the help-dialog
                               test and the screenshot recipes
   Pest.php, TestCase.php      safety guards and helpers
@@ -150,13 +154,17 @@ there; it is administered by the Admin module.
 | **Admin** | ✅ | `Admin` | `routes/admin.php` | `admin.` | `admin/` | `pages/admin/*` |
 | **Settings** (own account) | ✅ | `Settings` | `routes/settings.php` | `profile.`, `security.`, `appearance.`, `user-password.` | `settings/` | `pages/settings/*` |
 | **Training** (in-app manual) | ✅ | `Training` | `routes/training.php` | `training.` | `training/` | `pages/training/*` |
-| **Projects** (Project Management) | 📋 Planned | `ProjectManagement` | `routes/projects.php` | `projects.` | `projects/` | `pages/projects/*` |
-| **Accounting** (menu: Accounts) | 📋 Planned | `Accounting` | `routes/accounting.php` | `accounting.` | `accounting/` | `pages/accounting/*` |
-| **HRM** | 📋 Planned | `Hrm` | `routes/hrm.php` | `hrm.` | `hrm/` | `pages/hrm/*` |
+| **Projects** (Project Management) | 🧪 POC | `ProjectManagement` | `routes/projects.php` | `projects.` | `projects/` | `pages/projects/*` |
+| **Accounting** (menu: Accounts) | 🧪 POC | `Accounting` | `routes/accounting.php` | `accounting.` | `accounting/` | `pages/accounting/*` |
+| **HRM** | 🧪 POC | `Hrm` | `routes/hrm.php` | `hrm.` | `hrm/` | `pages/hrm/*` |
 
-📋 **Planned** means the scope and names are agreed but **nothing exists on disk yet**: no route file,
-folder or permission. The names in the row are reserved. When the first slice lands, follow
-[§11](#11-adding-a-new-module), add the folders to [§3](#3-top-level-layout), and switch the status to ✅.
+📋 **Planned** means the scope and names are agreed but **nothing exists on disk yet**. 🧪 **POC**
+(owner, 2026-10-28) means the module has its route file, its `{module}.dashboard.view` permission,
+an invokable `DashboardController` and one overview page, `pages/{module}/dashboard.tsx`, which shows
+**sample data** from `components/{module}/sample-data.ts` under a "Preview" banner
+(`components/shared/preview-banner.tsx`). The route, permission, role and controller stay; the page
+body and the sample data are **throwaway**, replaced when the first real slice lands. At that point,
+follow [§11](#11-adding-a-new-module) for the rest and switch the status to ✅.
 
 **Admin** owns: users (create, edit, deactivate, soft delete, restore, force delete, set password,
 assign roles, avatar), roles (with the permission picker), the read-only permission catalogue, the
@@ -177,7 +185,7 @@ captured from invented data by `composer training:screens`. **Every GET screen m
 (`pending` is enough) or `TrainingGapsTest` fails the suite. Reference:
 [`documentation/training.md`](documentation/training.md).
 
-### The ERP modules (planned)
+### The ERP modules (🧪 POC — an overview each, the rest planned)
 
 **Build order: Company (Admin, [§9.10](#910-multi-company-planned)) → Projects → Accounting → HRM**
 (owner, 2026-10-28). Projects comes first, so two small slices of the later modules ship with it:
@@ -292,7 +300,8 @@ to that list, deliberately.
 
 ### 8.3 Navigation
 
-`components/app-sidebar.tsx` builds one group per module (`Platform`, `Admin`); each link is included
+`components/app-sidebar.tsx` builds one group per module (`Platform`, `Admin`, `Projects`, `Accounts`,
+`HRM`); each link is included
 only when `useCan('{module}.{resource}.view')` passes, and an empty group is not rendered. **Hiding a
 link is convenience, not authorization.** The one exception is **Training** (Platform, under
 Dashboard), which has no `useCan` because the manual is open to everyone. The header's **?**
@@ -373,7 +382,11 @@ A confirmation raised from inside another dialog closes its parent through `onSu
   fails otherwise) + the check that uses it. On a deployed database, ship it in a migration that runs
   the seeder.
 - **Roles are rules over the catalogue**: `super-admin` (everything), `admin` (`admin.` and
-  `settings.` prefixes), `viewer` (every `.view`). `SUPER_ADMIN_ONLY` keeps the audit log, mail
+  `settings.` prefixes), `viewer` (every `.view`), and one business role per ERP module —
+  `project-manager` (`projects.`), `accountant` (`accounting.`), `hr-officer` (`hrm.`) (owner,
+  2026-10-28). `admin` is the system-administration role and gets no module prefix. Each seeded role
+  has a demo account (`DemoUserSeeder`: `admin`, `viewer`, `pm`, `accountant`, `hr`) outside
+  production. `SUPER_ADMIN_ONLY` keeps the audit log, mail
   settings, quick login and sent mails from being handed out by rule.
 - **`super-admin` passes every check** through `Gate::before` in `AppServiceProvider`. Routes and the
   UI check **permissions, never role names**.

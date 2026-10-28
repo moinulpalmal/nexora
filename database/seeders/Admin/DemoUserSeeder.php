@@ -26,6 +26,9 @@ class DemoUserSeeder extends Seeder
     public const array ACCOUNTS = [
         'admin' => ['name' => 'Demo Admin', 'email' => 'admin@example.com', 'role' => 'admin'],
         'viewer' => ['name' => 'Demo Viewer', 'email' => 'viewer@example.com', 'role' => 'viewer'],
+        'pm' => ['name' => 'Demo Project Manager', 'email' => 'pm@example.com', 'role' => 'project-manager'],
+        'accountant' => ['name' => 'Demo Accountant', 'email' => 'accountant@example.com', 'role' => 'accountant'],
+        'hr' => ['name' => 'Demo HR Officer', 'email' => 'hr@example.com', 'role' => 'hr-officer'],
     ];
 
     public function run(): void

@@ -52,15 +52,25 @@ class PermissionDescriptions
         'admin.quick-login.view' => ['summary' => 'See whether development quick login is switched on.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Application Settings → Quick Login'],
         'admin.quick-login.update' => ['summary' => 'Switch development quick login on or off.', 'note' => self::SUPER_ADMIN_ONLY.' Never shown outside local and testing environments.', 'where' => 'Admin → Application Settings → Quick Login'],
         'admin.sent-mails.view' => ['summary' => 'See every mail the application sent, with its status and a preview.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Sent Mails'],
+
+        'projects.dashboard.view' => ['summary' => 'Open the Projects overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Projects → Overview'],
+        'accounting.dashboard.view' => ['summary' => 'Open the Accounts overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Accounts → Overview'],
+        'hrm.dashboard.view' => ['summary' => 'Open the HRM overview.', 'note' => 'A preview with sample data for now.', 'where' => 'HRM → Overview'],
     ];
 
     /**
      * Curated help per module — the first segment of a permission name.
      *
-     * @var array<string, array{summary: string, where: string}>
+     * `label` is the module's display name — the menu's name, which is not
+     * always the permission prefix (`accounting` is the Accounts menu).
+     *
+     * @var array<string, array{label: string, summary: string, where: string}>
      */
     protected const array MODULES = [
-        'admin' => ['summary' => 'Users, roles, the audit trail and application-wide settings.', 'where' => 'Admin menu'],
+        'admin' => ['label' => 'Admin', 'summary' => 'Users, roles, the audit trail and application-wide settings.', 'where' => 'Admin menu'],
+        'projects' => ['label' => 'Projects', 'summary' => 'Client projects: milestones, tasks, timesheets and billing requests.', 'where' => 'Projects menu'],
+        'accounting' => ['label' => 'Accounts', 'summary' => "Each company's books: vouchers, ledgers, statements, customers and invoices.", 'where' => 'Accounts menu'],
+        'hrm' => ['label' => 'HRM', 'summary' => 'The workforce: employees, attendance, leave and payroll.', 'where' => 'HRM menu'],
     ];
 
     /**
@@ -114,12 +124,15 @@ class PermissionDescriptions
     /**
      * The help for one module, with a generic fallback for a module the map does not know.
      *
-     * @return array{summary: string, where: ?string}
+     * @return array{label: string, summary: string, where: ?string}
      */
     public function forModule(string $module): array
     {
+        $words = Str::of($module)->replace('-', ' ')->value();
+
         return self::MODULES[$module] ?? [
-            'summary' => 'Permissions for the '.Str::of($module)->replace('-', ' ')->value().' module.',
+            'label' => Str::ucfirst($words),
+            'summary' => 'Permissions for the '.$words.' module.',
             'where' => null,
         ];
     }

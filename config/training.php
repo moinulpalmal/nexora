@@ -40,6 +40,9 @@ return [
         'general' => ['en' => 'Getting started', 'bn' => 'শুরু করুন', 'sort' => 10],
         'admin' => ['en' => 'Admin', 'bn' => 'অ্যাডমিন', 'sort' => 20],
         'settings' => ['en' => 'Settings (your account)', 'bn' => 'সেটিংস (আপনার অ্যাকাউন্ট)', 'sort' => 30],
+        'projects' => ['en' => 'Projects', 'bn' => 'প্রকল্প', 'sort' => 40],
+        'accounting' => ['en' => 'Accounts', 'bn' => 'হিসাব', 'sort' => 50],
+        'hrm' => ['en' => 'HRM', 'bn' => 'মানবসম্পদ', 'sort' => 60],
     ],
 
     'pages' => [
@@ -101,6 +104,24 @@ return [
             'route' => 'appearance.edit', 'guide' => 'settings/appearance', 'section' => 'settings', 'sort' => 30,
             'title_en' => 'Appearance', 'title_bn' => 'চেহারা', 'status' => 'written',
             'shots' => ['overview' => 'The theme picker'],
+        ],
+
+        /* ------------------------------------------------- ERP modules (🧪 POC) */
+
+        'projects.dashboard' => [
+            'route' => 'projects.dashboard', 'guide' => 'projects/dashboard', 'section' => 'projects', 'sort' => 10,
+            'title_en' => 'Projects overview', 'title_bn' => 'প্রকল্পের সারসংক্ষেপ', 'status' => 'pending',
+            'shots' => [],
+        ],
+        'accounting.dashboard' => [
+            'route' => 'accounting.dashboard', 'guide' => 'accounting/dashboard', 'section' => 'accounting', 'sort' => 10,
+            'title_en' => 'Accounts overview', 'title_bn' => 'হিসাবের সারসংক্ষেপ', 'status' => 'pending',
+            'shots' => [],
+        ],
+        'hrm.dashboard' => [
+            'route' => 'hrm.dashboard', 'guide' => 'hrm/dashboard', 'section' => 'hrm', 'sort' => 10,
+            'title_en' => 'HRM overview', 'title_bn' => 'মানবসম্পদের সারসংক্ষেপ', 'status' => 'pending',
+            'shots' => [],
         ],
 
     ],

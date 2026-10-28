@@ -1,13 +1,16 @@
 import { Link } from '@inertiajs/react';
 import {
+    FolderKanban,
     GraduationCap,
     History,
     KeyRound,
+    Landmark,
     LayoutGrid,
     Mail,
     ShieldCheck,
     SlidersHorizontal,
     Users,
+    UsersRound,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -24,12 +27,15 @@ import {
 import { useCan } from '@/hooks/use-can';
 import { useNavGroups } from '@/hooks/use-nav-groups';
 import { dashboard } from '@/routes';
+import { dashboard as accountingDashboard } from '@/routes/accounting';
 import { edit as applicationSettingsEdit } from '@/routes/admin/application-settings';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as sentMailsIndex } from '@/routes/admin/sent-mails';
 import { index as usersIndex } from '@/routes/admin/users';
+import { dashboard as hrmDashboard } from '@/routes/hrm';
+import { dashboard as projectsDashboard } from '@/routes/projects';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
 
@@ -64,6 +70,10 @@ export function AppSidebar() {
     // called unconditionally; only their results are combined.
     const canViewMailSettings = useCan('admin.mail-settings.view');
     const canViewQuickLogin = useCan('admin.quick-login.view');
+
+    const canViewProjects = useCan('projects.dashboard.view');
+    const canViewAccounting = useCan('accounting.dashboard.view');
+    const canViewHrm = useCan('hrm.dashboard.view');
 
     const adminNavLinks: (NavItem & { visible: boolean })[] = [
         {
@@ -114,6 +124,42 @@ export function AppSidebar() {
     const navGroups: NavGroup[] = [
         { label: 'Platform', items: mainNavItems },
         { label: 'Admin', items: adminNavItems },
+        {
+            label: 'Projects',
+            items: canViewProjects
+                ? [
+                      {
+                          title: 'Overview',
+                          href: projectsDashboard(),
+                          icon: FolderKanban,
+                      },
+                  ]
+                : [],
+        },
+        {
+            label: 'Accounts',
+            items: canViewAccounting
+                ? [
+                      {
+                          title: 'Overview',
+                          href: accountingDashboard(),
+                          icon: Landmark,
+                      },
+                  ]
+                : [],
+        },
+        {
+            label: 'HRM',
+            items: canViewHrm
+                ? [
+                      {
+                          title: 'Overview',
+                          href: hrmDashboard(),
+                          icon: UsersRound,
+                      },
+                  ]
+                : [],
+        },
     ].filter((group) => group.items.length > 0);
 
     // Called once: this is the only place that knows every group and its links.

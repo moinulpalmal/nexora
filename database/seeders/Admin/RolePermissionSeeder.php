@@ -46,6 +46,11 @@ class RolePermissionSeeder extends Seeder
         'admin.mail-settings' => ['view', 'update'],
         'admin.quick-login' => ['view', 'update'],
         'admin.sent-mails' => ['view'],
+
+        // One overview per ERP module; each opens the module's dashboard.
+        'projects.dashboard' => ['view'],
+        'accounting.dashboard' => ['view'],
+        'hrm.dashboard' => ['view'],
     ];
 
     /**
@@ -83,6 +88,9 @@ class RolePermissionSeeder extends Seeder
         Role::SUPER_ADMIN => [],
         'admin' => ['admin.', 'settings.'],
         'viewer' => ['.view'],
+        'project-manager' => ['projects.'],
+        'accountant' => ['accounting.'],
+        'hr-officer' => ['hrm.'],
     ];
 
     /**
