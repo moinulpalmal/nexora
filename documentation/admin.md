@@ -202,3 +202,23 @@ a panel in `components/admin/application-settings/`, and a tab entry in the page
 `SentMailTest`. Helpers in `tests/Pest.php`: `userWithPermissions(...)`, `superAdmin()`,
 `assertToast($response, $type)`, `compliantPassword()`, `fakeBreachedPasswordLookup()`. Audit
 assertions turn auditing on with `config(['audit.console' => true])` after the fixtures.
+
+## 10. Planned: Companies
+
+> **📋 Planned — nothing built** (owner, 2026-10-28). This is the first thing to build for the ERP
+> modules ([`projects.md`](projects.md), [`accounting.md`](accounting.md), [`hrm.md`](hrm.md)). The
+> rule it sets is in [`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company-planned).
+
+Nexora serves **several Palmal Group companies in one installation**. Every HRM, Accounting and
+Projects record belongs to a company, and each company keeps its own ledger and payroll. Admin owns
+the company list because it is master data every module needs and no one business module owns.
+
+- **Admin → Companies** is the list of companies (name, short code, address, base currency, status),
+  with the usual list standards. Companies are deactivated, not deleted, once anything refers to
+  them.
+- **User ↔ company access.** On the user dialog, an administrator grants each user one or more
+  companies. A user with no company can reach no ERP module, though Admin and Settings still work.
+- **The selected company.** A user works in **one company at a time**, chosen from a switcher in the
+  header and remembered between sessions. Every ERP screen reads and writes only that company's
+  records, and the server enforces that whatever the browser sends.
+- Draft permissions: `admin.companies.{view,create,update,delete}`.

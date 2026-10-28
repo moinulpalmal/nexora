@@ -15,11 +15,15 @@ reserved or skipped on purpose.
 
 ## 1. What this application is
 
-Nexora is an internal web application suite for Palmal Group. This repository holds its
-**foundation**: the application shell, authentication, roles and permissions, the audit trail, and
+Nexora is an **ERP for Palmal Group**, serving several group companies in one installation (owner,
+2026-10-28). This repository holds its **foundation**: the application shell, authentication, roles and permissions, the audit trail, and
 the Admin module (users, roles, the permission catalogue, the audit log, application settings and
 sent mail). Business modules are added on top of it, one module per folder in every layer
 ([§4](#4-the-organizing-rule)).
+
+The first business modules are **Project Management**, **Accounts** and **HRM**. All three are
+planned and none is built yet; their agreed scope is in [§5](#5-module-registry) and in their module
+docs.
 
 Accounts are **created by administrators only** — there is no public registration — and sign in with
 their **email or username** (owner, 2026-10-26).
@@ -146,6 +150,13 @@ there; it is administered by the Admin module.
 | **Admin** | ✅ | `Admin` | `routes/admin.php` | `admin.` | `admin/` | `pages/admin/*` |
 | **Settings** (own account) | ✅ | `Settings` | `routes/settings.php` | `profile.`, `security.`, `appearance.`, `user-password.` | `settings/` | `pages/settings/*` |
 | **Training** (in-app manual) | ✅ | `Training` | `routes/training.php` | `training.` | `training/` | `pages/training/*` |
+| **Projects** (Project Management) | 📋 Planned | `ProjectManagement` | `routes/projects.php` | `projects.` | `projects/` | `pages/projects/*` |
+| **Accounting** (menu: Accounts) | 📋 Planned | `Accounting` | `routes/accounting.php` | `accounting.` | `accounting/` | `pages/accounting/*` |
+| **HRM** | 📋 Planned | `Hrm` | `routes/hrm.php` | `hrm.` | `hrm/` | `pages/hrm/*` |
+
+📋 **Planned** means the scope and names are agreed but **nothing exists on disk yet**: no route file,
+folder or permission. The names in the row are reserved. When the first slice lands, follow
+[§11](#11-adding-a-new-module), add the folders to [§3](#3-top-level-layout), and switch the status to ✅.
 
 **Admin** owns: users (create, edit, deactivate, soft delete, restore, force delete, set password,
 assign roles, avatar), roles (with the permission picker), the read-only permission catalogue, the
@@ -165,6 +176,30 @@ one-language guide fails the type check); the registry is `config/training.php`;
 captured from invented data by `composer training:screens`. **Every GET screen must be registered**
 (`pending` is enough) or `TrainingGapsTest` fails the suite. Reference:
 [`documentation/training.md`](documentation/training.md).
+
+### The ERP modules (planned)
+
+**Build order: Company (Admin, [§9.10](#910-multi-company-planned)) → Projects → Accounting → HRM**
+(owner, 2026-10-28). Projects comes first, so two small slices of the later modules ship with it:
+**HRM-lite** (Employees, Departments, Designations) and **Accounting → Customers**.
+
+**Projects** runs client projects from contract to billing request: projects for a customer,
+milestones, tasks, members (Employees, each with a per-contract billing rate), approved timesheets,
+and budget against actual. It raises billing requests; it never issues invoices. Namespace
+`ProjectManagement`, prefix `projects.` so permission names stay short. Reference:
+[`documentation/projects.md`](documentation/projects.md).
+
+**Accounting** keeps each company's double-entry ledger: chart of accounts, fiscal years (default
+July–June), BDT plus foreign-currency vouchers with approval, and statements. It also owns
+**customers and sales invoices**, so the ERP has one customer list. It is named *Accounting*, not
+*Accounts*, because "account" already means a sign-in account here; the menu may still say Accounts.
+Reference: [`documentation/accounting.md`](documentation/accounting.md).
+
+**HRM** holds each company's workforce: org structure, employees, shifts, attendance and leave
+(phase 1), payroll under the Bangladesh Labour Act (phase 2), and recruitment, appraisal and
+separation (phase 3). **An Employee is not a User**: it has an optional link to one, and creating an
+employee never creates an account. The employee's **cost rate** is what Projects prices hours with.
+Reference: [`documentation/hrm.md`](documentation/hrm.md).
 
 ## 6. Naming conventions
 
@@ -448,6 +483,38 @@ One-click sign-in buttons on `/login` for the seeded super admin and demo accoun
 switch on Application Settings → Quick Login *and* `APP_ENV` local/testing — production never renders
 them (owner, 2026-10-26). The buttons submit the real login form.
 
+### 9.10 Multi-company (planned)
+
+*(owner, 2026-10-28; nothing built yet)* One installation serves several Palmal Group companies.
+**Every Projects, Accounting and HRM record carries its company**, and each company has its own
+ledger, fiscal years and payroll. Admin owns the Company master and **user ↔ company access**. A
+user may hold several companies and works in **one selected company at a time** (a header
+switcher). Every ERP query is scoped to the selected company **on the server**, so a company id sent
+from the browser is never trusted on its own. The company dimension is set up before the first ERP
+table so that no table needs a later migration to add it. Reference:
+[`documentation/admin.md` §10](documentation/admin.md#10-planned-companies).
+
+### 9.11 Approvals (planned)
+
+*(owner, 2026-10-28)* Vouchers, invoices, timesheets, leave and payroll runs all need approval.
+**Each module implements it the same way; there is no generic workflow engine:**
+
+- A status enum: draft → submitted → approved or rejected (plus whatever states follow, such as
+  posted or invoiced).
+- An `{module}.{resource}.approve` permission, separate from `create`/`update`.
+- A `*Blocker()` guard in the service: no approving your own record, and no editing once approved.
+  It is a guard and not a gate, so it binds a super admin too ([§9.1](#91-rbac-roles--permissions)).
+
+Multi-level approval (by amount, by department) is deferred until a module truly needs it.
+
+### 9.12 Posting to the ledger (planned)
+
+*(owner, 2026-10-28)* Only Accounting writes the ledger. A module whose work has a financial effect
+(HRM payroll, later Projects cost) creates a **draft voucher** linked back to its source record. It
+reaches the ledger only when an accountant approves it, and **the source record is locked once its
+voucher is posted**. Billing works the same way in the other direction: Projects raises a *billing
+request*, and Accounting turns it into a sales invoice.
+
 ## 10. Adding a feature to an existing module
 
 1. Migration (`php artisan make:migration`), with `inserted_by`/`last_updated_by` and `status` where
@@ -544,7 +611,8 @@ manual verification ([CLAUDE.md](CLAUDE.md)).
 
 ## 14. Module reference documentation
 
-`documentation/` holds one reference per module (`admin.md`, `settings.md`, `training.md`) plus
+`documentation/` holds one reference per module (`admin.md`, `settings.md`, `training.md`, and the
+planned `projects.md`, `accounting.md`, `hrm.md`, which hold agreed scope until code lands) plus
 `frontend.md` (UI standards and the component catalogue) and `setup-and-deployment.md`. **This file
 answers "where does it go and what is it called"; a module doc answers "what does it do and why".** A
 module doc links here rather than repeating it.
