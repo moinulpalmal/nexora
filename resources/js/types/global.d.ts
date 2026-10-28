@@ -12,6 +12,8 @@ declare module '@inertiajs/core' {
     export interface InertiaConfig {
         sharedPageProps: {
             name: string;
+            /** Uploaded images from Application Settings → Branding; `null` means the default. */
+            branding: { logo: string | null; favicon: string | null };
             auth: Auth;
             sidebarOpen: boolean;
             /** `['*']` straight after sign-in means "collapse every group". */

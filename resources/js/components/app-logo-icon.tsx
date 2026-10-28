@@ -1,10 +1,11 @@
+import { usePage } from '@inertiajs/react';
 import type { SVGAttributes } from 'react';
 
 /*
- * Placeholder brand artwork — swap these two components for the real logo.
- *
- * Both draw in daisyUI's `primary` / `primary-content`, so the mark follows the
- * active theme rather than carrying fixed brand colours.
+ * The brand artwork. An administrator's upload (Application Settings →
+ * Branding, the shared `branding.logo`) wins; without one, the placeholder
+ * mark below is drawn in daisyUI's `primary` / `primary-content`, so it follows
+ * the active theme rather than carrying fixed colours.
  */
 
 const MARK_PATH = 'M10 34V6h5.2l11.6 17.6V6H32v28h-5.2L15.2 16.4V34Z';
@@ -23,6 +24,20 @@ export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
  * beside it.
  */
 export function AppLogoMark(props: SVGAttributes<SVGElement>) {
+    const { branding, name } = usePage().props;
+
+    if (branding.logo !== null) {
+        return (
+            <img
+                src={branding.logo}
+                alt={name}
+                className={props.className}
+                style={{ objectFit: 'contain' }}
+                data-test="app-logo-image"
+            />
+        );
+    }
+
     return (
         <svg
             {...props}

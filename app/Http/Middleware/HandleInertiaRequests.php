@@ -6,6 +6,7 @@ use App\Enums\Theme;
 use App\Listeners\CollapseNavGroupsOnLogin;
 use App\Models\Admin\Role;
 use App\Models\User;
+use App\Services\Admin\BrandingService;
 use App\Services\Training\TrainingRegistry;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
@@ -53,6 +54,12 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            /*
+             * The uploaded logo and favicon, or `null` for the defaults —
+             * always, so a page saved on the Branding tab repaints the sidebar
+             * logo on the redirect back without a full reload.
+             */
+            'branding' => Inertia::always(fn (): array => app(BrandingService::class)->urls()),
             /*
              * Always, because a partial reload is exactly when a revoked
              * permission must land: `useCan()` hides surfaces, and a page left

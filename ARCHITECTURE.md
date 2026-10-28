@@ -59,7 +59,7 @@ app/
   Exceptions/Admin/           MailNotConfiguredException
   Http/Controllers/           HomeController, NotificationController (module-less)
   Http/Controllers/Admin/     User, Role, Permission, AuditLog, ApplicationSetting,
-                              MailSetting, QuickLoginSetting, SentMail
+                              MailSetting, QuickLoginSetting, BrandingSetting, SentMail
   Http/Controllers/Settings/  Profile, Security, Appearance (the user's own account)
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
@@ -70,13 +70,14 @@ app/
   Listeners/Admin/            RecordLogin, RecordLogout, RecordFailedLogin, RecordSentMail
   Mail/Admin/                 UserWelcomeMail, UserPasswordResetMail, MailSettingTestMail
   Models/User.php             (the one model at the root — Laravel's auth convention)
-  Models/Admin/               Role, Permission, AuditLog, MailSetting, QuickLoginSetting, SentMail
+  Models/Admin/               Role, Permission, AuditLog, MailSetting, QuickLoginSetting,
+                              BrandingSetting, SentMail
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
   Providers/                  AppServiceProvider, FortifyServiceProvider
   Services/Admin/             UserService, RoleService, PermissionService, PermissionDescriptions,
                               AuditRecorder, AuditLogService, MailSettingService,
-                              QuickLoginService, UserCredentialMailer
+                              QuickLoginService, BrandingService, UserCredentialMailer
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
 config/                       audit.php, permission.php, reverb.php, broadcasting.php,
                               training.php (the guide registry) (+ Laravel's)
@@ -168,7 +169,8 @@ follow [§11](#11-adding-a-new-module) for the rest and switch the status to ✅
 
 **Admin** owns: users (create, edit, deactivate, soft delete, restore, force delete, set password,
 assign roles, avatar), roles (with the permission picker), the read-only permission catalogue, the
-audit log viewer, the Application Settings hub (Mail Server, Quick Login tabs) and Sent Mails. Full
+audit log viewer, the Application Settings hub (Mail Server, Quick Login, Branding tabs) and Sent
+Mails. Full
 reference: [`documentation/admin.md`](documentation/admin.md).
 
 **Settings** is the signed-in user's own account — profile (photo, name, phone, username, email),
@@ -446,7 +448,9 @@ deleting is a separate, soft, restorable verb.
 
 ### 9.5 Shared props
 
-`HandleInertiaRequests::share()`: `name`, `auth` (always: `user`, `permissions`), `sidebarOpen`,
+`HandleInertiaRequests::share()`: `name`, `branding` (always: `{logo, favicon}` URLs of the images
+uploaded on Application Settings → Branding, `null` for the default; cached by
+`BrandingService::urls()`), `auth` (always: `user`, `permissions`), `sidebarOpen`,
 `collapsedNavGroups`, `theme`, `passwordPolicy`, `notifications` (always: `unread_count`),
 `broadcasting` (Reverb key/host/port/scheme or `null`), `training` (always: `{key, title_en,
 title_bn, status}` of the guide covering this route, or `null` — the guide body itself is fetched
@@ -472,6 +476,13 @@ Admin-created only. Soft delete keeps the username and email reserved (unique in
 rows); force delete records who the user was first and removes the avatar. Avatars are jpg/png/webp
 ≤ 2 MB on the `public` disk at `avatars/{uuid}.{ext}` (needs `php artisan storage:link`); the old
 file is deleted on replace; no avatar → initials. `User::avatar_url` is appended.
+
+**Uploaded images are raster only** (owner, 2026-10-28): avatars, the logo and the favicon accept no
+SVG, because an SVG served from our `public` disk and opened directly runs its scripts on this domain.
+The logo and favicon (Application Settings → Branding) live at `branding/{uuid}.{ext}` on the same
+disk; `components/app-logo-icon.tsx` draws the uploaded logo, or the theme-following placeholder mark
+when there is none, and `app.blade.php` links the uploaded favicon (falling back to the logo, then to
+`public/favicon.*`).
 
 ### 9.7 Notifications & broadcasting
 

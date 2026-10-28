@@ -18,16 +18,16 @@ import { MAIL_ENCRYPTION_LABELS, MAIL_TRANSPORT_LABELS } from '@/lib/enums';
 
 /**
  * Admin → Application Settings (`admin.application-settings.edit`) — the
- * Mail Server and Quick Login tabs.
- * Source: documentation/admin.md §5, ARCHITECTURE.md §9.4, §9.9.
+ * Mail Server, Quick Login and Branding tabs.
+ * Source: documentation/admin.md §5, ARCHITECTURE.md §9.4, §9.9, §9.5.
  */
 export default function ApplicationSettingsGuide() {
     return (
         <Guide>
             <GuideSection kind="purpose">
                 <Para
-                    en="Setup for the whole application, one tab per setting: how mail goes out (Mail Server), and the one-click sign-in buttons used while developing (Quick Login)."
-                    bn="পুরো অ্যাপ্লিকেশনের সেটআপ, প্রতিটি সেটিংয়ের জন্য একটি ট্যাব: ইমেইল কীভাবে যায় (Mail Server), আর ডেভেলপমেন্টের সময় ব্যবহৃত এক-ক্লিকে সাইন-ইনের বোতাম (Quick Login)।"
+                    en="Setup for the whole application, one tab per setting: how mail goes out (Mail Server), the one-click sign-in buttons used while developing (Quick Login), and the logo and browser-tab icon (Branding)."
+                    bn="পুরো অ্যাপ্লিকেশনের সেটআপ, প্রতিটি সেটিংয়ের জন্য একটি ট্যাব: ইমেইল কীভাবে যায় (Mail Server), ডেভেলপমেন্টের সময় ব্যবহৃত এক-ক্লিকে সাইন-ইনের বোতাম (Quick Login), আর লোগো ও ব্রাউজার ট্যাবের আইকন (Branding)।"
                 />
             </GuideSection>
 
@@ -39,11 +39,13 @@ export default function ApplicationSettingsGuide() {
                             <Ui>admin.mail-settings.view</Ui> /{' '}
                             <Ui>admin.mail-settings.update</Ui> and{' '}
                             <Ui>admin.quick-login.view</Ui> /{' '}
-                            <Ui>admin.quick-login.update</Ui>. All four are
-                            super admin only until someone grants them. The page
-                            opens with either view permission; a tab you cannot
-                            read is not there, and without the update permission
-                            a tab is read-only.
+                            <Ui>admin.quick-login.update</Ui> — super admin only
+                            until someone grants them — and{' '}
+                            <Ui>admin.branding.view</Ui> /{' '}
+                            <Ui>admin.branding.update</Ui>, which the admin role
+                            holds. The page opens with any view permission; a
+                            tab you cannot read is not there, and without the
+                            update permission a tab is read-only.
                         </>
                     }
                     bn={
@@ -52,11 +54,14 @@ export default function ApplicationSettingsGuide() {
                             <Ui>admin.mail-settings.view</Ui> /{' '}
                             <Ui>admin.mail-settings.update</Ui> এবং{' '}
                             <Ui>admin.quick-login.view</Ui> /{' '}
-                            <Ui>admin.quick-login.update</Ui>। কেউ না দেওয়া
-                            পর্যন্ত চারটিই কেবল সুপার অ্যাডমিনের। যেকোনো একটি
-                            view পারমিশন থাকলেই পাতাটি খোলে; যে ট্যাব পড়ার
-                            অনুমতি নেই সেটি দেখা যায় না, আর update পারমিশন না
-                            থাকলে ট্যাবটি শুধু দেখা যায়, বদলানো যায় না।
+                            <Ui>admin.quick-login.update</Ui> — কেউ না দেওয়া
+                            পর্যন্ত এগুলো কেবল সুপার অ্যাডমিনের — এবং{' '}
+                            <Ui>admin.branding.view</Ui> /{' '}
+                            <Ui>admin.branding.update</Ui>, যা অ্যাডমিন রোলের
+                            আছে। যেকোনো একটি view পারমিশন থাকলেই পাতাটি খোলে; যে
+                            ট্যাব পড়ার অনুমতি নেই সেটি দেখা যায় না, আর update
+                            পারমিশন না থাকলে ট্যাবটি শুধু দেখা যায়, বদলানো যায়
+                            না।
                         </>
                     }
                 />
@@ -155,6 +160,48 @@ export default function ApplicationSettingsGuide() {
                         />
                     </Step>
                 </Steps>
+
+                <SubHeading en="Branding" bn="Branding" />
+                <Steps>
+                    <Step
+                        en={
+                            <>
+                                On the <Ui>Branding</Ui> tab, choose an image on
+                                the <Ui>Logo</Ui> or <Ui>Favicon</Ui> card and
+                                press <Ui>Upload</Ui> (<Ui>Replace</Ui> once one
+                                is set). The sidebar shows a new logo at once;
+                                the browser tab shows a new icon on the next
+                                page load.
+                            </>
+                        }
+                        bn={
+                            <>
+                                <Ui>Branding</Ui> ট্যাবে <Ui>Logo</Ui> বা{' '}
+                                <Ui>Favicon</Ui> কার্ডে একটি ছবি বেছে{' '}
+                                <Ui>Upload</Ui> চাপুন (একটি থাকলে{' '}
+                                <Ui>Replace</Ui>)। নতুন লোগো সাইডবারে সাথে সাথে
+                                দেখা যায়; নতুন আইকন ব্রাউজার ট্যাবে দেখা যায়
+                                পরের বার পাতা লোড হলে।
+                            </>
+                        }
+                    />
+                    <Step
+                        en={
+                            <>
+                                To go back to the default, press{' '}
+                                <Ui>Remove logo</Ui> or <Ui>Remove favicon</Ui>{' '}
+                                and confirm. The image file is deleted.
+                            </>
+                        }
+                        bn={
+                            <>
+                                আগের ডিফল্টে ফিরতে <Ui>Remove logo</Ui> বা{' '}
+                                <Ui>Remove favicon</Ui> চেপে নিশ্চিত করুন। ছবির
+                                ফাইলটি মুছে ফেলা হয়।
+                            </>
+                        }
+                    />
+                </Steps>
             </GuideSection>
 
             <GuideSection kind="fields">
@@ -216,6 +263,16 @@ export default function ApplicationSettingsGuide() {
                         en="One-click sign-in buttons on the login page for the demo accounts. They appear only on a development or test copy of the application — never on the live one, whatever the switch says. An account that is missing or inactive gets no button."
                         bn="লগইন পাতায় ডেমো অ্যাকাউন্টগুলোর জন্য এক-ক্লিকে সাইন-ইনের বোতাম। এগুলো কেবল অ্যাপ্লিকেশনের ডেভেলপমেন্ট বা টেস্ট কপিতে দেখা যায় — লাইভ কপিতে কখনো নয়, সুইচ যা-ই বলুক। যে অ্যাকাউন্ট নেই বা নিষ্ক্রিয়, তার কোনো বোতাম থাকে না।"
                     />
+                    <Field
+                        label="Logo"
+                        en="Shown in the sidebar beside the application name and large on the sign-in screens. PNG, JPG or WebP, up to 1 MB. One image serves every theme, light and dark, so a transparent background works best."
+                        bn="সাইডবারে অ্যাপ্লিকেশনের নামের পাশে, আর সাইন-ইন পাতায় বড় করে দেখানো হয়। PNG, JPG বা WebP, ১ MB পর্যন্ত। একটি ছবিই সব থিমে — হালকা ও গাঢ় — ব্যবহার হয়, তাই স্বচ্ছ পটভূমির ছবি সবচেয়ে ভালো দেখায়।"
+                    />
+                    <Field
+                        label="Favicon"
+                        en="The small icon in the browser tab. A square PNG, or an ICO, up to 256 KB. Without one, the tab uses the logo; without either, the default icon."
+                        bn="ব্রাউজার ট্যাবের ছোট আইকন। বর্গাকার PNG, অথবা ICO, ২৫৬ KB পর্যন্ত। না থাকলে ট্যাবে লোগো দেখায়; দুটোর কোনোটিই না থাকলে ডিফল্ট আইকন।"
+                    />
                 </Fields>
             </GuideSection>
 
@@ -250,6 +307,16 @@ export default function ApplicationSettingsGuide() {
                     en="Saved. On the live application the buttons still never show."
                     bn="সেভ হয়েছে। লাইভ অ্যাপ্লিকেশনে বোতামগুলো তবুও কখনো দেখা যায় না।"
                 />
+                <Message
+                    text="Branding saved. The browser tab icon updates on the next page load."
+                    en="The new image is stored. Reload any open tab to see its new icon."
+                    bn="নতুন ছবিটি সংরক্ষিত হয়েছে। খোলা কোনো ট্যাবে নতুন আইকন দেখতে পাতাটি আবার লোড করুন।"
+                />
+                <Message
+                    text="The favicon must be square."
+                    en="A PNG favicon must be as wide as it is tall. Crop it, or upload an ICO."
+                    bn="PNG ফেভিকনের প্রস্থ ও উচ্চতা সমান হতে হবে। ছবিটি কেটে বর্গাকার করুন, অথবা একটি ICO আপলোড করুন।"
+                />
             </GuideSection>
 
             <GuideSection kind="mistakes">
@@ -267,6 +334,11 @@ export default function ApplicationSettingsGuide() {
                     tone="warn"
                     en="While quick login is on, anyone who can open the login page can sign in as the demo accounts — a super admin among them — with one click. Switch it off when you are done."
                     bn="কুইক লগইন চালু থাকলে লগইন পাতা খুলতে পারেন এমন যে কেউ এক ক্লিকে ডেমো অ্যাকাউন্টগুলো দিয়ে সাইন ইন করতে পারেন — যার মধ্যে একজন সুপার অ্যাডমিনও আছেন। কাজ শেষ হলে এটি বন্ধ করুন।"
+                />
+                <Callout
+                    tone="warn"
+                    en="SVG images are refused — an SVG can carry code. Export the logo as a PNG with a transparent background instead."
+                    bn="SVG ছবি গ্রহণ করা হয় না — একটি SVG-এর ভেতরে কোড থাকতে পারে। এর বদলে লোগোটি স্বচ্ছ পটভূমির PNG হিসেবে এক্সপোর্ট করুন।"
                 />
             </GuideSection>
 

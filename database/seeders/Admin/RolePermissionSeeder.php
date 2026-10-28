@@ -45,6 +45,7 @@ class RolePermissionSeeder extends Seeder
          */
         'admin.mail-settings' => ['view', 'update'],
         'admin.quick-login' => ['view', 'update'],
+        'admin.branding' => ['view', 'update'],
         'admin.sent-mails' => ['view'],
 
         // One overview per ERP module; each opens the module's dashboard.

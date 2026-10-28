@@ -1,5 +1,6 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import { useMemo } from 'react';
+import BrandingPanel from '@/components/admin/application-settings/branding-panel';
 import MailPanel from '@/components/admin/application-settings/mail-panel';
 import QuickLoginPanel from '@/components/admin/application-settings/quick-login-panel';
 import Heading from '@/components/heading';
@@ -33,12 +34,20 @@ type QuickLoginSection = {
     updatedAt: string | null;
 };
 
-type TabKey = 'mail' | 'quick-login';
+type BrandingSection = {
+    logoUrl: string | null;
+    faviconUrl: string | null;
+    updatedBy: string | null;
+    updatedAt: string | null;
+};
+
+type TabKey = 'mail' | 'quick-login' | 'branding';
 
 type Props = {
     sections: {
         mail: MailSection | null;
         'quick-login': QuickLoginSection | null;
+        branding: BrandingSection | null;
     };
 };
 
@@ -70,6 +79,10 @@ export default function ApplicationSettings({ sections }: Props) {
                         key: 'quick-login' as const,
                         label: 'Quick Login',
                     },
+                    sections.branding && {
+                        key: 'branding' as const,
+                        label: 'Branding',
+                    },
                 ] as const
             ).filter((tab): tab is { key: TabKey; label: string } =>
                 Boolean(tab),
@@ -99,7 +112,7 @@ export default function ApplicationSettings({ sections }: Props) {
             <div className="flex h-full flex-1 flex-col gap-6 p-4">
                 <Heading
                     title="Application Settings"
-                    description="Software-level setup: how mail goes out, and the development quick login."
+                    description="Software-level setup: how mail goes out, the development quick login, and the logo and favicon."
                 />
 
                 {tabs.length === 0 ? (
@@ -131,6 +144,10 @@ export default function ApplicationSettings({ sections }: Props) {
                             sections['quick-login'] && (
                                 <QuickLoginPanel {...sections['quick-login']} />
                             )}
+
+                        {activeTab === 'branding' && sections.branding && (
+                            <BrandingPanel {...sections.branding} />
+                        )}
                     </>
                 )}
             </div>

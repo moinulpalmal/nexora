@@ -19,6 +19,7 @@
 | e. Application Settings → Mail Server | `Admin\MailSettingController`, `Admin\MailSettingService` | `pages/admin/application-settings.tsx` | `admin.mail-settings.{view,update}` ★ |
 | f. Application Settings → Quick Login | `Admin\QuickLoginSettingController`, `Admin\QuickLoginService` | same page | `admin.quick-login.{view,update}` ★ |
 | g. Sent Mails | `Admin\SentMailController` | `pages/admin/sent-mails/index.tsx` | `admin.sent-mails.view` ★ |
+| h. Application Settings → Branding | `Admin\BrandingSettingController`, `Admin\BrandingService` | `pages/admin/application-settings.tsx` | `admin.branding.{view,update}` |
 
 ★ `SUPER_ADMIN_ONLY` — no role receives it by rule; an administrator can still grant it by hand.
 
@@ -121,6 +122,7 @@ its sentence, and the code that checks it — `PermissionDescriptionsTest` fails
 | `admin.audit-logs.view` ★ | the audit trail |
 | `admin.mail-settings.view` / `update` ★ | Mail Server tab, test mail |
 | `admin.quick-login.view` / `update` ★ | Quick Login tab |
+| `admin.branding.view` / `update` | Branding tab: upload or remove the logo and favicon |
 | `admin.sent-mails.view` ★ | Sent Mails |
 
 ### 3.2 Seeded roles
@@ -149,7 +151,7 @@ super-admin role cannot be edited or deleted (`error`). Every grant change is au
 ## 4. The audit trail
 
 - Every create/update/delete/restore of `User`, `Role`, `Permission`, `MailSetting`,
-  `QuickLoginSetting` is recorded with old and new values; secrets (`password`, `remember_token`, the
+  `QuickLoginSetting`, `BrandingSetting` is recorded with old and new values; secrets (`password`, `remember_token`, the
   SMTP password) never are.
 - Also recorded: role and permission grants, administrator password resets, force deletes, mails
   queued, the mail-server password changing, test mails, sign-ins, sign-outs and failed sign-ins (the
@@ -183,6 +185,25 @@ A development aid: one-click sign-in buttons on `/login` for the seeded `superad
 `testing`** — production never renders them, whatever the switch says. An account that is missing or
 inactive gets no button.
 
+### 5.3 Branding
+
+The application's **logo** and the **favicon** in the browser tab (owner, 2026-10-28). The name stays
+`APP_NAME` in `.env`.
+
+- **Logo**: PNG, JPG or WebP, ≤ 1 MB. It replaces the placeholder mark in the sidebar (the name stays
+  beside it) and is shown large on the sign-in screens. One image serves every theme, so a
+  transparent background works best. Mails stay text-only.
+- **Favicon**: a square PNG, or an ICO, ≤ 256 KB. Without one, the tab uses the logo; without
+  either, the built-in `public/favicon.*` icons.
+- **No SVG.** An uploaded SVG opened directly would run its scripts on this domain, so uploads are
+  raster only.
+- Files go to the `public` disk at `branding/{uuid}.{ext}` (needs `php artisan storage:link`); a
+  replaced or removed image's file is deleted. A new upload gets a new URL, so no browser keeps the
+  old one. **Remove** brings the default back.
+- The effective URLs are shared to every page as `branding` and read by `app.blade.php` for the
+  `<link rel="icon">`; they are cached (`BrandingService::urls()`) and every save forgets the cache.
+- `admin.branding.{view,update}` are **not** super-admin-only: the `admin` role holds both by rule.
+
 ## 6. Sent Mails
 
 Every mail the mailer handed over, newest first, filterable by recipient, subject and kind; the eye
@@ -205,7 +226,7 @@ a panel in `components/admin/application-settings/`, and a tab entry in the page
 
 `tests/Feature/Admin/`: `UserTest`, `RoleTest`, `PermissionCatalogueTest`, `RbacTest`,
 `PermissionDescriptionsTest`, `AuditTrailTest`, `AuditLogViewerTest`, `ApplicationSettingTest`,
-`SentMailTest`. Helpers in `tests/Pest.php`: `userWithPermissions(...)`, `superAdmin()`,
+`BrandingSettingTest`, `SentMailTest`. Helpers in `tests/Pest.php`: `userWithPermissions(...)`, `superAdmin()`,
 `assertToast($response, $type)`, `compliantPassword()`, `fakeBreachedPasswordLookup()`. Audit
 assertions turn auditing on with `config(['audit.console' => true])` after the fixtures.
 

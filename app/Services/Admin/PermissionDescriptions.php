@@ -51,6 +51,8 @@ class PermissionDescriptions
         'admin.mail-settings.update' => ['summary' => 'Change the outgoing mail server and send a test mail.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Application Settings → Mail Server'],
         'admin.quick-login.view' => ['summary' => 'See whether development quick login is switched on.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Application Settings → Quick Login'],
         'admin.quick-login.update' => ['summary' => 'Switch development quick login on or off.', 'note' => self::SUPER_ADMIN_ONLY.' Never shown outside local and testing environments.', 'where' => 'Admin → Application Settings → Quick Login'],
+        'admin.branding.view' => ['summary' => 'See the uploaded logo and favicon.', 'where' => 'Admin → Application Settings → Branding'],
+        'admin.branding.update' => ['summary' => 'Upload or remove the logo and the browser-tab favicon.', 'note' => 'Changes what every user sees in the sidebar, on the login page and in the browser tab.', 'where' => 'Admin → Application Settings → Branding'],
         'admin.sent-mails.view' => ['summary' => 'See every mail the application sent, with its status and a preview.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Sent Mails'],
 
         'projects.dashboard.view' => ['summary' => 'Open the Projects overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Projects → Overview'],

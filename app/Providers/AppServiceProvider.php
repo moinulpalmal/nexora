@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Admin\BrandingSetting;
 use App\Models\Admin\MailSetting;
 use App\Models\Admin\Permission;
 use App\Models\Admin\QuickLoginSetting;
@@ -38,6 +39,7 @@ class AppServiceProvider extends ServiceProvider
         'permission' => Permission::class,
         'mail-setting' => MailSetting::class,
         'quick-login-setting' => QuickLoginSetting::class,
+        'branding-setting' => BrandingSetting::class,
     ];
 
     /**
