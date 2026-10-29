@@ -3,7 +3,8 @@
 > **📋 Mostly planned.** This is the agreed scope for the Human Resource Management module
 > (owner, 2026-10-28). It describes *what* the module will do and *why*; where things will live and
 > what they are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. **Built so far:
-> Departments** ([§4.1](#41-departments--built)), 2026-10-29; the planned parts shrink as they ship.
+> Departments** ([§4.1](#41-departments--built)), **Designations** ([§4.2](#42-designations--built))
+> and **Employees** ([§4.3](#43-employees--built)), 2026-10-29; the planned parts shrink as they ship.
 >
 > **🧪 POC overview:** `/hrm` (`hrm.dashboard`, permission `hrm.dashboard.view`) shows sample data
 > under a Preview banner. Its page body and `components/hrm/sample-data.ts` are throwaway; the route,
@@ -29,12 +30,17 @@ record never depends on a user account.
 
 **Every record belongs to a company** ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
 
-### Employee and User are separate
+### Employee and User
 
-An **Employee** is an HRM record. A **User** is a sign-in account created by Admin. An employee has an
-**optional link to one User** (owner, 2026-10-28). The link lets a member of staff log their own
-timesheet hours, and later see their own leave and payslips. Creating an employee never creates an
-account, and a User need not be an employee (an external auditor, for example).
+An **Employee** is an HRM record. A **User** is a sign-in account. An employee has an **optional
+link to one User** (owner, 2026-10-28), which lets a member of staff log their own timesheet hours,
+and later see their own leave and payslips.
+
+**An employee may be made an application user from the HRM form** (owner, 2026-10-29 — this
+reverses the earlier rule that creating an employee never creates an account). Ticking
+*Application user* opens a sign-in account for them; most employees still never sign in, and a User
+need not be an employee (an external auditor, for example). The details are in
+[§4.3](#43-employees--built).
 
 ## 2. Scope
 
@@ -62,7 +68,7 @@ Projects needs employees, so a small **HRM-lite** slice ships first:
 
 | Phase | Delivers |
 | --- | --- |
-| **HRM-lite** (ships with Projects) | Employees (code, name, company, department, designation, joining date, status, optional User link, **cost rate**), Departments, Designations. |
+| **HRM-lite** (ships with Projects) | Employees (employee ID, name, email, company, department, designation, mobiles, joining date, status, optional sign-in account, **monthly salary**), Departments, Designations — built. |
 | **1 — workforce** | Sections and lines, employee documents, shifts and rosters, attendance (manual + device import), leave types, entitlements and applications. |
 | **2 — payroll** | Wage grades, salary structures, overtime, attendance bonus, deductions, the salary sheet and payslips. Payroll posts a **draft voucher** to Accounting and **sets the employee cost rate** that Projects uses. |
 | **3 — lifecycle** | Recruitment, appraisal, separation and final settlement. |
@@ -74,7 +80,8 @@ Projects needs employees, so a small **HRM-lite** slice ships first:
   titles every company shares (HRM-lite; owner, 2026-10-29).
 - **Section / Line**: the working units under a department, such as teams or lines (phase 1).
 - **Employee**: employee code, name, company, department, designation, joining date, status,
-  optional User, and **cost rate**. Phase 1 adds personal and job details and documents.
+  optional User, and **monthly salary** (built, [§4.3](#43-employees--built)). Phase 1 adds personal and
+  job details and documents.
 - **Shift** and **roster**: working hours, and who works which shift.
 - **Attendance record**: an employee, a date, in and out times, and a source (manual or device).
 - **Leave type**, **leave entitlement**, **leave application**.
@@ -109,8 +116,10 @@ company-scoped master table. `Models/Hrm/Department`, `Hrm\DepartmentController`
 - **Bulk delete** on both tabs (ARCHITECTURE §8.6): the header box ticks the page; Active moves the
   ticked departments to Deleted, Deleted removes them for good. Only the selected company's ids are
   found, so another company's department is never touched.
-- **No deletion guard yet**: nothing references a department. Employees will add the first clause to
-  `DepartmentService::deletionBlocker()`.
+- **Deletion guard**: `DepartmentService::deletionBlocker()` refuses to delete (or delete for good) a
+  department any employee is in, deleted employees included — "Used by 3 employees. Move them to
+  another department, or deactivate this one instead." In bulk, the guarded rows are named in a
+  warning toast and the rest go.
 - **Import** (`hrm.departments.import`; `Hrm\DepartmentImportBlueprint`, a row writer): columns Code,
   Name, optional Status; every row goes to the uploader's selected company. **A row matches an existing
   department when its code or its name matches** (owner, 2026-10-29): Skip leaves it, Update rewrites
@@ -139,8 +148,8 @@ and `DesignationImportTest.php`.
   spacing, **deleted designations included** — the refusal says to restore the deleted one. Unique
   indexes on `code` and on `name` back the rule.
 - **Bulk delete** on both tabs, as departments.
-- **No deletion guard yet**: nothing references a designation. Employees will add the first clause to
-  `DesignationService::deletionBlocker()`.
+- **Deletion guard**: `DesignationService::deletionBlocker()` refuses while any employee, in any
+  company, holds the designation — the same sentence and bulk behaviour as departments.
 - **Import** (`hrm.designations.import`; `Hrm\DesignationImportBlueprint`, a row writer): columns
   Code, Name, optional Status; the same matching and rejection rules as departments, with no company
   — the staged file stores none, and switching company does not affect it.
@@ -148,6 +157,60 @@ and `DesignationImportTest.php`.
   restore or force-delete — one officer's delete would remove the title from every company.
   `RolePermissionSeeder::ROLE_EXCLUSIONS` takes those three back after the `hrm.` rule matches; they
   stay with super-admin unless granted to a role by hand. `viewer` gets the `.view`.
+
+### 4.3 Employees — built
+
+HRM → Employees (`hrm.employees.index`, `pages/hrm/employees/index.tsx`), company-scoped and
+restorable like departments. `Models/Hrm/Employee`, `Hrm\EmployeeController`, `Hrm\EmployeeService`,
+tests in `tests/Feature/Hrm/EmployeeTest.php` and `EmployeeImportTest.php` (owner, 2026-10-29).
+
+| Column | Rule |
+| --- | --- |
+| `company_id` | The **selected** company, stamped by the server — never a form field. |
+| `employee_code` | Labelled **Employee ID**. Required, up to 30, letters and digits joined by single `-`/`_`; stored in capitals. **Unique across every company**, deleted employees included. |
+| `name` | Required, up to 255. |
+| `email` | Required, lowercased, **unique across every company**, deleted employees included. |
+| `department_id` | Required: an active department of the selected company. `restrictOnDelete`. |
+| `designation_id` | Required: an active designation. `restrictOnDelete`. |
+| `official_mobile_no`, `personal_mobile_no` | Optional **Bangladeshi** mobiles (`01[3-9]` + 8 digits); spaces, hyphens and a `+880`/`880` prefix are folded, so `+880 1712-345678` is stored `01712345678`. |
+| `joining_date` | Optional date. |
+| `monthly_salary` | Optional, BDT, ≥ 0, two decimals. Seen and saved only with `hrm.employees.view-compensation`; for anyone else the column is not even sent and a posted value is ignored. Projects will derive its hourly cost rate from it. |
+| `user_id` | The optional sign-in account; unique; set only by the service. |
+| `status` | `A` / `I`. |
+| actor stamps, timestamps, `deleted_at` | Restorable: Active / Deleted tabs. |
+
+An employee keeps a department or designation that was deactivated after they joined it; only a new
+choice must be active. Ids are filters (`Equals`) on the list, not sort keys.
+
+**The sign-in account** (`hrm.employees.create-account`; without it the form has no box and the
+account is left as it is):
+
+- **Opening** — ticking *Application user* for an active employee asks for a temporary password
+  (the password policy applies). The account's **username is the employee ID in lowercase** (so the ID
+  needs at least 3 characters), its email and phone are the employee's, it gets **no role** (an
+  administrator assigns one in Admin → Users) and is granted the employee's company. The password is
+  emailed with the welcome mail and **must be changed at first sign-in**. A username or email already
+  used by another account is a field error; existing accounts are not linked in this slice.
+- **Keeping in step** — every save copies name, email, official mobile (→ phone) and employee ID (→
+  employee code and username) onto the account.
+- **Closing** — unticking, deactivating the employee, or deleting them sets the account Inactive; it
+  is never deleted. Re-ticking re-opens the same account with a new temporary password (mailed as a
+  password reset). Restoring an employee does not re-open it. Deleting an employee for good leaves
+  the account in Admin, inactive and unlinked.
+- **Guard** — closing the account of the actor themselves, or of the last active super admin, is
+  refused with `UserService`'s own sentence (`EmployeeService::accountBlocker()`).
+
+- **No deletion guard of its own yet**: nothing references an employee. Projects members and
+  timesheets will bring the first clause.
+- **Import** (`hrm.employees.import`; `Hrm\EmployeeImportBlueprint`, a row writer): columns Employee
+  ID, Name, Email, Department code, Designation code, optional mobiles, joining date (date cell or
+  text), status, and monthly salary for an uploader with `view-compensation`. A row matches on its
+  employee ID; another company's ID, a deleted employee, an unknown or inactive department or
+  designation, a taken email, a bad mobile or date are rejected with the reason. **An import never
+  opens an account**; an updated employee's existing account follows their row.
+- Roles by rule: `hr-officer` receives every `hrm.employees.*`, including `create-account` and
+  `view-compensation`; `viewer` gets only `hrm.employees.view` (the suffix rule matches `.view`
+  exactly).
 
 ## 5. Workflows and approvals
 
@@ -166,15 +229,16 @@ that stops anyone approving their own record.
 ## 6. Draft permission catalogue
 
 *Draft — not seeded*, except `hrm.dashboard.view`,
-`hrm.departments.{view,create,update,delete,restore,force-delete,import}` and
-`hrm.designations.{view,create,update,delete,restore,force-delete,import}`, which are. Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
+`hrm.departments.{view,create,update,delete,restore,force-delete,import}`,
+`hrm.designations.{view,create,update,delete,restore,force-delete,import}` and
+`hrm.employees.{view,create,update,delete,restore,force-delete,import,create-account,view-compensation}`, which are. Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
 §6.2](../ARCHITECTURE.md#62-routes-and-permissions)).
 
 | Permission | Allows |
 | --- | --- |
 | `hrm.departments.{view,create,update,delete,restore,force-delete,import}` | Departments (HRM-lite) — **seeded** |
 | `hrm.designations.{view,create,update,delete,restore,force-delete,import}` | Designations (HRM-lite, group-wide) — **seeded** |
-| `hrm.employees.{view,create,update,delete}` | Employees (HRM-lite) |
+| `hrm.employees.{view,create,update,delete,restore,force-delete,import,create-account,view-compensation}` | Employees (HRM-lite) — **seeded** |
 | `hrm.sections.{view,create,update,delete}` | Sections and lines |
 | `hrm.shifts.{view,manage}` | Shifts and rosters |
 | `hrm.attendance.{view,manage,import}` | Attendance records and device import |
@@ -191,9 +255,7 @@ that stops anyone approving their own record.
 
 ## 8. Open decisions
 
-- Who can see an employee's cost rate and salary? This probably needs a separate permission, such as
-  `hrm.employees.view-compensation`.
-- Employee code format: per company, per department, or one series across the group?
+- How Projects turns the monthly salary into an hourly cost rate (working hours per month).
 - Which attendance devices are used, and how are they imported (file, API, database pull)?
 - Does a linked User see a self-service area (own attendance, leave, payslips)? If so, which module
   owns those pages?

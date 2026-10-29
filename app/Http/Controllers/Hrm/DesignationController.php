@@ -96,6 +96,12 @@ class DesignationController extends Controller
 
     public function destroy(Designation $designation): RedirectResponse
     {
+        $blocker = $this->designations->deletionBlocker($designation);
+
+        if ($blocker !== null) {
+            return $this->refuse($blocker);
+        }
+
         $this->designations->delete($designation);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Designation moved to Deleted.')]);
@@ -114,6 +120,12 @@ class DesignationController extends Controller
 
     public function forceDelete(Designation $designation): RedirectResponse
     {
+        $blocker = $this->designations->deletionBlocker($designation);
+
+        if ($blocker !== null) {
+            return $this->refuse($blocker);
+        }
+
         $this->designations->forceDelete($designation);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Designation permanently deleted.')]);
@@ -126,15 +138,9 @@ class DesignationController extends Controller
      */
     public function bulkDestroy(BulkRequest $request): RedirectResponse
     {
-        $count = $this->designations->bulkDelete(Designation::query()->whereKey($request->ids())->get());
+        $result = $this->designations->bulkDelete(Designation::query()->whereKey($request->ids())->get());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => trans_choice(
-            ':count designation moved to Deleted.|:count designations moved to Deleted.',
-            $count,
-            ['count' => $count],
-        )]);
-
-        return back();
+        return $this->bulkToast($result, ':count designation moved to Deleted.|:count designations moved to Deleted.');
     }
 
     /**
@@ -142,13 +148,38 @@ class DesignationController extends Controller
      */
     public function bulkForceDelete(BulkRequest $request): RedirectResponse
     {
-        $count = $this->designations->bulkForceDelete(Designation::onlyTrashed()->whereKey($request->ids())->get());
+        $result = $this->designations->bulkForceDelete(Designation::onlyTrashed()->whereKey($request->ids())->get());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => trans_choice(
-            ':count designation permanently deleted.|:count designations permanently deleted.',
-            $count,
-            ['count' => $count],
-        )]);
+        return $this->bulkToast($result, ':count designation permanently deleted.|:count designations permanently deleted.');
+    }
+
+    /**
+     * `success` when every ticked designation went, `warning` naming each one
+     * a guard kept, as `Admin\CompanyController::bulkToast()`.
+     *
+     * @param  array{done: int, refused: list<string>}  $result
+     */
+    protected function bulkToast(array $result, string $doneMessage): RedirectResponse
+    {
+        $message = trans_choice($doneMessage, $result['done'], ['count' => $result['done']]);
+
+        if ($result['refused'] === []) {
+            Inertia::flash('toast', ['type' => 'success', 'message' => $message]);
+
+            return back();
+        }
+
+        Inertia::flash('toast', [
+            'type' => 'warning',
+            'message' => $message.' '.__('Not deleted — :reasons', ['reasons' => implode(' ', $result['refused'])]),
+        ]);
+
+        return back();
+    }
+
+    protected function refuse(string $message): RedirectResponse
+    {
+        Inertia::flash('toast', ['type' => 'warning', 'message' => $message]);
 
         return back();
     }

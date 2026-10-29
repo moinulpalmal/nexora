@@ -114,6 +114,12 @@ class DepartmentController extends Controller
 
     public function destroy(Department $department): RedirectResponse
     {
+        $blocker = $this->departments->deletionBlocker($department);
+
+        if ($blocker !== null) {
+            return $this->refuse($blocker);
+        }
+
         $this->departments->delete($department);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Department moved to Deleted.')]);
@@ -132,6 +138,12 @@ class DepartmentController extends Controller
 
     public function forceDelete(Department $department): RedirectResponse
     {
+        $blocker = $this->departments->deletionBlocker($department);
+
+        if ($blocker !== null) {
+            return $this->refuse($blocker);
+        }
+
         $this->departments->forceDelete($department);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Department permanently deleted.')]);
@@ -146,15 +158,9 @@ class DepartmentController extends Controller
      */
     public function bulkDestroy(BulkRequest $request): RedirectResponse
     {
-        $count = $this->departments->bulkDelete(Department::query()->whereKey($request->ids())->get());
+        $result = $this->departments->bulkDelete(Department::query()->whereKey($request->ids())->get());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => trans_choice(
-            ':count department moved to Deleted.|:count departments moved to Deleted.',
-            $count,
-            ['count' => $count],
-        )]);
-
-        return back();
+        return $this->bulkToast($result, ':count department moved to Deleted.|:count departments moved to Deleted.');
     }
 
     /**
@@ -162,13 +168,32 @@ class DepartmentController extends Controller
      */
     public function bulkForceDelete(BulkRequest $request): RedirectResponse
     {
-        $count = $this->departments->bulkForceDelete(Department::onlyTrashed()->whereKey($request->ids())->get());
+        $result = $this->departments->bulkForceDelete(Department::onlyTrashed()->whereKey($request->ids())->get());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => trans_choice(
-            ':count department permanently deleted.|:count departments permanently deleted.',
-            $count,
-            ['count' => $count],
-        )]);
+        return $this->bulkToast($result, ':count department permanently deleted.|:count departments permanently deleted.');
+    }
+
+    /**
+     * `success` when every ticked department went, `warning` naming each one
+     * a guard kept — the actor can clear those by moving their employees, as
+     * `Admin\CompanyController::bulkToast()`.
+     *
+     * @param  array{done: int, refused: list<string>}  $result
+     */
+    protected function bulkToast(array $result, string $doneMessage): RedirectResponse
+    {
+        $message = trans_choice($doneMessage, $result['done'], ['count' => $result['done']]);
+
+        if ($result['refused'] === []) {
+            Inertia::flash('toast', ['type' => 'success', 'message' => $message]);
+
+            return back();
+        }
+
+        Inertia::flash('toast', [
+            'type' => 'warning',
+            'message' => $message.' '.__('Not deleted — :reasons', ['reasons' => implode(' ', $result['refused'])]),
+        ]);
 
         return back();
     }

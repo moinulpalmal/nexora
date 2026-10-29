@@ -39,6 +39,10 @@ class UserService
     /**
      * Create a user, assign their roles and store their avatar.
      *
+     * The password is someone else's choice, so it is temporary: the user is
+     * kept on Settings → Security until they set their own (ARCHITECTURE.md
+     * §9.2; owner, 2026-10-29).
+     *
      * @param  array<string, mixed>  $attributes
      * @param  list<string>  $roles
      */
@@ -47,6 +51,7 @@ class UserService
         return DB::transaction(function () use ($attributes, $password, $roles, $avatar): User {
             $user = new User($attributes);
             $user->password = $password;
+            $user->must_change_password = true;
             $user->save();
 
             $this->syncRoles($user, $roles);
@@ -134,10 +139,12 @@ class UserService
      * The `updated` row the save writes carries no values (`password` is
      * excluded from the trail), so the act itself is recorded as its own event.
      * The user is told in the bell, so a reset they did not ask for is visible.
+     * Like a new account's, the password is temporary unless the actor set
+     * their own.
      */
     public function resetPassword(User $user, string $password): void
     {
-        $user->forceFill(['password' => $password])->save();
+        $user->forceFill(['password' => $password, 'must_change_password' => ! $this->isActor($user)])->save();
 
         $this->audits->record($user, AuditEvent::PasswordReset);
 

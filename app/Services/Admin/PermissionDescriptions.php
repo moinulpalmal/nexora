@@ -82,6 +82,15 @@ class PermissionDescriptions
         'hrm.designations.restore' => ['summary' => 'Bring a designation back from Deleted.', 'where' => 'HRM → Designations → Deleted'],
         'hrm.designations.force-delete' => ['summary' => 'Permanently delete designations from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'HRM → Designations → Deleted'],
         'hrm.designations.import' => ['summary' => 'Create and update designations from a spreadsheet.', 'note' => 'Writes many rows at once, shared by every company.', 'where' => 'HRM → Designations → Import'],
+        'hrm.employees.view' => ['summary' => "Open the selected company's Employees list (active and deleted tabs) and search it.", 'where' => 'HRM → Employees'],
+        'hrm.employees.create' => ['summary' => 'Add an employee to the selected company.', 'where' => 'HRM → Employees'],
+        'hrm.employees.update' => ['summary' => "Change an employee's details, department and designation, and activate or deactivate them.", 'note' => 'Deactivating an employee also stops their sign-in account.', 'where' => 'HRM → Employees'],
+        'hrm.employees.delete' => ['summary' => 'Move employees into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; their employee ID and email stay reserved, and their sign-in account stops.', 'where' => 'HRM → Employees'],
+        'hrm.employees.restore' => ['summary' => 'Bring an employee back from Deleted.', 'note' => 'Their sign-in account stays inactive until it is re-opened.', 'where' => 'HRM → Employees → Deleted'],
+        'hrm.employees.force-delete' => ['summary' => 'Permanently delete employees from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone. A sign-in account stays in Admin, inactive.', 'where' => 'HRM → Employees → Deleted'],
+        'hrm.employees.import' => ['summary' => 'Create and update employees from a spreadsheet.', 'note' => 'Writes many rows at once into the selected company. Never opens sign-in accounts.', 'where' => 'HRM → Employees → Import'],
+        'hrm.employees.create-account' => ['summary' => 'Make an employee an application user — open, close or re-open their sign-in account and set its temporary password.', 'note' => 'The account gets no role; an administrator assigns one in Admin → Users.', 'where' => 'HRM → Employees'],
+        'hrm.employees.view-compensation' => ['summary' => "See and change employees' monthly salary, on the list, the form and the import.", 'note' => 'Without it the salary is hidden and left unchanged on save.', 'where' => 'HRM → Employees'],
     ];
 
     /**

@@ -5,6 +5,8 @@ use App\Http\Controllers\Hrm\DepartmentController;
 use App\Http\Controllers\Hrm\DepartmentImportController;
 use App\Http\Controllers\Hrm\DesignationController;
 use App\Http\Controllers\Hrm\DesignationImportController;
+use App\Http\Controllers\Hrm\EmployeeController;
+use App\Http\Controllers\Hrm\EmployeeImportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -132,4 +134,55 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:hrm.designations.force-delete')
             ->name('designations.force-delete');
+
+        // Before the resource, so `import` is not read as an {employee} id.
+        Route::get('employees/import/template', [EmployeeImportController::class, 'template'])
+            ->middleware('permission:hrm.employees.import')
+            ->name('employees.import.template');
+
+        Route::post('employees/import', [EmployeeImportController::class, 'store'])
+            ->middleware('permission:hrm.employees.import')
+            ->name('employees.import.store');
+
+        Route::post('employees/imports/{sheetImport}/review', [EmployeeImportController::class, 'review'])
+            ->middleware('permission:hrm.employees.import')
+            ->name('employees.import.review');
+
+        Route::post('employees/imports/{sheetImport}/confirm', [EmployeeImportController::class, 'confirm'])
+            ->middleware('permission:hrm.employees.import')
+            ->name('employees.import.confirm');
+
+        Route::get('employees/imports/{sheetImport}/rejects', [EmployeeImportController::class, 'rejects'])
+            ->middleware('permission:hrm.employees.import')
+            ->name('employees.import.rejects');
+
+        Route::delete('employees/imports/{sheetImport}', [EmployeeImportController::class, 'cancel'])
+            ->middleware('permission:hrm.employees.import')
+            ->name('employees.import.cancel');
+
+        // Before the resource, so `bulk` is not read as an {employee} id.
+        Route::delete('employees/bulk', [EmployeeController::class, 'bulkDestroy'])
+            ->middleware('permission:hrm.employees.delete')
+            ->name('employees.bulk-destroy');
+
+        Route::delete('employees/bulk/force', [EmployeeController::class, 'bulkForceDelete'])
+            ->middleware('permission:hrm.employees.force-delete')
+            ->name('employees.bulk-force-delete');
+
+        Route::resource('employees', EmployeeController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:hrm.employees.view')
+            ->middlewareFor(['store'], 'permission:hrm.employees.create')
+            ->middlewareFor(['update'], 'permission:hrm.employees.update')
+            ->middlewareFor(['destroy'], 'permission:hrm.employees.delete');
+
+        Route::put('employees/{employee}/restore', [EmployeeController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:hrm.employees.restore')
+            ->name('employees.restore');
+
+        Route::delete('employees/{employee}/force', [EmployeeController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:hrm.employees.force-delete')
+            ->name('employees.force-delete');
     });

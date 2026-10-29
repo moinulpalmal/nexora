@@ -57,6 +57,9 @@ class RolePermissionSeeder extends Seeder
         'hrm.departments' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],
         // Group-wide (§9.10): one list every company shares.
         'hrm.designations' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],
+        // `create-account` opens an employee's sign-in account; `view-compensation`
+        // shows and edits the salary (owner, 2026-10-29).
+        'hrm.employees' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import', 'create-account', 'view-compensation'],
     ];
 
     /**

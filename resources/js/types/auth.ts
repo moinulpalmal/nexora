@@ -14,6 +14,8 @@ export type User = {
     avatar_url: string | null;
     /** `App\Enums\RecordStatus` — `'A'` or `'I'`. */
     status: string;
+    /** Set when someone else chose the password; kept on Settings → Security until changed. */
+    must_change_password: boolean;
     last_login_at: string | null;
     created_at: string;
     updated_at: string;

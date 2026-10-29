@@ -72,7 +72,7 @@ app/
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5);
                               Hrm/ also Department, DepartmentImport, Designation, DesignationImport
-  Http/Middleware/            EnsureUserIsActive, HandleAppearance, HandleInertiaRequests
+  Http/Middleware/            EnsureUserIsActive, EnsurePasswordIsChanged, HandleAppearance, HandleInertiaRequests
   Http/Requests/              ListRequest, BulkRequest (module-less) + Admin/, Settings/, Hrm/,
                               Imports/ (ImportConfirmRequest, shared by every importer)
   Listeners/                  CollapseNavGroupsOnLogin, StampLastLogin (module-less)
@@ -132,7 +132,7 @@ routes/
   settings.php                the user's own account settings
   training.php                the in-app manual (ungated)
   projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each; hrm.php also
-                              departments and their import)
+                              departments, designations, employees and their imports)
   channels.php                private broadcast channels
 tests/
   Feature/                    root: apparatus tests (Listable, EnumRegistry, PasswordPolicy, …)
@@ -238,10 +238,19 @@ Reference: [`documentation/accounting.md`](documentation/accounting.md).
 
 **HRM** holds each company's workforce: org structure, employees, shifts, attendance and leave
 (phase 1), payroll under the Bangladesh Labour Act (phase 2), and recruitment, appraisal and
-separation (phase 3). **An Employee is not a User**: it has an optional link to one, and creating an
-employee never creates an account. The employee's **cost rate** is what Projects prices hours with.
+separation (phase 3). **An Employee may be an application user** (owner, 2026-10-29, reversing the
+2026-10-28 rule that creating an employee never creates an account): `employees.user_id` is an
+optional, unique link, and ticking *Application user* on the form (`hrm.employees.create-account`)
+makes `EmployeeService` open a sign-in account through `UserService` — username the lowercased
+employee ID, no role, the employee's company granted, a temporary password that must be changed at
+first sign-in (§9.2). There is no stored flag: an application user is a linked account that is
+active. The account follows the employee (details copied on every save; closed, never deleted, when
+unticked, deactivated or deleted); a User still need not be an employee, and an import never opens
+an account. The employee's monthly salary sits behind `hrm.employees.view-compensation`.
 **Built so far: Departments** (`hrm/departments`, with import) — the first company-scoped master
-table — and **Designations** (`hrm/designations`, with import), the first group-wide one (§9.10). The module stays 🧪 while its overview still shows sample data; the sidebar group is already
+table — **Designations** (`hrm/designations`, with import), the first group-wide one (§9.10), and
+**Employees** (`hrm/employees`, with import), company-scoped with an employee ID and email unique
+across the group. The module stays 🧪 while its overview still shows sample data; the sidebar group is already
 a list of links, each behind its own `useCan`. Reference: [`documentation/hrm.md`](documentation/hrm.md).
 
 ## 6. Naming conventions
@@ -459,6 +468,12 @@ A confirmation raised from inside another dialog closes its parent through `onSu
   by `AppServiceProvider::passwordPolicy()` and shared as `passwordPolicy` for the live checklist
   (`components/shared/password-policy-checklist.tsx`). Tests fake Have I Been Pwned suite-wide.
 - `StampLastLogin` records `last_login_at` / `last_login_ip` quietly (no audit row, no actor stamp).
+- **A password someone else set is temporary** (owner, 2026-10-29). `users.must_change_password` is
+  set by `UserService::create()` (Admin → Users and an HRM employee's account) and by
+  `resetPassword()` unless the actor reset their own; `EnsurePasswordIsChanged` (web group, after
+  `EnsureUserIsActive`) then sends every request to Settings → Security, marking the session's
+  password as confirmed so the page does not ask twice, until `SecurityController::update()` clears
+  the flag. Sign-out, the bell and the help panel stay reachable.
 
 ### 9.3 Audit logging
 

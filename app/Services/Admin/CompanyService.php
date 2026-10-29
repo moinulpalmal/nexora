@@ -5,6 +5,7 @@ namespace App\Services\Admin;
 use App\Enums\Admin\AuditEvent;
 use App\Models\Admin\Company;
 use App\Models\Hrm\Department;
+use App\Models\Hrm\Employee;
 
 /**
  * Every write to the Company master, and the guard that may refuse a delete
@@ -121,12 +122,12 @@ class CompanyService
     */
 
     /**
-     * Refused while any department belongs to the company.
+     * Refused while any department or employee belongs to the company.
      *
-     * Counted with the company scope removed and deleted departments included
+     * Counted with the company scope removed and deleted rows included
      * (§9.14): whether a row is in use is a question about the database, not
-     * about what the actor can see, and a deleted department still points here
-     * — the foreign key would refuse the permanent delete either way.
+     * about what the actor can see, and a deleted row still points here — the
+     * foreign key would refuse the permanent delete either way.
      */
     public function deletionBlocker(Company $company): ?string
     {
@@ -138,6 +139,17 @@ class CompanyService
                 .'|[2,*] :count departments belong to this company. Deactivate the company instead, or delete them for good first.',
                 $departments,
                 ['count' => $departments],
+            );
+        }
+
+        $employees = Employee::withoutGlobalScopes()->where('company_id', $company->id)->count();
+
+        if ($employees > 0) {
+            return trans_choice(
+                '{1} One employee belongs to this company. Deactivate the company instead, or delete that employee for good first.'
+                .'|[2,*] :count employees belong to this company. Deactivate the company instead, or delete them for good first.',
+                $employees,
+                ['count' => $employees],
             );
         }
 

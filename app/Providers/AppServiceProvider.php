@@ -10,6 +10,7 @@ use App\Models\Admin\QuickLoginSetting;
 use App\Models\Admin\Role;
 use App\Models\Hrm\Department;
 use App\Models\Hrm\Designation;
+use App\Models\Hrm\Employee;
 use App\Models\ImportLimit;
 use App\Models\SheetImport;
 use App\Models\User;
@@ -44,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         'company' => Company::class,
         'department' => Department::class,
         'designation' => Designation::class,
+        'employee' => Employee::class,
         'permission' => Permission::class,
         'mail-setting' => MailSetting::class,
         'quick-login-setting' => QuickLoginSetting::class,

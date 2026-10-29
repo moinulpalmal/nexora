@@ -4,6 +4,7 @@ namespace App\Services\Hrm;
 
 use App\Enums\Admin\AuditEvent;
 use App\Models\Hrm\Department;
+use App\Models\Hrm\Employee;
 use App\Services\Admin\AuditRecorder;
 
 /**
@@ -11,9 +12,9 @@ use App\Services\Admin\AuditRecorder;
  * spreadsheet import ({@see DepartmentImportBlueprint}), so both are audited
  * the same way.
  *
- * **No `deletionBlocker()` yet** (ARCHITECTURE.md §9.14): nothing references a
- * department. A blocker that could only return `null` would read as a guard
- * while guarding nothing; Employees will bring the first clause.
+ * {@see self::deletionBlocker()} refuses while employees are in the
+ * department (ARCHITECTURE.md §9.14), for one row and per row in bulk, as
+ * `Admin\CompanyService`.
  */
 class DepartmentService
 {
@@ -72,36 +73,74 @@ class DepartmentService
     }
 
     /**
-     * Soft delete each department, one at a time so each is audited.
+     * Soft delete each department its guard allows, one at a time so each is
+     * audited; the rest are reported, not deleted.
      *
      * @param  iterable<Department>  $departments
+     * @return array{done: int, refused: list<string>}
      */
-    public function bulkDelete(iterable $departments): int
+    public function bulkDelete(iterable $departments): array
     {
-        $count = 0;
-
-        foreach ($departments as $department) {
-            $this->delete($department);
-            $count++;
-        }
-
-        return $count;
+        return $this->eachUnblocked($departments, $this->delete(...));
     }
 
     /**
      * Delete each soft-deleted department for good, recording each.
      *
      * @param  iterable<Department>  $departments
+     * @return array{done: int, refused: list<string>}
      */
-    public function bulkForceDelete(iterable $departments): int
+    public function bulkForceDelete(iterable $departments): array
     {
-        $count = 0;
+        return $this->eachUnblocked($departments, $this->forceDelete(...));
+    }
 
-        foreach ($departments as $department) {
-            $this->forceDelete($department);
-            $count++;
+    /**
+     * Refused while any employee is in the department.
+     *
+     * Counted with the company scope removed and deleted employees included
+     * (§9.14): whether a row is in use is a question about the database, not
+     * about what the actor can see, and a deleted employee still points here.
+     */
+    public function deletionBlocker(Department $department): ?string
+    {
+        $employees = Employee::withoutGlobalScopes()->where('department_id', $department->id)->count();
+
+        if ($employees > 0) {
+            return trans_choice(
+                '{1} Used by one employee. Move them to another department, or deactivate this one instead.'
+                .'|[2,*] Used by :count employees. Move them to another department, or deactivate this one instead.',
+                $employees,
+                ['count' => $employees],
+            );
         }
 
-        return $count;
+        return null;
+    }
+
+    /**
+     * @param  iterable<Department>  $departments
+     * @param  callable(Department): void  $write
+     * @return array{done: int, refused: list<string>}
+     */
+    private function eachUnblocked(iterable $departments, callable $write): array
+    {
+        $done = 0;
+        $refused = [];
+
+        foreach ($departments as $department) {
+            $blocker = $this->deletionBlocker($department);
+
+            if ($blocker !== null) {
+                $refused[] = "{$department->code}: {$blocker}";
+
+                continue;
+            }
+
+            $write($department);
+            $done++;
+        }
+
+        return ['done' => $done, 'refused' => $refused];
     }
 }

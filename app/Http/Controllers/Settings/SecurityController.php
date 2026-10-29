@@ -23,12 +23,16 @@ class SecurityController extends Controller
 
     /**
      * Update the user's password.
+     *
+     * A password the user chose themselves is no longer temporary, so this
+     * also releases them from `EnsurePasswordIsChanged`.
      */
     public function update(PasswordUpdateRequest $request): RedirectResponse
     {
-        $request->user()->update([
+        $request->user()->forceFill([
             'password' => $request->password,
-        ]);
+            'must_change_password' => false,
+        ])->save();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Password updated.')]);
 

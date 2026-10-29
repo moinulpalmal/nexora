@@ -10,6 +10,7 @@ use App\Enums\FilterType;
 use App\Enums\RecordStatus;
 use App\Enums\Theme;
 use App\Models\Admin\Company;
+use App\Models\Hrm\Employee;
 use App\Observers\ActorObserver;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Appends;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -33,6 +35,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string $username
  * @property string $email
  * @property string $password
+ * @property bool $must_change_password
  * @property string|null $phone
  * @property string|null $employee_code
  * @property string|null $avatar_path
@@ -107,6 +110,7 @@ class User extends Authenticatable implements Auditable
             'password' => 'hashed',
             'theme' => Theme::class,
             'last_login_at' => 'datetime',
+            'must_change_password' => 'boolean',
         ];
     }
 
@@ -163,5 +167,16 @@ class User extends Authenticatable implements Auditable
     public function selectedCompany(): BelongsTo
     {
         return $this->belongsTo(Company::class, 'selected_company_id');
+    }
+
+    /**
+     * The HRM employee this account was created for, if any — across every
+     * company, since an account is one person wherever they work.
+     *
+     * @return HasOne<Employee, $this>
+     */
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class)->withoutGlobalScope('company');
     }
 }

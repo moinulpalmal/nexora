@@ -6,6 +6,7 @@ import {
     Network,
     GraduationCap,
     History,
+    IdCard,
     KeyRound,
     Landmark,
     LayoutGrid,
@@ -41,6 +42,7 @@ import { index as usersIndex } from '@/routes/admin/users';
 import { dashboard as hrmDashboard } from '@/routes/hrm';
 import { index as departmentsIndex } from '@/routes/hrm/departments';
 import { index as designationsIndex } from '@/routes/hrm/designations';
+import { index as employeesIndex } from '@/routes/hrm/employees';
 import { dashboard as projectsDashboard } from '@/routes/projects';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
@@ -83,6 +85,7 @@ export function AppSidebar() {
     const canViewHrm = useCan('hrm.dashboard.view');
     const canViewDepartments = useCan('hrm.departments.view');
     const canViewDesignations = useCan('hrm.designations.view');
+    const canViewEmployees = useCan('hrm.employees.view');
 
     const adminNavLinks: (NavItem & { visible: boolean })[] = [
         {
@@ -153,6 +156,12 @@ export function AppSidebar() {
             href: designationsIndex(),
             icon: Briefcase,
             visible: canViewDesignations,
+        },
+        {
+            title: 'Employees',
+            href: employeesIndex(),
+            icon: IdCard,
+            visible: canViewEmployees,
         },
     ];
 

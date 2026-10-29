@@ -138,6 +138,11 @@ return [
             'title_en' => 'Designations', 'title_bn' => 'পদবি', 'status' => 'written',
             'shots' => ['overview' => 'The designations every company shares', 'form' => 'The New designation dialog', 'import' => 'The designation import dialog'],
         ],
+        'hrm.employees' => [
+            'route' => 'hrm.employees.index', 'guide' => 'hrm/employees', 'section' => 'hrm', 'sort' => 40,
+            'title_en' => 'Employees', 'title_bn' => 'কর্মচারী', 'status' => 'pending',
+            'shots' => [],
+        ],
 
     ],
 
@@ -154,6 +159,8 @@ return [
         'hrm.departments.import.rejects',
         'hrm.designations.import.template',
         'hrm.designations.import.rejects',
+        'hrm.employees.import.template',
+        'hrm.employees.import.rejects',
         'admin.audit-logs.history',
         'admin.sent-mails.show',
         'training.index',

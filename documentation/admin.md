@@ -96,6 +96,10 @@ Refusals are toasts (`error`), not validation errors — see
 - A password set by an administrator is audited as its own `password-reset` event (the `updated` row
   carries no values, because `password` is never written to the trail), and the user gets a bell
   notification ([§6](#6-notifications)).
+- **A password an administrator sets is temporary** (owner, 2026-10-29): a new user, and a user whose
+  password was reset by someone else, must choose their own at next sign-in — every page sends them
+  to Settings → Security until they do (`users.must_change_password`, ARCHITECTURE §9.2). The same
+  holds for an account opened from HRM → Employees.
 
 ### 2.5 The screen
 

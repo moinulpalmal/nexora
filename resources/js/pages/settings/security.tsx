@@ -1,4 +1,5 @@
-import { Form, Head } from '@inertiajs/react';
+import { Form, Head, usePage } from '@inertiajs/react';
+import { TriangleAlert } from 'lucide-react';
 import { useRef, useState } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/heading';
@@ -9,8 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { usePasswordPolicy } from '@/hooks/use-password-policy';
 import { edit } from '@/routes/security';
+import type { Auth } from '@/types';
 
 export default function Security() {
+    // Set by `EnsurePasswordIsChanged`'s flag; cleared by the save below.
+    const mustChangePassword = Boolean(
+        usePage<{ auth?: Auth }>().props.auth?.user?.must_change_password,
+    );
     const [password, setPassword] = useState('');
     const { hint } = usePasswordPolicy();
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -23,6 +29,26 @@ export default function Security() {
             <h1 className="sr-only">Security settings</h1>
 
             <div className="space-y-6">
+                {mustChangePassword && (
+                    <div
+                        role="alert"
+                        className="alert alert-soft alert-warning"
+                        data-test="must-change-password"
+                    >
+                        <TriangleAlert className="size-5" />
+                        <div>
+                            <p className="font-medium">
+                                Choose your own password
+                            </p>
+                            <p className="text-xs">
+                                Your password was set by someone else. Enter it
+                                as your current password and choose a new one to
+                                continue using the application.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 <Heading
                     variant="small"
                     title="Update password"
