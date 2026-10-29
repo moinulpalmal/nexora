@@ -14,6 +14,7 @@ use App\Models\Admin\Role;
 use App\Models\Admin\SentMail;
 use App\Models\Hrm\Department;
 use App\Models\Hrm\Designation;
+use App\Models\Hrm\Employee;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
 use App\Services\Training\TrainingRegistry;
@@ -255,6 +256,59 @@ test('hrm.designations', function () {
 
     $page = visitForTraining(route('hrm.designations.index', absolute: false))
         ->click('[data-test="import-designations"]')
+        ->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'import');
+});
+
+test('hrm.employees', function () {
+    $key = 'hrm.employees';
+    $actor = trainingActor();
+    $companies = trainingCompanies();
+    $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
+
+    $departments = [];
+    foreach ([['HR', 'Human Resources'], ['PROD', 'Production'], ['FIN', 'Finance & Accounts']] as [$code, $name]) {
+        $departments[$code] = Department::factory()->for($companies['atl'])->create(['code' => $code, 'name' => $name]);
+    }
+
+    $designations = [];
+    foreach ([['OP', 'Operator'], ['SUP', 'Supervisor'], ['MGR', 'Production Manager'], ['EXEC', 'Executive']] as [$code, $name]) {
+        $designations[$code] = Designation::factory()->create(['code' => $code, 'name' => $name]);
+    }
+
+    $people = [
+        ['E1001', 'Rafiq Islam', 'PROD', 'MGR', '01712345678', '85000.00', true],
+        ['E1002', 'Ayesha Rahman', 'HR', 'EXEC', '01812223344', '42000.00', false],
+        ['E1003', 'Tanvir Hossain', 'PROD', 'SUP', '01912334455', '38000.00', false],
+        ['E1004', 'Nusrat Jahan', 'FIN', 'EXEC', null, '45000.00', false],
+        ['E1005', 'Kamal Uddin', 'PROD', 'OP', '01612998877', '18500.00', false],
+    ];
+
+    foreach ($people as [$code, $name, $department, $designation, $mobile, $salary, $hasAccount]) {
+        $factory = Employee::factory()->for($companies['atl'])->state([
+            'employee_code' => $code,
+            'name' => $name,
+            'email' => str_replace(' ', '.', strtolower($name)).'@example.com',
+            'department_id' => $departments[$department]->id,
+            'designation_id' => $designations[$designation]->id,
+            'official_mobile_no' => $mobile,
+            'monthly_salary' => $salary,
+        ]);
+
+        ($hasAccount ? $factory->withAccount() : $factory)->create();
+    }
+
+    $page = visitForTraining(route('hrm.employees.index', absolute: false))->assertSee('Rafiq Islam');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-employee"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+
+    $page->click('[data-test="employee-application-user"]')->assertVisible('#password');
+    captureTrainingShot($page, $key, 'account');
+
+    $page = visitForTraining(route('hrm.employees.index', absolute: false))
+        ->click('[data-test="import-employees"]')
         ->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'import');
 });

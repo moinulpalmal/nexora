@@ -22,8 +22,8 @@ export default function SecurityGuide() {
         <Guide>
             <GuideSection kind="purpose">
                 <Para
-                    en="Change your own password."
-                    bn="নিজের পাসওয়ার্ড বদলানো।"
+                    en="Change your own password. When an administrator has just created your account or set a new password for you, this is the only screen you can open until you choose your own."
+                    bn="নিজের পাসওয়ার্ড বদলানো। কোনো অ্যাডমিনিস্ট্রেটর সবে আপনার অ্যাকাউন্ট খুলে দিলে বা আপনার জন্য নতুন পাসওয়ার্ড দিলে, নিজের পাসওয়ার্ড বেছে না নেওয়া পর্যন্ত আপনি শুধু এই স্ক্রিনটিই খুলতে পারবেন।"
                 />
             </GuideSection>
 
@@ -109,6 +109,11 @@ export default function SecurityGuide() {
             </GuideSection>
 
             <GuideSection kind="messages">
+                <Message
+                    text="Choose your own password. Your password was set by someone else. Enter it as your current password and choose a new one to continue using the application."
+                    en="Shown at the top while your password is a temporary one. Type the password you were given as Current password, choose a new one and save; every other screen opens again once it is saved."
+                    bn="পাসওয়ার্ড অস্থায়ী থাকা অবস্থায় উপরে দেখায়। যে পাসওয়ার্ডটি আপনাকে দেওয়া হয়েছিল সেটি Current password-এ লিখুন, নতুন একটি বেছে নিয়ে সেভ করুন; সেভ হলেই অন্য সব স্ক্রিন আবার খোলে।"
+                />
                 <Message
                     text="Password updated."
                     en="Saved. Use the new password from your next sign-in."

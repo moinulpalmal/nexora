@@ -81,7 +81,9 @@ function main() {
     }
 
     const payload = JSON.parse(raw);
-    const filePath = payload?.tool_response?.filePath ?? payload?.tool_input?.file_path;
+    // Write/Edit send `file_path`; Serena's editing tools send a repo-relative `relative_path`.
+    const filePath =
+        payload?.tool_response?.filePath ?? payload?.tool_input?.file_path ?? payload?.tool_input?.relative_path;
 
     if (!filePath) {
         return;
@@ -92,7 +94,7 @@ function main() {
     const root = git(process.cwd(), ['rev-parse', '--show-toplevel']).trim();
 
     // Repo-relative, forward slashes, so the patterns below are platform-independent.
-    const rel = path.relative(root, path.resolve(filePath)).split(path.sep).join('/');
+    const rel = path.relative(root, path.resolve(root, filePath)).split(path.sep).join('/');
 
     if (!rel || rel.startsWith('../') || rel === MAP_FILE) {
         return;

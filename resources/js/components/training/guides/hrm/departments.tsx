@@ -215,6 +215,11 @@ export default function DepartmentsGuide() {
                     bn="মুছে ফেলা একটি বিভাগের এখনো এই নামটি আছে। দ্বিতীয়টি না বানিয়ে সেটিকেই ফিরিয়ে আনুন।"
                 />
                 <Message
+                    text="Used by 3 employees. Move them to another department, or deactivate this one instead."
+                    en="Employees are in the department — deleted employees count too — so it cannot be deleted. Move them in HRM → Employees, or make the department Inactive. In a bulk delete the others still go."
+                    bn="বিভাগটিতে কর্মচারী আছেন — মুছে ফেলা কর্মচারীও ধরা হয় — তাই এটি মোছা যায় না। HRM → Employees-এ তাঁদের অন্য বিভাগে সরান, অথবা বিভাগটিকে Inactive করুন। একসাথে মোছার সময় বাকিগুলো ঠিকই মুছে যায়।"
+                />
+                <Message
                     text="Select a company in the header before adding a department."
                     en="No company is selected. Choose one from the switcher and try again."
                     bn="কোনো কোম্পানি বেছে নেওয়া হয়নি। সুইচার থেকে একটি বেছে নিয়ে আবার চেষ্টা করুন।"
@@ -245,6 +250,11 @@ export default function DepartmentsGuide() {
             </GuideSection>
 
             <GuideSection kind="related">
+                <RelatedGuide
+                    to="hrm.employees"
+                    en="Placing employees in a department."
+                    bn="কর্মচারীদের বিভাগে রাখা।"
+                />
                 <RelatedGuide
                     to="admin.companies"
                     en="The companies departments belong to."

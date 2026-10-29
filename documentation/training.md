@@ -35,7 +35,7 @@ slashes are not.
 | Shared prop | `training` in `HandleInertiaRequests::share()` — `{key, title_en, title_bn, status}` or `null` |
 | Pages | `pages/training/index.tsx`, `show.tsx` |
 | Vocabulary, loader, toggle, help button, table of contents | `components/training/` |
-| Guides | `components/training/guides/{section}/{name}.tsx` — 12 written (the port's 10, Admin → Companies, HRM → Departments); the three ERP overviews are `pending` |
+| Guides | `components/training/guides/{section}/{name}.tsx` — 14 written (the port's 10, Admin → Companies, HRM → Departments, Designations, Employees); the three ERP overviews are `pending` |
 | Shared fragments | `components/training/guides/shared/list-basics.tsx` |
 | Screenshots | `public/images/training/{key}/{shot}.png`, committed |
 | Capture | `tests/Browser/Training/CaptureScreenshotsTest.php`, `composer training:screens` |
@@ -181,9 +181,13 @@ into each state its guide shows, and writes `public/images/training/{key}/{shot}
 6. Read the guide in both languages at `/training/{key}` and in the dialog on the screen itself.
 7. Send the Bangla to the owner for review.
 
-**A new screen** needs only step 3's entry, as `pending`, or the suite fails
-([ARCHITECTURE.md §10](../ARCHITECTURE.md#10-adding-a-feature-to-an-existing-module)). A new module may
-need a new section in `config/training.php`.
+**A new screen** fails the suite until it has at least step 3's entry
+([ARCHITECTURE.md §10](../ARCHITECTURE.md#10-adding-a-feature-to-an-existing-module)), but the gate is
+the floor, not the rule: write the guide in the same change (§8). A new module may need a new section
+in `config/training.php`.
+
+**A changed screen** — read its guide and fix every sentence, field, message and screenshot the
+change made untrue, in both languages. The gate cannot see stale prose (§5).
 
 ## 8. Status
 
@@ -191,10 +195,16 @@ need a new section in `config/training.php`.
 | --- | --- | --- |
 | Port | Dashboard; Admin — Users, Roles, Permissions, Audit Log, Sent Mails, Application Settings; Settings — Profile, Security, Appearance | ✅ written 2026-10-27; **Bangla awaits the owner's read** |
 | Multi-company | Admin — Companies (new), Users (the Companies dialog added); HRM — Departments (new, with its import) | ✅ written 2026-10-29; **Bangla awaits the owner's read** |
+| HRM-lite | HRM — Designations (new, with its import), Employees (new: the sign-in account, the import); Departments, Designations and Companies gained the "used by employees" deletion guards; Users and Security gained the temporary password | ✅ written 2026-10-29; **Bangla awaits the owner's read** |
 | ERP overviews | Projects, Accounts and HRM overviews | `pending` — sample-data previews; written when each overview shows real data |
 
-There is no backlog: every new screen is registered as it lands and its guide written in the same
-change or the next one.
+**There is no backlog, and there is no "next change"** (owner, 2026-10-29): every change that adds or
+alters a screen — a field, a button, a message, a rule, a permission — updates that screen's guide
+(both languages) and, where a picture changed, its screenshots, **in the same change**, together with
+the module's `documentation/{module}.md`. A new screen with no written guide yet is registered
+`pending`, and only for a 🧪 POC page is that the end state. The Stop hook in
+`.claude/hooks/docs-sync.mjs` refuses to end a turn that changed a module's code or screens without
+touching its doc and its guides ([`ARCHITECTURE.md` §12](../ARCHITECTURE.md#12-keeping-this-file-in-sync)).
 
 ### Shared fragments
 

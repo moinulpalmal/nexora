@@ -6,6 +6,22 @@ Serena cannot help (non-code files, a few lines). It is the owner's standing req
 token use down. If the Serena tools are not loaded in a session, say so and ask the owner to restart
 Claude Code rather than working around it.
 
+**Every development change updates its documentation and its training guides, in the same change**
+(owner, 2026-10-29). Whatever you build, fix or alter — a screen, field, button, message, rule,
+permission or guard — before you finish:
+
+1. Update the owning module's `documentation/{module}.md` (and every other module whose behaviour the
+   change alters).
+2. Update the training guide of **every screen it touches**, in **English and Bangla**
+   (`resources/js/components/training/guides/`); write the guide for a new screen (not just a
+   `pending` entry); add or update its screenshot recipe and recapture the shots whose picture
+   changed; `php artisan training:gaps` must say **No gaps**.
+3. Update `ARCHITECTURE.md` when the change is structural (§2 below).
+
+"In the next change" is not allowed. The `docs-sync` Stop hook (`.claude/hooks/docs-sync.mjs`) refuses
+to end a turn that changed a module's code or screens without touching its doc and guides; if a change
+is genuinely not user-visible, say so plainly.
+
 # Agent Operating Contract
 
 ## 1. Read the map first
@@ -56,8 +72,9 @@ turn, with the rationale, so the next agent inherits the decision.
 - **Do not add dependencies or create top-level directories** without asking first.
 - **Never write application data through tinker, scripts or raw SQL** on the development database:
   console writes are not audited (§9.3). Verify through the screens or tests.
-- **Do not create documentation files** unless asked. `ARCHITECTURE.md` and the module docs in
-  `documentation/` are kept current as part of the work.
+- **Do not create documentation files** unless asked. `ARCHITECTURE.md`, the module docs in
+  `documentation/` and the training guides are kept current as part of **every** change (see
+  Critical, above).
 - The Laravel Boost guidelines imported below apply in full.
 
 ## 5. Where to start, by task

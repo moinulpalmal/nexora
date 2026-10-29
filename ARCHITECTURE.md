@@ -71,7 +71,8 @@ app/
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5);
-                              Hrm/ also Department, DepartmentImport, Designation, DesignationImport
+                              Hrm/ also Department, DepartmentImport, Designation, DesignationImport,
+                              Employee, EmployeeImport
   Http/Middleware/            EnsureUserIsActive, EnsurePasswordIsChanged, HandleAppearance, HandleInertiaRequests
   Http/Requests/              ListRequest, BulkRequest (module-less) + Admin/, Settings/, Hrm/,
                               Imports/ (ImportConfirmRequest, shared by every importer)
@@ -82,7 +83,7 @@ app/
   Models/SheetImport.php, ImportLimit.php   (at the root — the import engine's own records, §9.13)
   Models/Admin/               Role, Permission, Company, AuditLog, MailSetting, QuickLoginSetting,
                               BrandingSetting, SentMail
-  Models/Hrm/                 Department (company-scoped, §9.10), Designation (group-wide, §9.10)
+  Models/Hrm/                 Department, Employee (company-scoped, §9.10), Designation (group-wide, §9.10)
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
   Providers/                  AppServiceProvider, FortifyServiceProvider
@@ -91,7 +92,8 @@ app/
                               AuditLogService, MailSettingService, QuickLoginService,
                               BrandingService, UserCredentialMailer
   Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer),
-                              DesignationService, DesignationImportBlueprint
+                              DesignationService, DesignationImportBlueprint, EmployeeService,
+                              EmployeeImportBlueprint
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
   Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
                               ImportBlueprint, ImportRegistry, the DTOs ImportLimits/Outcome/Preview
@@ -116,10 +118,11 @@ resources/
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
     components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview;
-                              hrm/ also the department and designation form dialogs and the
-                              no-company panel
+                              hrm/ also the department, designation and employee form dialogs
+                              and the no-company panel
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
                               table of contents; guides/{general,admin,settings,hrm,shared}/ (§5)
+                              — hrm/ holds departments, designations, employees
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
     hooks/                    use-can, use-list-filters, use-form-dialog, use-appearance, …
     layouts/                  app, auth, settings
@@ -143,7 +146,8 @@ tests/
                               test and the screenshot recipes
   Pest.php, TestCase.php      safety guards and helpers
 documentation/                module reference docs (§14)
-.claude/                      settings.json (hooks), hooks/, skills/
+.claude/                      settings.json (hooks), hooks/ (architecture-sync, docs-sync — §12),
+                              skills/
 .serena/                      Serena project config and memories
 ```
 
@@ -715,9 +719,18 @@ never a policy ([§9.1](#91-rbac-roles--permissions)).
 13. **Training entry**: every new GET screen gets an entry in `config/training.php`, `status =>
     'pending'` until its guide is written; a GET route that is not a screen (JSON, a file, a redirect)
     goes in `ignore_routes`. `TrainingGapsTest` fails the suite otherwise — except for a
-    `Route::inertia()` screen, which the gate cannot see and must be remembered by hand. Write the
-    guide and its screenshots in the same change or the next ([`documentation/training.md`](documentation/training.md) §7).
-14. Update `documentation/{module}.md`; update this file only if a convention changed.
+    `Route::inertia()` screen, which the gate cannot see and must be remembered by hand. **Write the
+    guide and its screenshots in the same change** ([`documentation/training.md`](documentation/training.md) §7–§8).
+14. Update `documentation/{module}.md` **in the same change**; update this file only if a convention
+    changed.
+
+**Every development change carries its documentation** (owner, 2026-10-29). Not only a new feature:
+any change to what a screen shows or does — a field, button, message, rule, permission, guard —
+updates, in the same change, **the module's `documentation/{module}.md`** and **the guide of every
+screen it touches** (both languages, screenshots recaptured when the picture changed), and a change
+that alters another module's behaviour (a new deletion guard, a shared rule) updates that module's
+doc and guides too. "In the next change" is not allowed. Enforced by the `docs-sync` hook
+([§12](#12-keeping-this-file-in-sync)).
 
 Two Claude skills walk this path (owner, 2026-10-28): **`master-crud`** for a master table in an ERP
 module — shape, company scoping, spreadsheet import and the deletion guards of
@@ -736,7 +749,8 @@ module — shape, company scoping, spreadsheet import and the deletion guards of
 6. Each screen registered in `config/training.php` (`pending` is enough), with a section for the
    module in `training.sections` if it needs one.
 7. A row in [§5](#5-module-registry) and the tree in [§3](#3-top-level-layout);
-   `documentation/{module}.md`.
+   `documentation/{module}.md`, and the module's row in `MODULE_DOCS` of
+   `.claude/hooks/docs-sync.mjs` ([§12](#12-keeping-this-file-in-sync)).
 
 ## 12. Keeping this file in sync
 
@@ -756,6 +770,19 @@ Edit this file **in the same change** when:
 A PostToolUse hook (`.claude/hooks/architecture-sync.mjs`) nudges when a structural file (route
 files, `app.tsx`, `composer.json`/`package.json`, `bootstrap/app.php`/`providers.php`) changes while
 this file has no pending edits, or when a file lands in a module folder this file never mentions.
+
+**Module docs and training guides** are held to [§10](#10-adding-a-feature-to-an-existing-module)'s
+"every change carries its documentation" by `.claude/hooks/docs-sync.mjs` (owner, 2026-10-29). It
+reads the uncommitted working tree and maps each changed file to its module through the layer
+folders (`Controllers/Hrm/`, `pages/hrm/`, `routes/hrm.php`, …): a module whose code changed while
+`documentation/{module}.md` did not — or whose **screens** (pages, module components, controllers,
+requests) changed while neither its guides folder nor `config/training.php` did — is named. As a
+PostToolUse hook it nudges once per module per session; as a **Stop** hook it refuses to end the
+turn until the docs are touched, or until the agent says plainly why the change is not user-visible
+(it lets the second stop through). Both hooks match Serena's editing tools as well as Write/Edit.
+Module map: `Admin`→`admin.md`, `Settings`→`settings.md`, `Training`→`training.md`,
+`Hrm`→`hrm.md`, `ProjectManagement`/`projects`→`projects.md`, `Accounting`→`accounting.md`; a new
+module adds its row to `MODULE_DOCS` in the hook ([§11](#11-adding-a-new-module)).
 
 ## 13. Commands
 
@@ -798,7 +825,9 @@ manual verification ([CLAUDE.md](CLAUDE.md)).
 planned `projects.md`, `accounting.md`, `hrm.md`, which hold agreed scope until code lands) plus
 `frontend.md` (UI standards and the component catalogue) and `setup-and-deployment.md`. **This file
 answers "where does it go and what is it called"; a module doc answers "what does it do and why".** A
-module doc links here rather than repeating it.
+module doc links here rather than repeating it. Module docs and the screens' training guides are
+updated in the same change as the code they describe ([§10](#10-adding-a-feature-to-an-existing-module),
+[§12](#12-keeping-this-file-in-sync)).
 
 ## 15. Deployment
 

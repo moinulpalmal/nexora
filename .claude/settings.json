@@ -3,7 +3,7 @@
     "hooks": {
         "PostToolUse": [
             {
-                "matcher": "Write|Edit",
+                "matcher": "Write|Edit|mcp__serena__(replace_content|replace_symbol_body|insert_after_symbol|insert_before_symbol|rename_symbol|safe_delete_symbol|replace_in_files)",
                 "hooks": [
                     {
                         "type": "command",
@@ -11,6 +11,26 @@
                         "shell": "bash",
                         "timeout": 10,
                         "statusMessage": "Checking ARCHITECTURE.md sync"
+                    },
+                    {
+                        "type": "command",
+                        "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/docs-sync.mjs\"",
+                        "shell": "bash",
+                        "timeout": 10,
+                        "statusMessage": "Checking module docs and training guides"
+                    }
+                ]
+            }
+        ],
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "node \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/docs-sync.mjs\"",
+                        "shell": "bash",
+                        "timeout": 10,
+                        "statusMessage": "Checking module docs and training guides"
                     }
                 ]
             }

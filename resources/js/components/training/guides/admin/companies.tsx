@@ -182,6 +182,11 @@ export default function CompaniesGuide() {
                     en="A company cannot be deleted while anything belongs to it — deleted departments count too. Make it inactive instead."
                     bn="কোনো কিছু অধীনে থাকা অবস্থায় কোম্পানি মোছা যায় না — মুছে ফেলা বিভাগও গোনা হয়। তার বদলে এটিকে inactive করুন।"
                 />
+                <Message
+                    text="12 employees belong to this company. Deactivate the company instead, or delete them for good first."
+                    en="The same rule for employees, checked once the company has no departments left."
+                    bn="কর্মচারীদের জন্যও একই নিয়ম, কোম্পানির আর কোনো বিভাগ না থাকলে এটি যাচাই হয়।"
+                />
             </GuideSection>
 
             <GuideSection kind="mistakes">

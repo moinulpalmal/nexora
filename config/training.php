@@ -140,8 +140,8 @@ return [
         ],
         'hrm.employees' => [
             'route' => 'hrm.employees.index', 'guide' => 'hrm/employees', 'section' => 'hrm', 'sort' => 40,
-            'title_en' => 'Employees', 'title_bn' => 'কর্মচারী', 'status' => 'pending',
-            'shots' => [],
+            'title_en' => 'Employees', 'title_bn' => 'কর্মচারী', 'status' => 'written',
+            'shots' => ['overview' => 'The employees of an invented company, one an application user', 'form' => 'The New employee dialog', 'account' => 'Application user ticked, asking for a temporary password', 'import' => 'The employee import dialog'],
         ],
 
     ],

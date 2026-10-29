@@ -219,6 +219,11 @@ export default function DesignationsGuide() {
                     bn="মুছে ফেলা একটি পদবির এখনো এই নামটি আছে। দ্বিতীয়টি না বানিয়ে যিনি ফিরিয়ে আনতে পারেন তাকে সেটি ফিরিয়ে আনতে বলুন।"
                 />
                 <Message
+                    text="Used by 3 employees. Move them to another designation, or deactivate this one instead."
+                    en="Employees in some company hold the designation — deleted employees count too — so it cannot be deleted. Move them in HRM → Employees, or make the designation Inactive. In a bulk delete the others still go."
+                    bn="কোনো না কোনো কোম্পানির কর্মচারীদের এই পদবি আছে — মুছে ফেলা কর্মচারীও ধরা হয় — তাই এটি মোছা যায় না। HRM → Employees-এ তাঁদের অন্য পদবিতে সরান, অথবা পদবিটিকে Inactive করুন। একসাথে মোছার সময় বাকিগুলো ঠিকই মুছে যায়।"
+                />
+                <Message
                     text='The code "OP" belongs to "Operator" but the name "Supervisor" belongs to the designation coded "SUP". Correct one of them.'
                     en="An import row points at two different designations. Fix the code or the name in the sheet and upload the row again."
                     bn="ইমপোর্টের একটি সারি দুটি ভিন্ন পদবিকে নির্দেশ করছে। শিটে কোড বা নাম ঠিক করে সারিটি আবার আপলোড করুন।"
@@ -239,6 +244,11 @@ export default function DesignationsGuide() {
             </GuideSection>
 
             <GuideSection kind="related">
+                <RelatedGuide
+                    to="hrm.employees"
+                    en="Giving employees a designation."
+                    bn="কর্মচারীদের পদবি দেওয়া।"
+                />
                 <RelatedGuide
                     to="hrm.departments"
                     en="Departments, which each company keeps for itself."

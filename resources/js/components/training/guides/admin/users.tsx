@@ -291,8 +291,8 @@ export default function UsersGuide() {
                     </Field>
                     <Field
                         label="Password"
-                        en="Only on New user and Set a password. The checklist under the box ticks off each rule as you type; the save is refused until every line is met."
-                        bn="কেবল New user ও Set a password-এ থাকে। টাইপ করার সাথে সাথে বক্সের নিচের চেকলিস্টে প্রতিটি নিয়ম টিক হয়ে যায়; সব শর্ত পূরণ না হওয়া পর্যন্ত সেভ হয় না।"
+                        en="Only on New user and Set a password. The checklist under the box ticks off each rule as you type; the save is refused until every line is met. The password is temporary: at their next sign-in the user is sent to Settings → Security and must choose their own before anything else opens. Setting your own password here is not temporary."
+                        bn="কেবল New user ও Set a password-এ থাকে। টাইপ করার সাথে সাথে বক্সের নিচের চেকলিস্টে প্রতিটি নিয়ম টিক হয়ে যায়; সব শর্ত পূরণ না হওয়া পর্যন্ত সেভ হয় না। পাসওয়ার্ডটি অস্থায়ী: পরের সাইন-ইনে ব্যবহারকারীকে Settings → Security-তে পাঠানো হয়, আর নিজের পাসওয়ার্ড বেছে না নেওয়া পর্যন্ত অন্য কিছু খোলে না। এখানে নিজের পাসওয়ার্ড দিলে সেটি অস্থায়ী হয় না।"
                     />
                     <Field
                         label="Email this user their username and password."
@@ -320,8 +320,8 @@ export default function UsersGuide() {
                     />
                     <Field
                         label="Set password"
-                        en="The key. Sets a new password; the user gets a notification that it was changed."
-                        bn="চাবি চিহ্ন। নতুন পাসওয়ার্ড দেয়; পাসওয়ার্ড বদলানো হয়েছে বলে ব্যবহারকারী একটি নোটিফিকেশন পান।"
+                        en="The key. Sets a new, temporary password; the user gets a notification that it was changed and must choose their own at their next sign-in."
+                        bn="চাবি চিহ্ন। নতুন, অস্থায়ী পাসওয়ার্ড দেয়; পাসওয়ার্ড বদলানো হয়েছে বলে ব্যবহারকারী একটি নোটিফিকেশন পান, আর পরের সাইন-ইনে তাঁকে নিজের পাসওয়ার্ড বেছে নিতে হয়।"
                     />
                     <Field
                         label="Delete"
