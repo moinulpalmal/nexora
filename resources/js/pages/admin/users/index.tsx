@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
 import {
+    Building2,
     KeyRound,
     Pencil,
     Plus,
@@ -8,6 +9,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import UserController from '@/actions/App/Http/Controllers/Admin/UserController';
+import UserCompanyDialog from '@/components/admin/user-company-dialog';
 import UserFormDialog from '@/components/admin/user-form-dialog';
 import UserPasswordDialog from '@/components/admin/user-password-dialog';
 import UserRoleDialog from '@/components/admin/user-role-dialog';
@@ -25,6 +27,7 @@ import { useListFilters } from '@/hooks/use-list-filters';
 import { RECORD_STATUS } from '@/lib/enums';
 import { index } from '@/routes/admin/users';
 import type {
+    CompanyGrantOption,
     Filterable,
     Paginated,
     StatusOption,
@@ -36,6 +39,8 @@ type Props = {
     users: Paginated<UserListItem>;
     /** Assignable role names — `super-admin` only for a super admin. */
     roles: string[];
+    /** Every undeleted company — only for a holder of `admin.users.assign-companies`. */
+    companies: CompanyGrantOption[];
     /** `RecordStatus::options()` — drives both the form and the filter. */
     statuses: StatusOption[];
     sortable: string[];
@@ -53,6 +58,7 @@ type Props = {
 export default function UsersIndex({
     users,
     roles,
+    companies,
     statuses,
     sortable,
     filterable,
@@ -67,6 +73,7 @@ export default function UsersIndex({
     const canForceDelete = useCan('admin.users.force-delete');
     const canResetPassword = useCan('admin.users.reset-password');
     const canAssignRoles = useCan('admin.users.assign-roles');
+    const canAssignCompanies = useCan('admin.users.assign-companies');
     const getInitials = useInitials();
 
     const isDeleted = filters.view === 'trashed';
@@ -83,7 +90,7 @@ export default function UsersIndex({
         filters,
         url: index,
         only: ['users', 'filters'],
-        refreshOnly: ['users', 'filters', 'counts', 'roles'],
+        refreshOnly: ['users', 'filters', 'counts', 'roles', 'companies'],
     });
 
     const sortProps = (column: string) => ({
@@ -183,7 +190,7 @@ export default function UsersIndex({
                                 >
                                     Last sign-in
                                 </SortableHeader>
-                                <th className="w-40" />
+                                <th className="w-48" />
                             </tr>
 
                             <ColumnFilterRow
@@ -461,6 +468,30 @@ export default function UsersIndex({
                                                                 <ShieldCheck />
                                                             </Button>
                                                         </UserRoleDialog>
+                                                    )}
+
+                                                    {canAssignCompanies && (
+                                                        <UserCompanyDialog
+                                                            submit={UserController.updateCompanies.form(
+                                                                user.id,
+                                                            )}
+                                                            user={user}
+                                                            companies={
+                                                                companies
+                                                            }
+                                                        >
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                disabled={
+                                                                    user.is_self
+                                                                }
+                                                                aria-label={`Companies for ${user.name}`}
+                                                                data-test="user-companies"
+                                                            >
+                                                                <Building2 />
+                                                            </Button>
+                                                        </UserCompanyDialog>
                                                     )}
 
                                                     {canResetPassword && (

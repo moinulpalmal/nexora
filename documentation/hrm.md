@@ -1,9 +1,9 @@
 # HRM Module — Reference
 
-> **📋 Planned — nothing built.** This is the agreed scope for the Human Resource Management module
+> **📋 Mostly planned.** This is the agreed scope for the Human Resource Management module
 > (owner, 2026-10-28). It describes *what* the module will do and *why*; where things will live and
-> what they are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is
-> built, this file becomes its reference and the planned parts shrink as they ship.
+> what they are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. **Built so far:
+> Departments** ([§4.1](#41-departments--built)), 2026-10-29; the planned parts shrink as they ship.
 >
 > **🧪 POC overview:** `/hrm` (`hrm.dashboard`, permission `hrm.dashboard.view`) shows sample data
 > under a Preview banner. Its page body and `components/hrm/sample-data.ts` are throwaway; the route,
@@ -26,7 +26,7 @@ most employees are factory workers on shifts and production lines who **never si
 | URL prefix | `hrm/` |
 | Pages | `pages/hrm/*` |
 
-**Every record belongs to a company** ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company-planned)).
+**Every record belongs to a company** ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
 
 ### Employee and User are separate
 
@@ -68,7 +68,8 @@ Projects needs employees, so a small **HRM-lite** slice ships first:
 
 ## 4. Main entities
 
-- **Department**, **Designation**: company-level lookups (HRM-lite).
+- **Department** (built, [§4.1](#41-departments--built)), **Designation**: company-level lookups
+  (HRM-lite).
 - **Section / Line**: the factory-floor units under a department (phase 1).
 - **Employee**: employee code, name, company, department, designation, joining date, status,
   optional User, and **cost rate**. Phase 1 adds personal and job details and documents.
@@ -84,6 +85,38 @@ The cost rate is what an hour of this employee costs the company. Projects uses 
 timesheet hours for budget against actual ([`projects.md` §4](projects.md#billing-rate-and-cost-rate)).
 Until payroll exists it is **entered by hand**; from phase 2 payroll calculates it. It is
 salary-derived, so it is not visible to everyone ([§8](#8-open-decisions)).
+
+### 4.1 Departments — built
+
+HRM → Departments (`hrm.departments.index`, `pages/hrm/departments/index.tsx`), the first
+company-scoped master table. `Models/Hrm/Department`, `Hrm\DepartmentController`,
+`Hrm\DepartmentService`, tests in `tests/Feature/Hrm/DepartmentTest.php` and `DepartmentImportTest.php`.
+
+| Column | Rule |
+| --- | --- |
+| `company_id` | The **selected** company, stamped by the server — never a form field. `restrictOnDelete`: the company's service refuses to delete a company with departments. |
+| `code` | Required, up to 20, letters and digits joined by single `-`/`_`; stored in capitals. |
+| `name` | Required, up to 100; trimmed, inner spaces collapsed. |
+| `status` | `A` / `I`. Inactive keeps the department on record but out of new entries. |
+| actor stamps, timestamps, `deleted_at` | Restorable: Active / Deleted tabs. |
+
+- **Duplicates** (owner, 2026-10-29): `code` and `name` are each unique **within the company**,
+  ignoring case and spacing, **deleted departments included** — the refusal says to restore the
+  deleted one. The same code or name in another company is allowed. Unique indexes
+  `(company_id, code)` and `(company_id, name)` back the rule.
+- **Bulk delete** on both tabs (ARCHITECTURE §8.6): the header box ticks the page; Active moves the
+  ticked departments to Deleted, Deleted removes them for good. Only the selected company's ids are
+  found, so another company's department is never touched.
+- **No deletion guard yet**: nothing references a department. Employees will add the first clause to
+  `DepartmentService::deletionBlocker()`.
+- **Import** (`hrm.departments.import`; `Hrm\DepartmentImportBlueprint`, a row writer): columns Code,
+  Name, optional Status; every row goes to the uploader's selected company. **A row matches an existing
+  department when its code or its name matches** (owner, 2026-10-29): Skip leaves it, Update rewrites
+  its code, name and status. Rejected, with the reason: a row whose code and name match two different
+  departments, a row matching a deleted department, a name or code repeated in the file, an unknown
+  status. A file uploaded for one company cannot be reviewed or confirmed while the uploader works in
+  another.
+- Roles by rule: `hr-officer` receives every `hrm.departments.*`, `viewer` the `.view`.
 
 ## 5. Workflows and approvals
 
@@ -101,12 +134,13 @@ that stops anyone approving their own record.
 
 ## 6. Draft permission catalogue
 
-*Draft — not seeded.* Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
+*Draft — not seeded*, except `hrm.dashboard.view` and
+`hrm.departments.{view,create,update,delete,restore,force-delete,import}`, which are. Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
 §6.2](../ARCHITECTURE.md#62-routes-and-permissions)).
 
 | Permission | Allows |
 | --- | --- |
-| `hrm.departments.{view,create,update,delete}` | Departments (HRM-lite) |
+| `hrm.departments.{view,create,update,delete,restore,force-delete,import}` | Departments (HRM-lite) — **seeded** |
 | `hrm.designations.{view,create,update,delete}` | Designations (HRM-lite) |
 | `hrm.employees.{view,create,update,delete}` | Employees (HRM-lite) |
 | `hrm.sections.{view,create,update,delete}` | Sections and lines |

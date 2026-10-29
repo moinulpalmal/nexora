@@ -54,20 +54,19 @@ props and a third of the page. Propose one with your reasoning and let the owner
 | --- | --- | --- | --- |
 | The same fact for every company; retired by status | **Global** | `admin/roles` | `references/global.md` |
 | As global, but a deleted row must be restorable (Active/Deleted tabs) | **Restorable** | `admin/users` | `references/restorable.md` |
-| A row means nothing outside the company that keeps it (§9.10: every Projects, Accounting and HRM record) | **Company-scoped** | *none yet* | `references/company-scoped.md` |
+| A row means nothing outside the company that keeps it (§9.10: every Projects, Accounting and HRM record) | **Company-scoped** | `hrm/departments` (restorable too) | `references/company-scoped.md` |
 | A parent whose form edits a list of child rows with no identity of their own | **Parent + child ladder** | *none yet* | `references/child-table.md` |
 
 The shapes combine: a company-scoped table can also be a ladder parent.
 
-**Two shapes have no sibling in Nexora yet.** For those, the reference file carries the rules —
+**The ladder shape has no sibling in Nexora yet.** For it, the reference file carries the rules —
 proved in compozit, restated here — and the first table you build becomes the sibling. Before
 building one, confirm the design with the owner, and record the new reference in this skill when you
 are done.
 
-**Company-scoped is gated.** §9.10 puts the Company master before the first ERP table. If
-`companies` does not exist on disk (no `Models/Admin/Company`, no company scope), **stop**: say the
-table cannot be built company-scoped yet, and offer to build the Company master first (it is a global
-Admin table — this skill builds it).
+**Company-scoped** follows `hrm/departments`: `Concerns\BelongsToCompany` on the model,
+`Services/Admin/SelectedCompany` for "which company?", uniqueness scoped to the company in the
+request, the no-company panel on the page (built 2026-10-29, §9.10).
 
 Module paths follow from the owner (§4, layer first, module second):
 

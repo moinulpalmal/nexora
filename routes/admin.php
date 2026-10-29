@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ApplicationSettingController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandingSettingController;
+use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\ImportLimitController;
 use App\Http\Controllers\Admin\MailSettingController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -58,6 +59,36 @@ Route::middleware(['auth', 'auth.session'])
         Route::put('users/{user}/roles', [UserController::class, 'updateRoles'])
             ->middleware('permission:admin.users.assign-roles')
             ->name('users.roles');
+
+        Route::put('users/{user}/companies', [UserController::class, 'updateCompanies'])
+            ->middleware('permission:admin.users.assign-companies')
+            ->name('users.companies');
+
+        // Before the resource, so `bulk` is not read as a {company} id.
+        Route::delete('companies/bulk', [CompanyController::class, 'bulkDestroy'])
+            ->middleware('permission:admin.companies.delete')
+            ->name('companies.bulk-destroy');
+
+        Route::delete('companies/bulk/force', [CompanyController::class, 'bulkForceDelete'])
+            ->middleware('permission:admin.companies.force-delete')
+            ->name('companies.bulk-force-delete');
+
+        Route::resource('companies', CompanyController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:admin.companies.view')
+            ->middlewareFor(['store'], 'permission:admin.companies.create')
+            ->middlewareFor(['update'], 'permission:admin.companies.update')
+            ->middlewareFor(['destroy'], 'permission:admin.companies.delete');
+
+        Route::put('companies/{company}/restore', [CompanyController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:admin.companies.restore')
+            ->name('companies.restore');
+
+        Route::delete('companies/{company}/force', [CompanyController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:admin.companies.force-delete')
+            ->name('companies.force-delete');
 
         Route::resource('roles', RoleController::class)
             ->only(['index', 'store', 'update', 'destroy'])

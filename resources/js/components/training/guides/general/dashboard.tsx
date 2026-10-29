@@ -16,9 +16,9 @@ import {
 
 /**
  * Dashboard (`dashboard`) — and the shell every screen shares: the sidebar,
- * the header's help button and bell, and the user menu. The dashboard holds
- * no widgets yet; rewrite this guide when it does.
- * Source: ARCHITECTURE.md §8.3, §9.7; documentation/training.md.
+ * the header's company switcher, help button and bell, and the user menu.
+ * The dashboard holds no widgets yet; rewrite this guide when it does.
+ * Source: ARCHITECTURE.md §8.3, §9.7, §9.10; documentation/training.md.
  */
 export default function DashboardGuide() {
     return (
@@ -93,6 +93,30 @@ export default function DashboardGuide() {
                                 করুন। সাইডবারের <Ui>Training</Ui>-এ সব গাইডের
                                 তালিকা আছে — যে স্ক্রিন আপনি এখনো খুলতে পারেন
                                 না, তার গাইডও।
+                            </>
+                        }
+                    />
+                    <Step
+                        en={
+                            <>
+                                If you work in Projects, Accounts or HRM, the
+                                company switcher in the header shows the company
+                                you are working in. Every record you see or add
+                                there belongs to that company; pick another from
+                                the switcher to change it. You only see the
+                                companies an administrator has given you — with
+                                just one, it is chosen for you.
+                            </>
+                        }
+                        bn={
+                            <>
+                                Projects, Accounts বা HRM-এ কাজ করলে হেডারের
+                                কোম্পানি সুইচারে দেখা যায় আপনি কোন কোম্পানিতে
+                                কাজ করছেন। সেখানে যে রেকর্ড দেখেন বা যোগ করেন,
+                                সবই সেই কোম্পানির; বদলাতে সুইচার থেকে অন্যটি
+                                বেছে নিন। একজন অ্যাডমিনিস্ট্রেটর আপনাকে যে
+                                কোম্পানিগুলো দিয়েছেন শুধু সেগুলোই দেখা যায় —
+                                একটি থাকলে সেটিই আপনা থেকে বেছে নেওয়া হয়।
                             </>
                         }
                     />

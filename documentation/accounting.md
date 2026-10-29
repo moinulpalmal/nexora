@@ -31,7 +31,7 @@ The code uses **Accounting**, not *Accounts*, because "account" already means a 
 say *Accounts* (owner, 2026-10-28).
 
 **Every record belongs to a company**, and each company has its own chart of accounts, fiscal years
-and ledger ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company-planned)).
+and ledger ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
 
 ## 2. Scope
 

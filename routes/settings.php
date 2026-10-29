@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\AppearanceController;
+use App\Http\Controllers\Settings\CompanySelectionController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -27,4 +28,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/appearance', [AppearanceController::class, 'edit'])->name('appearance.edit');
     Route::patch('settings/appearance', [AppearanceController::class, 'update'])->name('appearance.update');
+
+    // The header's company switcher (ARCHITECTURE.md §9.10).
+    Route::put('settings/company', [CompanySelectionController::class, 'update'])->name('company-selection.update');
 });

@@ -12,6 +12,8 @@ export type UserListItem = {
     status: string;
     avatar_url: string | null;
     roles: string[];
+    /** Ids of the companies the user was granted (ARCHITECTURE.md §9.10). */
+    companies: number[];
     last_login_at: string | null;
     created_at: string | null;
     deleted_at: string | null;
@@ -27,6 +29,34 @@ export type UserFilters = ListFilters & {
      * A tab, not a column filter.
      */
     view: 'active' | 'trashed';
+};
+
+/** One row of the companies list, as `CompanyController::index()` projects it. */
+export type CompanyListItem = {
+    id: number;
+    name: string;
+    short_code: string;
+    /** `App\Enums\RecordStatus` — `'A'` or `'I'`. Inactive companies cannot be selected. */
+    status: string;
+    users_count: number;
+    created_at: string | null;
+    deleted_at: string | null;
+    /** Why the company cannot be deleted right now, or null when it can. */
+    deletion_blocker: string | null;
+};
+
+export type CompanyFilters = ListFilters & {
+    /** Which record set is listed — a tab, not a column filter. */
+    view: 'active' | 'trashed';
+};
+
+/** A company offered in a user's Companies dialog. */
+export type CompanyGrantOption = {
+    id: number;
+    name: string;
+    short_code: string;
+    /** An inactive company may be granted; it is usable once reactivated. */
+    is_active: boolean;
 };
 
 /** Help for one permission — `PermissionDescriptions::for()`. */

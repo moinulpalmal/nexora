@@ -12,12 +12,13 @@ one upload request, its routes and a call to the shared dialog.
 - `app/Http/Requests/Imports/ImportConfirmRequest.php` — shared; you do **not** write a confirm request
 - `resources/js/components/shared/sheet-import-dialog.tsx`, `pending-import-banner.tsx`,
   `import-result-panel.tsx` — shared; you do **not** write a dialog
-- **The current reference implementation.** No shipped table imports yet, so the reference is the
-  fixture importer the engine is proved with: `tests/Fixtures/Imports/WidgetImportBlueprint.php`,
-  `WidgetImportController.php`, `FixtureImportRequest.php`, and the routes in `ImportFixtures.php`;
-  its tests are `tests/Feature/Imports/SheetImportLifecycleTest.php`. Search `app/Services/` for
-  `implements ImportBlueprint` first — once a real importer exists it is the sibling, and you should
-  record it here.
+- **The current reference implementation: HRM → Departments** — `app/Services/Hrm/
+  DepartmentImportBlueprint.php` (company-scoped, a row writer matching on code *or* name),
+  `Http/Controllers/Hrm/DepartmentImportController.php` (selected company; refuses review/confirm
+  from another company), `Http/Requests/Hrm/DepartmentImportRequest.php`, the routes in
+  `routes/hrm.php`, the page `pages/hrm/departments/index.tsx`, and
+  `tests/Feature/Hrm/DepartmentImportTest.php`. For a plain all-or-nothing importer the fixture
+  `tests/Fixtures/Imports/WidgetImportBlueprint.php` is still the simplest shape.
 
 ---
 

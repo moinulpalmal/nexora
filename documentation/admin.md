@@ -21,6 +21,7 @@
 | g. Sent Mails | `Admin\SentMailController` | `pages/admin/sent-mails/index.tsx` | `admin.sent-mails.view` ★ |
 | h. Application Settings → Branding | `Admin\BrandingSettingController`, `Admin\BrandingService` | `pages/admin/application-settings.tsx` | `admin.branding.{view,update}` |
 | i. Application Settings → Import Limits | `Admin\ImportLimitController`, `Admin\ImportLimitService` | same page | `admin.import-limits.{view,update}` ★ |
+| j. Companies ([§10](#10-companies)) | `Admin\CompanyController`, `Admin\CompanyService`, `Admin\SelectedCompany` | `pages/admin/companies/index.tsx` | `admin.companies.*`, `admin.users.assign-companies` |
 
 ★ `SUPER_ADMIN_ONLY` — no role receives it by rule; an administrator can still grant it by hand.
 
@@ -243,30 +244,73 @@ a panel in `components/admin/application-settings/`, and a tab entry in the page
 
 ## 9. Testing
 
-`tests/Feature/Admin/`: `UserTest`, `RoleTest`, `PermissionCatalogueTest`, `RbacTest`,
+`tests/Feature/Admin/`: `UserTest`, `RoleTest`, `CompanyTest`, `UserCompanyAssignmentTest`, `PermissionCatalogueTest`, `RbacTest`,
 `PermissionDescriptionsTest`, `AuditTrailTest`, `AuditLogViewerTest`, `ApplicationSettingTest`,
-`BrandingSettingTest`, `ImportLimitTest`, `SentMailTest`. The import engine itself is proved in
+`BrandingSettingTest`, `ImportLimitTest`, `SentMailTest`; the header switcher is
+`tests/Feature/Settings/CompanySelectionTest`. The import engine itself is proved in
 `tests/Feature/Imports/` against fixture importers in `tests/Fixtures/Imports/`. Helpers in `tests/Pest.php`: `userWithPermissions(...)`, `superAdmin()`,
 `assertToast($response, $type)`, `compliantPassword()`, `fakeBreachedPasswordLookup()`,
 `workbookFixture([...])` / `uploadedWorkbook([...])` (an `.xlsx` built from `[tab => rows]`). Audit
 assertions turn auditing on with `config(['audit.console' => true])` after the fixtures.
 
-## 10. Planned: Companies
+## 10. Companies
 
-> **📋 Planned — nothing built** (owner, 2026-10-28). This is the first thing to build for the ERP
-> modules ([`projects.md`](projects.md), [`accounting.md`](accounting.md), [`hrm.md`](hrm.md)). The
-> rule it sets is in [`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company-planned).
+> **Built 2026-10-29** (owner's decisions of that day). The rule it sets is
+> [`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company).
 
 Nexora serves **several Palmal Group companies in one installation**. Every HRM, Accounting and
 Projects record belongs to a company, and each company keeps its own ledger and payroll. Admin owns
 the company list because it is master data every module needs and no one business module owns.
 
-- **Admin → Companies** is the list of companies (name, short code, address, base currency, status),
-  with the usual list standards. Companies are deactivated, not deleted, once anything refers to
-  them.
-- **User ↔ company access.** On the user dialog, an administrator grants each user one or more
-  companies. A user with no company can reach no ERP module, though Admin and Settings still work.
-- **The selected company.** A user works in **one company at a time**, chosen from a switcher in the
-  header and remembered between sessions. Every ERP screen reads and writes only that company's
-  records, and the server enforces that whatever the browser sends.
-- Draft permissions: `admin.companies.{view,create,update,delete}`.
+### 10.1 The Company master — Admin → Companies
+
+| Column | Rule |
+| --- | --- |
+| `name` | Required, up to 150. Trimmed, inner spaces collapsed. Unique across **every** company, ignoring case, soft-deleted ones included. |
+| `short_code` | Required, up to 10, letters and digits joined by single `-`/`_`. Stored in capitals; unique like the name. Shown in the header switcher. |
+| `status` | `A` / `I`. An inactive company cannot be selected; anyone working in it is moved on. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. |
+
+- **Active / Deleted tabs**, as Users: delete moves a company to Deleted, where it can be restored or
+  permanently deleted. A deleted company **keeps its name and short code reserved**; creating a
+  duplicate says to restore it instead.
+- **Bulk delete** on both tabs (ARCHITECTURE §8.6): tick rows — the header box ticks the page — and
+  delete them (Active) or delete them for good (Deleted), behind `admin.companies.delete` /
+  `admin.companies.force-delete`. A company something belongs to cannot be ticked; the server re-checks
+  each and names any it kept in a `warning` toast.
+- **Deletion guard:** `CompanyService::deletionBlocker()` refuses delete and permanent delete while
+  any department belongs to the company, deleted departments included (the count drops the company
+  scope). The button is disabled with the reason on hover; the server answers a `warning` toast.
+  Deactivating is the normal way to retire a company.
+- No spreadsheet import — a handful of rows, entered by hand.
+- Permissions: `admin.companies.{view,create,update,delete,restore,force-delete}` — the `admin` role
+  receives them by rule, `viewer` the `.view`.
+
+### 10.2 User ↔ company access
+
+The `company_user` pivot. On Admin → Users, the building button opens **Companies for {user}**: one
+tick box per undeleted company, inactive ones marked (a grant outlives a deactivation). Its own
+permission, `admin.users.assign-companies`; **nobody changes their own companies** (`UserService::
+companyAssignmentBlocker()`). The change is audited as `companies-changed` with the ids before and
+after, the user is told in the bell, and a selection the new set no longer covers is cleared.
+
+**A super admin needs no grant**: they may work in any active company.
+
+### 10.3 The selected company
+
+A user works in **one company at a time**, chosen from the switcher in the header
+(`components/company-switcher.tsx` → `PUT settings/company`, `company-selection.update`, no
+permission gate) and remembered in `users.selected_company_id` between sessions and devices.
+
+`Services/Admin/SelectedCompany` answers "which company?" for every request:
+
+- **Usable** companies are the active, undeleted ones the user was granted — or every active one for
+  a super admin.
+- The remembered choice is honoured only while it is usable. When it stops being (deactivated,
+  deleted, grant removed) it is cleared; when exactly one usable company is left it is chosen
+  automatically, so someone with one company never picks it.
+- Shared with every page as `auth.companies` and `auth.company`.
+
+A company-scoped model uses `Concerns\BelongsToCompany`: its queries see only the selected company
+(another company's row binds as a 404) and the company is stamped on create. A user with no company
+still reaches Admin and Settings; an ERP page shows a "no company" panel instead of its table.

@@ -51,8 +51,9 @@ their **email or username** (owner, 2026-10-26).
 ```
 app/
   Actions/Fortify/            ResetUserPassword
-  Concerns/                   Model & request traits: Audited, HasStatus, Listable,
-                              ProvidesOptions, *ValidationRules, RoleAssignmentRules
+  Concerns/                   Model & request traits: Audited, HasStatus, Listable, BelongsToCompany
+                              (§9.10), ProvidesOptions, *ValidationRules (incl. MasterDataValidationRules),
+                              RoleAssignmentRules
   Console/Commands/           SyncEnums (`php artisan enums:sync`), TrainingGaps (`training:gaps`)
   Contracts/                  Auditable, IdentifiedEnum, LabelledEnum
   Enums/                      FilterType, RecordStatus, Theme, EnumRegistry (module-less)
@@ -61,29 +62,33 @@ app/
   Exceptions/Admin/           MailNotConfiguredException
   Exceptions/Imports/         SheetImportException
   Http/Controllers/           HomeController, NotificationController (module-less)
-  Http/Controllers/Admin/     User, Role, Permission, AuditLog, ApplicationSetting,
+  Http/Controllers/Admin/     User, Role, Company, Permission, AuditLog, ApplicationSetting,
                               MailSetting, QuickLoginSetting, BrandingSetting, SentMail
-  Http/Controllers/Settings/  Profile, Security, Appearance (the user's own account)
+  Http/Controllers/Settings/  Profile, Security, Appearance, CompanySelection (the user's own account)
   Http/Controllers/Imports/   SheetImportController — the abstract base every importer extends
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
-                              DashboardController each — the 🧪 POC overviews (§5)
+                              DashboardController each — the 🧪 POC overviews (§5);
+                              Hrm/ also Department, DepartmentImport
   Http/Middleware/            EnsureUserIsActive, HandleAppearance, HandleInertiaRequests
-  Http/Requests/              ListRequest (module-less) + Admin/, Settings/,
+  Http/Requests/              ListRequest, BulkRequest (module-less) + Admin/, Settings/, Hrm/,
                               Imports/ (ImportConfirmRequest, shared by every importer)
   Listeners/                  CollapseNavGroupsOnLogin, StampLastLogin (module-less)
   Listeners/Admin/            RecordLogin, RecordLogout, RecordFailedLogin, RecordSentMail
   Mail/Admin/                 UserWelcomeMail, UserPasswordResetMail, MailSettingTestMail
   Models/User.php             (at the root — Laravel's auth convention)
   Models/SheetImport.php, ImportLimit.php   (at the root — the import engine's own records, §9.13)
-  Models/Admin/               Role, Permission, AuditLog, MailSetting, QuickLoginSetting,
+  Models/Admin/               Role, Permission, Company, AuditLog, MailSetting, QuickLoginSetting,
                               BrandingSetting, SentMail
+  Models/Hrm/                 Department (company-scoped, §9.10)
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
   Providers/                  AppServiceProvider, FortifyServiceProvider
-  Services/Admin/             UserService, RoleService, PermissionService, PermissionDescriptions,
-                              AuditRecorder, AuditLogService, MailSettingService,
-                              QuickLoginService, BrandingService, UserCredentialMailer
+  Services/Admin/             UserService, RoleService, CompanyService, SelectedCompany (§9.10),
+                              PermissionService, PermissionDescriptions, AuditRecorder,
+                              AuditLogService, MailSettingService, QuickLoginService,
+                              BrandingService, UserCredentialMailer
+  Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer)
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
   Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
                               ImportBlueprint, ImportRegistry, the DTOs ImportLimits/Outcome/Preview
@@ -107,21 +112,23 @@ resources/
     components/shared/        used by two or more modules (list toolbar, pagination, …)
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
-    components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview
+    components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview;
+                              hrm/ also the department form dialog and the no-company panel
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
-                              table of contents; guides/{general,admin,settings,shared}/ (§5)
+                              table of contents; guides/{general,admin,settings,hrm,shared}/ (§5)
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
     hooks/                    use-can, use-list-filters, use-form-dialog, use-appearance, …
     layouts/                  app, auth, settings
     lib/                      utils (cn), daisy-class-groups, themes, echo, enums (GENERATED)
     pages/                    one file per Inertia page, path mirrors the URL (§6.4)
-    types/                    index.ts re-exports auth, admin, imports, navigation, training, ui
+    types/                    index.ts re-exports auth, admin, hrm, imports, navigation, training, ui
 routes/
   web.php                     `/`, dashboard, notifications; requires admin.php, settings.php
   admin.php                   the Admin module
   settings.php                the user's own account settings
   training.php                the in-app manual (ungated)
-  projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each)
+  projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each; hrm.php also
+                              departments and their import)
   channels.php                private broadcast channels
 tests/
   Feature/                    root: apparatus tests (Listable, EnumRegistry, PasswordPolicy, …)
@@ -172,7 +179,7 @@ there; it is administered by the Admin module.
 | --- | --- | --- | --- | --- | --- | --- |
 | Platform (shell) | ✅ | root of each layer | `routes/web.php` | — | `/` | `pages/dashboard.tsx`, `pages/auth/*` |
 | **Admin** | ✅ | `Admin` | `routes/admin.php` | `admin.` | `admin/` | `pages/admin/*` |
-| **Settings** (own account) | ✅ | `Settings` | `routes/settings.php` | `profile.`, `security.`, `appearance.`, `user-password.` | `settings/` | `pages/settings/*` |
+| **Settings** (own account) | ✅ | `Settings` | `routes/settings.php` | `profile.`, `security.`, `appearance.`, `user-password.`, `company-selection.` | `settings/` | `pages/settings/*` |
 | **Training** (in-app manual) | ✅ | `Training` | `routes/training.php` | `training.` | `training/` | `pages/training/*` |
 | **Projects** (Project Management) | 🧪 POC | `ProjectManagement` | `routes/projects.php` | `projects.` | `projects/` | `pages/projects/*` |
 | **Accounting** (menu: Accounts) | 🧪 POC | `Accounting` | `routes/accounting.php` | `accounting.` | `accounting/` | `pages/accounting/*` |
@@ -187,13 +194,14 @@ body and the sample data are **throwaway**, replaced when the first real slice l
 follow [§11](#11-adding-a-new-module) for the rest and switch the status to ✅.
 
 **Admin** owns: users (create, edit, deactivate, soft delete, restore, force delete, set password,
-assign roles, avatar), roles (with the permission picker), the read-only permission catalogue, the
+assign roles, grant companies, avatar), roles (with the permission picker), the Company master
+([§9.10](#910-multi-company)), the read-only permission catalogue, the
 audit log viewer, the Application Settings hub (Mail Server, Quick Login, Branding, Import Limits tabs)
 and Sent Mails. Full
 reference: [`documentation/admin.md`](documentation/admin.md).
 
 **Settings** is the signed-in user's own account — profile (photo, name, phone, username, email),
-password and theme. It is not a place for application configuration; that is Admin → Application
+password, theme and the selected company (the header switcher, [§9.10](#910-multi-company)). It is not a place for application configuration; that is Admin → Application
 Settings. Reference: [`documentation/settings.md`](documentation/settings.md).
 
 **Training** is the in-app manual: one guide per screen in English and Bangla, read at `/training`,
@@ -208,7 +216,7 @@ captured from invented data by `composer training:screens`. **Every GET screen m
 
 ### The ERP modules (🧪 POC — an overview each, the rest planned)
 
-**Build order: Company (Admin, [§9.10](#910-multi-company-planned)) → Projects → Accounting → HRM**
+**Build order: Company (Admin, [§9.10](#910-multi-company)) → Projects → Accounting → HRM**
 (owner, 2026-10-28). Projects comes first, so two small slices of the later modules ship with it:
 **HRM-lite** (Employees, Departments, Designations) and **Accounting → Customers**.
 
@@ -228,7 +236,9 @@ Reference: [`documentation/accounting.md`](documentation/accounting.md).
 (phase 1), payroll under the Bangladesh Labour Act (phase 2), and recruitment, appraisal and
 separation (phase 3). **An Employee is not a User**: it has an optional link to one, and creating an
 employee never creates an account. The employee's **cost rate** is what Projects prices hours with.
-Reference: [`documentation/hrm.md`](documentation/hrm.md).
+**Built so far: Departments** (`hrm/departments`, with import) — the first company-scoped master
+table. The module stays 🧪 while its overview still shows sample data; the sidebar group is already
+a list of links, each behind its own `useCan`. Reference: [`documentation/hrm.md`](documentation/hrm.md).
 
 ## 6. Naming conventions
 
@@ -244,7 +254,7 @@ Reference: [`documentation/hrm.md`](documentation/hrm.md).
 | Listener | `Record{Thing}`, `{Verb}{Thing}` | `Listeners/` or `Listeners/{Module}/` |
 | Validation rules shared by requests | `{Topic}ValidationRules` trait | `Concerns/` |
 
-**Exceptions to "one level deep":** `ListRequest`, `HomeController` and `NotificationController` live
+**Exceptions to "one level deep":** `ListRequest`, `BulkRequest`, `HomeController` and `NotificationController` live
 at the layer root because they belong to no module. **There are no Policy classes**: authorization is
 route middleware plus service guards ([§9.1](#91-rbac-roles--permissions)) (owner, 2026-10-26).
 
@@ -286,8 +296,8 @@ compozit)*.
 
 ### 6.6 TypeScript types
 
-`types/index.ts` re-exports one file per area (`auth.ts`, `admin.ts`, `imports.ts`, `navigation.ts`,
-`training.ts`, `ui.ts`).
+`types/index.ts` re-exports one file per area (`auth.ts`, `admin.ts`, `hrm.ts`, `imports.ts`,
+`navigation.ts`, `training.ts`, `ui.ts`).
 Shared Inertia props are typed in `types/global.d.ts` (`InertiaConfig.sharedPageProps`).
 
 ## 7. Request lifecycle
@@ -359,6 +369,16 @@ Values are compared as strings.
   page is `pages/admin/users/index.tsx`.
 - A list that reads newest first overrides `ListRequest::defaultDirection()`; core keys (`sort`,
   `direction`, `per_page`, `filter`) always win over a surface's extra `filterValues()`.
+- **Bulk actions** *(owner, 2026-10-29; first on Companies and Departments)*: a tick-box column, a
+  header box that ticks **every row on this page** — never "everything matching the filter" — and
+  `components/shared/bulk-action-bar.tsx` with the action, confirmed through `ConfirmActionDialog`
+  `fields` (hidden `ids[]`). `hooks/use-row-selection.ts` drops the selection on any page or filter
+  change; its `selectable` callback keeps a row the action cannot take out of the selection. The
+  server takes `Http\Requests\BulkRequest` (`ids`, at most one page), re-runs each row's guard and
+  writes **row by row through the service**, so every row is audited; a refused row is reported in a
+  `warning` toast, the rest still go. A restorable list offers bulk delete on Active and bulk
+  permanent delete on Deleted, each behind its single-row permission. Routes `{x}/bulk` and
+  `{x}/bulk/force` are declared before the resource.
 
 ### 8.7 Modals never light-dismiss; menus always do
 
@@ -526,16 +546,41 @@ One-click sign-in buttons on `/login` for the seeded super admin and demo accoun
 switch on Application Settings → Quick Login *and* `APP_ENV` local/testing — production never renders
 them (owner, 2026-10-26). The buttons submit the real login form.
 
-### 9.10 Multi-company (planned)
+### 9.10 Multi-company
 
-*(owner, 2026-10-28; nothing built yet)* One installation serves several Palmal Group companies.
+*(owner, 2026-10-28; built 2026-10-29)* One installation serves several Palmal Group companies.
 **Every Projects, Accounting and HRM record carries its company**, and each company has its own
-ledger, fiscal years and payroll. Admin owns the Company master and **user ↔ company access**. A
-user may hold several companies and works in **one selected company at a time** (a header
-switcher). Every ERP query is scoped to the selected company **on the server**, so a company id sent
-from the browser is never trusted on its own. The company dimension is set up before the first ERP
-table so that no table needs a later migration to add it. Reference:
-[`documentation/admin.md` §10](documentation/admin.md#10-planned-companies).
+ledger, fiscal years and payroll. The company dimension is set up before the first ERP table so that
+no table needs a later migration to add it. Reference:
+[`documentation/admin.md` §10](documentation/admin.md#10-companies).
+
+- **The Company master** is Admin's (`Models/Admin/Company`, Admin → Companies): name and short code,
+  each unique across every company **soft-deleted ones included**, status, restorable. Deactivating
+  is the normal way to retire one; `CompanyService::deletionBlocker()` refuses a delete while any
+  record belongs to it ([§9.14](#914-master-data-and-deletion-guards)).
+- **User ↔ company access** is the `company_user` pivot, granted on the user's Companies dialog
+  (`admin.users.assign-companies`, audited as `companies-changed`; nobody re-grants their own). **A
+  super admin needs no grant** and may work in any active company (owner, 2026-10-29).
+- **One selected company at a time**, chosen in the header switcher and remembered in
+  `users.selected_company_id` across sessions and devices. **`Services/Admin/SelectedCompany` is the
+  only place that answers "which company?"**: it checks the remembered choice against the user's
+  *usable* companies (active, undeleted, granted) on every request, clears it when it stops being
+  usable, and picks the company automatically when exactly one is usable.
+- **Server-side scope.** A company-scoped model uses `Concerns\BelongsToCompany`: a `company` global
+  scope confines every read (lists, options, route-model binding — another company's row is a 404)
+  whenever someone is signed in, and the selected company is stamped on create. `company_id` is never
+  fillable and never a form field, so a browser-sent value is ignored, not validated. Console code has
+  no actor and is not scoped. A guard that counts rows drops the scope
+  (`withoutGlobalScope('company')` / `withoutGlobalScopes()`).
+- **No company is a state, not an error.** An ERP page receives `company: null` and draws
+  `components/hrm/no-company-panel.tsx` in place of its table (promoted to `shared/` when a second
+  module needs it, §6.5), hiding create and import; Admin and Settings are unaffected. The switcher is
+  `components/company-switcher.tsx`, in the app header.
+- **Uniqueness is per company** and `Rule::unique` does not know it: the rule names the company
+  itself. Master tables compare names and codes ignoring case and keep a deleted row's values
+  reserved — `Concerns\MasterDataValidationRules` (owner, 2026-10-29).
+
+`hrm/departments` is the reference company-scoped surface.
 
 ### 9.11 Approvals (planned)
 
@@ -587,18 +632,21 @@ renders `components/shared/sheet-import-dialog.tsx` and `pending-import-banner.t
   `POST {x}/imports/{sheetImport}/confirm`, `DELETE {x}/imports/{sheetImport}`, `GET {x}/import/template`,
   and for a row writer `POST …/review` and `GET …/rejects`. The two GET routes are not screens and go
   in `config/training.php → ignore_routes`.
-- **Company:** `sheet_imports.company_id` is **pre-wired** (nullable, no foreign key until the Company
-  master exists, [§9.10](#910-multi-company-planned)). A blueprint answering `isCompanyScoped()` gets
+- **Company:** `sheet_imports.company_id` is nullable and deliberately has **no foreign key** — an
+  import row is a log of what happened, and the engine's own tests stage against fixture companies
+  that do not exist ([§9.10](#910-multi-company)). A blueprint answering `isCompanyScoped()` gets
   `company_id` in its uniqueness check, its written rows and its upsert key; its controller resolves
   the **selected** company in `companyIdFor()` — never from the request body — and staging refuses
-  without one. A second scope (`scopeField()`) is generic.
+  without one. A staged file keeps the company it was uploaded for, so its controller refuses review
+  and confirm while the uploader works in another (`Hrm\DepartmentImportController`). A second
+  scope (`scopeField()`) is generic.
 - **Limits:** rows (workbook-wide), columns (per tab) and worksheets are read from the `import_limits`
   row (Admin → Application Settings → Import Limits, super-admin only), falling back to
   `config/sheet-import.php`; `max_file_size_kb` stays in config because PHP's upload limit bounds it.
   Uploads are kept on the `local` disk under `sheet-imports/`.
-- **No shipped table imports yet.** The engine is proved in `tests/Feature/Imports/` against fixture
-  importers in `tests/Fixtures/Imports/`; the first real importer becomes the reference the
-  `master-crud` skill points at.
+- **The reference importer is HRM → Departments** (`Services/Hrm/DepartmentImportBlueprint`, a
+  company-scoped row writer that matches a row on its code **or** its name). The engine itself is
+  proved in `tests/Feature/Imports/` against fixture importers in `tests/Fixtures/Imports/`.
 
 ### 9.14 Master data and deletion guards
 

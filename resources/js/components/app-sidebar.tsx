@@ -1,6 +1,8 @@
 import { Link } from '@inertiajs/react';
 import {
+    Building2,
     FolderKanban,
+    Network,
     GraduationCap,
     History,
     KeyRound,
@@ -30,11 +32,13 @@ import { dashboard } from '@/routes';
 import { dashboard as accountingDashboard } from '@/routes/accounting';
 import { edit as applicationSettingsEdit } from '@/routes/admin/application-settings';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
+import { index as companiesIndex } from '@/routes/admin/companies';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as sentMailsIndex } from '@/routes/admin/sent-mails';
 import { index as usersIndex } from '@/routes/admin/users';
 import { dashboard as hrmDashboard } from '@/routes/hrm';
+import { index as departmentsIndex } from '@/routes/hrm/departments';
 import { dashboard as projectsDashboard } from '@/routes/projects';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
@@ -62,6 +66,7 @@ export function AppSidebar() {
     // the `permission:` middleware.
     const canViewUsers = useCan('admin.users.view');
     const canViewRoles = useCan('admin.roles.view');
+    const canViewCompanies = useCan('admin.companies.view');
     const canViewPermissions = useCan('admin.permissions.view');
     const canViewAuditLogs = useCan('admin.audit-logs.view');
     const canViewSentMails = useCan('admin.sent-mails.view');
@@ -74,6 +79,7 @@ export function AppSidebar() {
     const canViewProjects = useCan('projects.dashboard.view');
     const canViewAccounting = useCan('accounting.dashboard.view');
     const canViewHrm = useCan('hrm.dashboard.view');
+    const canViewDepartments = useCan('hrm.departments.view');
 
     const adminNavLinks: (NavItem & { visible: boolean })[] = [
         {
@@ -87,6 +93,12 @@ export function AppSidebar() {
             href: rolesIndex(),
             icon: ShieldCheck,
             visible: canViewRoles,
+        },
+        {
+            title: 'Companies',
+            href: companiesIndex(),
+            icon: Building2,
+            visible: canViewCompanies,
         },
         {
             title: 'Permissions',
@@ -115,6 +127,27 @@ export function AppSidebar() {
     ];
 
     const adminNavItems: NavItem[] = adminNavLinks
+        .filter((link) => link.visible)
+        .map(({ title, href, icon }) => ({ title, href, icon }));
+
+    // HRM's first real screen turned its group into a list of links, each
+    // behind its own permission, like Admin's.
+    const hrmNavLinks: (NavItem & { visible: boolean })[] = [
+        {
+            title: 'Overview',
+            href: hrmDashboard(),
+            icon: UsersRound,
+            visible: canViewHrm,
+        },
+        {
+            title: 'Departments',
+            href: departmentsIndex(),
+            icon: Network,
+            visible: canViewDepartments,
+        },
+    ];
+
+    const hrmNavItems: NavItem[] = hrmNavLinks
         .filter((link) => link.visible)
         .map(({ title, href, icon }) => ({ title, href, icon }));
 
@@ -148,18 +181,7 @@ export function AppSidebar() {
                   ]
                 : [],
         },
-        {
-            label: 'HRM',
-            items: canViewHrm
-                ? [
-                      {
-                          title: 'Overview',
-                          href: hrmDashboard(),
-                          icon: UsersRound,
-                      },
-                  ]
-                : [],
-        },
+        { label: 'HRM', items: hrmNavItems },
     ].filter((group) => group.items.length > 0);
 
     // Called once: this is the only place that knows every group and its links.

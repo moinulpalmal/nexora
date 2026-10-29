@@ -4,20 +4,20 @@ For a table whose rows belong to exactly one company, and whose values legitimat
 company — a department code, a customer code, an account in the chart. §9.10: **every Projects,
 Accounting and HRM record carries its company**, so this is the default shape for an ERP table.
 
-**There is no sibling yet, and there may be no Company yet.** Check first:
+**The sibling is `hrm/departments`** (built 2026-10-29) — read it end to end; it wins over this
+file. What it established, named after what ships:
 
-- `app/Models/Admin/Company.php`, its migration, and whatever mechanism holds the user's **selected
-  company** (the header switcher §9.10 plans). If any is missing, **stop** and tell the owner: the
-  Company master comes first in the build order. Offer to build it — it is a global Admin table
-  (`references/global.md`) with user ↔ company access, and its own design questions (see
-  `documentation/admin.md` §10).
-- If Company exists, find the first company-scoped table already built and read it end to end. If
-  there is one, it is your sibling and it wins over this file; if this is the first, confirm the
-  design below with the owner, and when you are done, **record the new sibling in this file and in
-  SKILL.md's shape table**.
-
-Do not invent the trait, scope or helper names below the rules: name them after what Company actually
-ships, or agree them with the owner and record them in `ARCHITECTURE.md` §9.10.
+- `Models/Admin/Company`, the `company_user` grants, `users.selected_company_id`, and
+  **`Services/Admin/SelectedCompany`** — `current()`, `id()`, `usable($user)` — the only answer to
+  "which company?" (§9.10).
+- **`Concerns\BelongsToCompany`** on the model: the `company` global scope (signed-in requests only)
+  and the stamp on create. `company_id` stays out of `#[Fillable]`.
+- **`Concerns\MasterDataValidationRules`**: `normaliseName()` / `normaliseCode()` (also the import
+  fields' transforms) and `uniqueIgnoringCase()`, which counts deleted rows and says "restore it
+  instead" — the owner's duplicate rule for master tables (2026-10-29).
+- `components/hrm/no-company-panel.tsx` for rule 5 below (promote it to `shared/` when a second
+  module needs it).
+- The test helper shape: `departmentActor($company, ...$permissions)` in `DepartmentTest.php`.
 
 ---
 

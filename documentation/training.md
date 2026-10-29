@@ -35,7 +35,7 @@ slashes are not.
 | Shared prop | `training` in `HandleInertiaRequests::share()` — `{key, title_en, title_bn, status}` or `null` |
 | Pages | `pages/training/index.tsx`, `show.tsx` |
 | Vocabulary, loader, toggle, help button, table of contents | `components/training/` |
-| Guides | `components/training/guides/{section}/{name}.tsx` — all 10 screens written |
+| Guides | `components/training/guides/{section}/{name}.tsx` — 12 written (the port's 10, Admin → Companies, HRM → Departments); the three ERP overviews are `pending` |
 | Shared fragments | `components/training/guides/shared/list-basics.tsx` |
 | Screenshots | `public/images/training/{key}/{shot}.png`, committed |
 | Capture | `tests/Browser/Training/CaptureScreenshotsTest.php`, `composer training:screens` |
@@ -64,7 +64,7 @@ administration or security theory. Do not add `concept.*` pages.
 | Q5 | Bangla font | **compozit's repaired Nikosh**, self-hosted, no dependency — at `resources/fonts/`, not compozit's `public/fonts/` | The common Nikosh TTF has a `name` table Chrome rejects; this copy was rebuilt. Do not replace it with a fresh download. Under `public/` the dev server 404'd it (ARCHITECTURE.md §9.5) |
 | Q6 | The gate | **Exactly as compozit's** — only routes of `App\Http\Controllers\…` are checked | Owner's choice. A `Route::inertia()` screen (the dashboard) is invisible to it and is registered by hand |
 | Q7 | Registry placement | `App\Services\Training\` beside the gap finder | No new `app/Support/` layer folder |
-| Q8 | Sections | `general` / `admin` / `settings` ("Settings (your account)") | Nexora's own module names; guide folders match |
+| Q8 | Sections | `general` / `admin` / `settings` ("Settings (your account)"), then one per ERP module — `projects`, `accounting`, `hrm` | Nexora's own module names; guide folders match |
 | Q9 | Dashboard guide | **"Getting around"** — the sidebar, the **?**, the bell, the user menu, toasts, dialogs | The dashboard has no widgets yet; rewrite the guide when it does |
 | Q10 | Sign-in guide | **None**; a paragraph in the dashboard guide covers signing in | Parity with compozit; the manual is for signed-in users |
 | — | Storage | **TSX files in git**, no database | Reviewed in diffs; required `en`/`bn` props make a one-language guide fail the type check |
@@ -190,6 +190,8 @@ need a new section in `config/training.php`.
 | Batch | Screens | Status |
 | --- | --- | --- |
 | Port | Dashboard; Admin — Users, Roles, Permissions, Audit Log, Sent Mails, Application Settings; Settings — Profile, Security, Appearance | ✅ written 2026-10-27; **Bangla awaits the owner's read** |
+| Multi-company | Admin — Companies (new), Users (the Companies dialog added); HRM — Departments (new, with its import) | ✅ written 2026-10-29; **Bangla awaits the owner's read** |
+| ERP overviews | Projects, Accounts and HRM overviews | `pending` — sample-data previews; written when each overview shows real data |
 
 There is no backlog: every new screen is registered as it lands and its guide written in the same
 change or the next one.

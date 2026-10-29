@@ -4,9 +4,11 @@ namespace App\Http\Middleware;
 
 use App\Enums\Theme;
 use App\Listeners\CollapseNavGroupsOnLogin;
+use App\Models\Admin\Company;
 use App\Models\Admin\Role;
 use App\Models\User;
 use App\Services\Admin\BrandingService;
+use App\Services\Admin\SelectedCompany;
 use App\Services\Training\TrainingRegistry;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules\Password;
@@ -69,6 +71,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => Inertia::always([
                 'user' => $request->user(),
                 'permissions' => $this->permissionsFor($request->user()),
+                ...$this->companiesFor($request->user()),
             ]),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'collapsedNavGroups' => $this->collapsedNavGroups($request),
@@ -206,5 +209,34 @@ class HandleInertiaRequests extends Middleware
             $user->getAllPermissions()->pluck('name')->all(),
             is_string(...),
         ));
+    }
+
+    /**
+     * The header switcher's data (ARCHITECTURE.md §9.10): the companies the
+     * user may work in, and the one they are working in — resolved by
+     * `SelectedCompany`, which also applies the fallback, so the switcher never
+     * shows a company the server would not honour.
+     *
+     * @return array{companies: list<array{id: int, name: string, short_code: string}>, company: array{id: int, name: string, short_code: string}|null}
+     */
+    protected function companiesFor(?User $user): array
+    {
+        if ($user === null) {
+            return ['companies' => [], 'company' => null];
+        }
+
+        $selected = app(SelectedCompany::class);
+        $describe = fn (Company $company): array => [
+            'id' => $company->id,
+            'name' => $company->name,
+            'short_code' => $company->short_code,
+        ];
+
+        $current = $selected->current();
+
+        return [
+            'companies' => array_values($selected->usable($user)->map($describe)->all()),
+            'company' => $current === null ? null : $describe($current),
+        ];
     }
 }

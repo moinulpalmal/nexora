@@ -58,6 +58,7 @@ export default function UsersGuide() {
                             <>
                                 Each other action has its own permission:{' '}
                                 <Ui>admin.users.assign-roles</Ui>,{' '}
+                                <Ui>admin.users.assign-companies</Ui>,{' '}
                                 <Ui>admin.users.reset-password</Ui>,{' '}
                                 <Ui>admin.users.delete</Ui>,{' '}
                                 <Ui>admin.users.restore</Ui> and{' '}
@@ -69,6 +70,7 @@ export default function UsersGuide() {
                             <>
                                 বাকি প্রতিটি কাজের আলাদা পারমিশন:{' '}
                                 <Ui>admin.users.assign-roles</Ui>,{' '}
+                                <Ui>admin.users.assign-companies</Ui>,{' '}
                                 <Ui>admin.users.reset-password</Ui>,{' '}
                                 <Ui>admin.users.delete</Ui>,{' '}
                                 <Ui>admin.users.restore</Ui> ও{' '}
@@ -179,6 +181,16 @@ export default function UsersGuide() {
                             id="roles"
                             en="Roles for a user: one tick box per role."
                             bn="একজন ব্যবহারকারীর রোল: প্রতিটি রোলের জন্য একটি টিক বক্স।"
+                        />
+                    </Step>
+                    <Step
+                        en="To decide which companies someone works in, press the building on their row and tick the companies. Without one they can still sign in, but Projects, Accounting and HRM show them nothing. The super admin needs none: they can work in every active company."
+                        bn="কেউ কোন কোন কোম্পানিতে কাজ করবেন তা ঠিক করতে তাঁর সারির ভবন চিহ্নটি চাপুন এবং কোম্পানিগুলোতে টিক দিন। কোনো কোম্পানি না থাকলেও তিনি সাইন ইন করতে পারবেন, কিন্তু Projects, Accounting ও HRM-এ কিছুই দেখবেন না। super admin-এর কোনোটি লাগে না: তিনি সব সক্রিয় কোম্পানিতে কাজ করতে পারেন।"
+                    >
+                        <Shot
+                            id="companies"
+                            en="Companies for a user: one tick box per company, inactive ones marked."
+                            bn="একজন ব্যবহারকারীর কোম্পানি: প্রতিটি কোম্পানির জন্য একটি টিক বক্স, নিষ্ক্রিয়গুলো চিহ্নিত।"
                         />
                     </Step>
                     <Step
@@ -302,6 +314,11 @@ export default function UsersGuide() {
                         bn="ঢাল চিহ্ন। ব্যবহারকারীর রোলগুলো বদলে দেয়। আপনার নিজের সারিতে এটি বন্ধ থাকে: নিজের রোল নিজে বদলানো যায় না।"
                     />
                     <Field
+                        label="Companies"
+                        en="The building. Replaces the companies the user may work in. Disabled on your own row: you cannot change your own companies."
+                        bn="ভবন চিহ্ন। ব্যবহারকারী যেসব কোম্পানিতে কাজ করতে পারেন সেগুলো বদলে দেয়। আপনার নিজের সারিতে এটি বন্ধ থাকে: নিজের কোম্পানি নিজে বদলানো যায় না।"
+                    />
+                    <Field
                         label="Set password"
                         en="The key. Sets a new password; the user gets a notification that it was changed."
                         bn="চাবি চিহ্ন। নতুন পাসওয়ার্ড দেয়; পাসওয়ার্ড বদলানো হয়েছে বলে ব্যবহারকারী একটি নোটিফিকেশন পান।"
@@ -325,6 +342,11 @@ export default function UsersGuide() {
                     text="You cannot change your own roles. Ask another administrator."
                     en="Nobody raises or lowers their own access. Another administrator has to do it."
                     bn="কেউ নিজের প্রবেশাধিকার নিজে বাড়াতে বা কমাতে পারেন না। অন্য একজন অ্যাডমিনিস্ট্রেটরকে এটি করতে হবে।"
+                />
+                <Message
+                    text="You cannot change your own companies. Ask another administrator."
+                    en="Like roles, the companies you can reach are changed by someone else."
+                    bn="রোলের মতোই, আপনি কোন কোম্পানিতে কাজ করবেন তা অন্য কেউ বদলান।"
                 />
                 <Message
                     text="You cannot deactivate your own account."

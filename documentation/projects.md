@@ -27,7 +27,7 @@ invoices ([§7](#7-links-to-other-modules)).
 | URL prefix | `projects/` |
 | Pages | `pages/projects/*` |
 
-**Every record belongs to a company** ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company-planned)).
+**Every record belongs to a company** ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
 A user works in one selected company at a time and sees only that company's projects.
 
 ## 2. Scope
@@ -56,7 +56,7 @@ modules:
 
 | Phase | Delivers |
 | --- | --- |
-| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-planned-companies)). **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)). **Accounting → Customers** ([`accounting.md`](accounting.md#3-phases)). |
+| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)). **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)). **Accounting → Customers** ([`accounting.md`](accounting.md#3-phases)). |
 | **1 — delivery** | Projects with contract terms, milestones, tasks (list + board), project members with billing rates, timesheets with approval. |
 | **2 — billing** | Billing requests from approved milestones and hours. They wait as **ready to invoice** until Accounting's invoices exist, then become invoices. |
 | **3 — profitability** | Budget against actual per project and per milestone, using the employee cost rate. |

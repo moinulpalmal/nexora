@@ -119,6 +119,10 @@ export default function AuditLogsGuide() {
                                     en: "A user's roles were changed, with the roles before and after.",
                                     bn: 'একজন ব্যবহারকারীর রোল বদলানো হয়েছে — আগের ও পরের রোলসহ।',
                                 },
+                                'companies-changed': {
+                                    en: 'The companies a user may work in were changed, with the company numbers before and after.',
+                                    bn: 'একজন ব্যবহারকারী কোন কোন কোম্পানিতে কাজ করতে পারবেন তা বদলানো হয়েছে — আগের ও পরের কোম্পানির নম্বরসহ।',
+                                },
                                 'permissions-changed': {
                                     en: "A role's permissions were changed, with the permissions before and after.",
                                     bn: 'একটি রোলের পারমিশন বদলানো হয়েছে — আগের ও পরের পারমিশনসহ।',

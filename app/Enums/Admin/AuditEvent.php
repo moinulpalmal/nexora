@@ -39,6 +39,9 @@ enum AuditEvent: string implements LabelledEnum
     /** Roles granted to or revoked from a user. */
     case RolesChanged = 'roles-changed';
 
+    /** Companies granted to or revoked from a user (ARCHITECTURE.md §9.10). */
+    case CompaniesChanged = 'companies-changed';
+
     /** Permissions attached to or detached from a role. */
     case PermissionsChanged = 'permissions-changed';
 
@@ -81,6 +84,7 @@ enum AuditEvent: string implements LabelledEnum
             self::Deleted => 'Deleted',
             self::Restored => 'Restored',
             self::RolesChanged => 'Roles changed',
+            self::CompaniesChanged => 'Companies changed',
             self::PermissionsChanged => 'Permissions changed',
             self::PasswordReset => 'Password reset by an administrator',
             self::ForceDeleted => 'Permanently deleted',

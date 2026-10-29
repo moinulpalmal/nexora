@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\RecordStatus;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\UserCompanyUpdateRequest;
 use App\Http\Requests\Admin\UserIndexRequest;
 use App\Http\Requests\Admin\UserPasswordUpdateRequest;
 use App\Http\Requests\Admin\UserRoleUpdateRequest;
 use App\Http\Requests\Admin\UserStoreRequest;
 use App\Http\Requests\Admin\UserUpdateRequest;
+use App\Models\Admin\Company;
 use App\Models\User;
 use App\Services\Admin\UserCredentialMailer;
 use App\Services\Admin\UserService;
@@ -38,7 +40,7 @@ class UserController extends Controller
 
         $users = User::query()
             ->when($request->view() === 'trashed', fn ($query) => $query->onlyTrashed())
-            ->with('roles:id,name')
+            ->with(['roles:id,name', 'companies:id'])
             ->filterColumns($filters['filter'])
             ->sortBy($filters['sort'], $filters['direction'])
             ->paginate($filters['per_page'])
@@ -48,6 +50,19 @@ class UserController extends Controller
         return Inertia::render('admin/users/index', [
             'users' => $users,
             'roles' => $this->users->assignableRoleNames(),
+            /*
+             * Every undeleted company, for the Companies dialog — inactive
+             * ones included and marked, since a grant outlives a deactivation.
+             * Only for someone who can grant: the list is no one else's business.
+             */
+            'companies' => $request->user()?->can('admin.users.assign-companies')
+                ? Company::query()->orderBy('name')->get(['id', 'name', 'short_code', 'status'])->map(fn (Company $company): array => [
+                    'id' => $company->id,
+                    'name' => $company->name,
+                    'short_code' => $company->short_code,
+                    'is_active' => $company->isActive(),
+                ])
+                : [],
             'statuses' => RecordStatus::options(),
             'sortable' => User::SORTABLE,
             'filterable' => User::FILTERABLE,
@@ -174,6 +189,21 @@ class UserController extends Controller
         return back();
     }
 
+    public function updateCompanies(UserCompanyUpdateRequest $request, User $user): RedirectResponse
+    {
+        $blocker = $this->users->companyAssignmentBlocker($user);
+
+        if ($blocker !== null) {
+            return $this->refuse($blocker);
+        }
+
+        $this->users->assignCompanies($user, $request->submittedCompanies());
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Companies updated.')]);
+
+        return back();
+    }
+
     /**
      * Whether a username or email is still free, for the form's live check.
      *
@@ -220,6 +250,7 @@ class UserController extends Controller
             'status' => $user->status->value,
             'avatar_url' => $user->avatar_url,
             'roles' => $user->roles->pluck('name')->sort()->values(),
+            'companies' => $user->companies->pluck('id')->sort()->values(),
             'last_login_at' => $user->last_login_at?->toIso8601String(),
             'created_at' => $user->created_at?->toDateString(),
             'deleted_at' => $user->deleted_at?->toDateString(),

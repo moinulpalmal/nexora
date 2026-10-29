@@ -9,6 +9,7 @@ use App\Contracts\Auditable;
 use App\Enums\FilterType;
 use App\Enums\RecordStatus;
 use App\Enums\Theme;
+use App\Models\Admin\Company;
 use App\Observers\ActorObserver;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Appends;
@@ -17,6 +18,8 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -38,6 +41,7 @@ use Spatie\Permission\Traits\HasRoles;
  * @property Theme|null $theme
  * @property Carbon|null $last_login_at
  * @property string|null $last_login_ip
+ * @property int|null $selected_company_id
  * @property int|null $inserted_by
  * @property int|null $last_updated_by
  * @property string|null $remember_token
@@ -137,5 +141,27 @@ class User extends Authenticatable implements Auditable
         return Attribute::get(fn (): ?string => $this->avatar_path === null
             ? null
             : Storage::disk('public')->url($this->avatar_path));
+    }
+
+    /**
+     * The companies this user was granted (ARCHITECTURE.md §9.10). A super
+     * admin needs none — see `SelectedCompany::usable()`.
+     *
+     * @return BelongsToMany<Company, $this>
+     */
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class);
+    }
+
+    /**
+     * The company the user last chose to work in. Read it through
+     * `SelectedCompany`, which checks it is still usable.
+     *
+     * @return BelongsTo<Company, $this>
+     */
+    public function selectedCompany(): BelongsTo
+    {
+        return $this->belongsTo(Company::class, 'selected_company_id');
     }
 }

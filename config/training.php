@@ -60,7 +60,12 @@ return [
         'admin.users' => [
             'route' => 'admin.users.index', 'guide' => 'admin/users', 'section' => 'admin', 'sort' => 10,
             'title_en' => 'Users', 'title_bn' => 'ব্যবহারকারী', 'status' => 'written',
-            'shots' => ['overview' => 'The users list with invented users', 'form' => 'The New user dialog', 'roles' => 'The Roles dialog for a user', 'password' => 'The Set a password dialog', 'deleted' => 'The Deleted tab with a deleted user'],
+            'shots' => ['overview' => 'The users list with invented users', 'form' => 'The New user dialog', 'roles' => 'The Roles dialog for a user', 'companies' => 'The Companies dialog for a user', 'password' => 'The Set a password dialog', 'deleted' => 'The Deleted tab with a deleted user'],
+        ],
+        'admin.companies' => [
+            'route' => 'admin.companies.index', 'guide' => 'admin/companies', 'section' => 'admin', 'sort' => 25,
+            'title_en' => 'Companies', 'title_bn' => 'কোম্পানি', 'status' => 'written',
+            'shots' => ['overview' => 'The companies list with invented companies', 'form' => 'The New company dialog', 'deleted' => 'The Deleted tab with a deleted company'],
         ],
         'admin.roles' => [
             'route' => 'admin.roles.index', 'guide' => 'admin/roles', 'section' => 'admin', 'sort' => 20,
@@ -123,6 +128,11 @@ return [
             'title_en' => 'HRM overview', 'title_bn' => 'মানবসম্পদের সারসংক্ষেপ', 'status' => 'pending',
             'shots' => [],
         ],
+        'hrm.departments' => [
+            'route' => 'hrm.departments.index', 'guide' => 'hrm/departments', 'section' => 'hrm', 'sort' => 20,
+            'title_en' => 'Departments', 'title_bn' => 'বিভাগ', 'status' => 'written',
+            'shots' => ['overview' => 'The departments of an invented company', 'form' => 'The New department dialog', 'import' => 'The department import dialog'],
+        ],
 
     ],
 
@@ -134,6 +144,9 @@ return [
         'home',
         'notifications.index',
         'admin.users.availability',
+        // A workbook download and a rejected-rows download — files, not screens (ARCHITECTURE.md §9.13).
+        'hrm.departments.import.template',
+        'hrm.departments.import.rejects',
         'admin.audit-logs.history',
         'admin.sent-mails.show',
         'training.index',

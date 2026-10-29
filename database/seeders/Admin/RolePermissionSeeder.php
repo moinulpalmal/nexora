@@ -32,8 +32,9 @@ class RolePermissionSeeder extends Seeder
      * @var array<string, list<string>>
      */
     protected const array CATALOGUE = [
-        'admin.users' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'reset-password', 'assign-roles'],
+        'admin.users' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'reset-password', 'assign-roles', 'assign-companies'],
         'admin.roles' => ['view', 'create', 'update', 'delete'],
+        'admin.companies' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // `view` alone: the catalogue is defined in code, never edited in the UI.
         'admin.permissions' => ['view'],
         // `view` alone: the audit trail is read, never written or corrected.
@@ -53,6 +54,7 @@ class RolePermissionSeeder extends Seeder
         'projects.dashboard' => ['view'],
         'accounting.dashboard' => ['view'],
         'hrm.dashboard' => ['view'],
+        'hrm.departments' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],
     ];
 
     /**

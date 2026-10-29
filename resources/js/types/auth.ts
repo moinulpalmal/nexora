@@ -20,6 +20,13 @@ export type User = {
     [key: string]: unknown;
 };
 
+/** A company as the header switcher shows it (ARCHITECTURE.md §9.10). */
+export type CompanySummary = {
+    id: number;
+    name: string;
+    short_code: string;
+};
+
 export type Auth = {
     user: User;
     /**
@@ -27,6 +34,10 @@ export type Auth = {
      * admin. Shared by `HandleInertiaRequests`; read it with `useCan()`.
      */
     permissions: string[];
+    /** The companies the user may work in — active, and granted (or all, for a super admin). */
+    companies: CompanySummary[];
+    /** The company the user is working in, or null when none is selected. */
+    company: CompanySummary | null;
 };
 
 /**

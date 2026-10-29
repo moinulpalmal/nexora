@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Enums\Admin\AuditEvent;
 use App\Enums\RecordStatus;
+use App\Models\Admin\Company;
 use App\Models\Admin\Role;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
@@ -90,6 +91,40 @@ class UserService
             $after === []
                 ? __('An administrator removed all your roles.')
                 : __('You now hold: :roles.', ['roles' => implode(', ', $after)]),
+        ));
+    }
+
+    /**
+     * Replace the companies a user may work in (ARCHITECTURE.md §9.10).
+     *
+     * Recorded by id, like roles by name — the pivot write fires no model
+     * event, and who may see which company's records is as access-sensitive as
+     * a role. A selection the new set no longer covers is cleared here, not
+     * left for `SelectedCompany` to notice; the user is told in the bell.
+     *
+     * @param  list<int>  $companyIds  sorted
+     */
+    public function assignCompanies(User $user, array $companyIds): void
+    {
+        $before = $this->companyIds($user);
+
+        $user->companies()->sync($companyIds);
+
+        if ($before === $companyIds) {
+            return;
+        }
+
+        $this->audits->recordChange($user, AuditEvent::CompaniesChanged, ['companies' => $before], ['companies' => $companyIds]);
+
+        if ($user->selected_company_id !== null && ! in_array($user->selected_company_id, $companyIds, true)) {
+            $user->forceFill(['selected_company_id' => null])->saveQuietly();
+        }
+
+        $this->notifyAccountChanged($user, new AccountChanged(
+            __('Your companies were changed'),
+            $companyIds === []
+                ? __('An administrator removed all your companies. You can no longer work in Projects, Accounting or HRM.')
+                : __('You may now work in: :companies.', ['companies' => Company::query()->whereKey($companyIds)->orderBy('name')->pluck('name')->implode(', ')]),
         ));
     }
 
@@ -205,6 +240,19 @@ class UserService
 
         if ($losesSuperAdmin && $this->isLastSuperAdmin($user)) {
             return __('This is the last active super admin. Grant the role to someone else first.');
+        }
+
+        return null;
+    }
+
+    /**
+     * Nobody re-grants their own companies — the same rule as roles: widening
+     * your own access is a decision for another administrator.
+     */
+    public function companyAssignmentBlocker(User $user): ?string
+    {
+        if ($this->isActor($user)) {
+            return __('You cannot change your own companies. Ask another administrator.');
         }
 
         return null;
@@ -339,5 +387,18 @@ class UserService
         sort($names);
 
         return $names;
+    }
+
+    /**
+     * Sorted, so an unchanged set compares equal.
+     *
+     * @return list<int>
+     */
+    private function companyIds(User $user): array
+    {
+        $ids = array_map(intval(...), $user->companies()->pluck('companies.id')->all());
+        sort($ids);
+
+        return $ids;
     }
 }

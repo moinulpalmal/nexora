@@ -21,7 +21,7 @@ test('the table of contents follows the sidebar: its groups in order, and their 
     expect(array_column($grouped, 'key'))->toBe(['general', 'admin', 'settings', 'projects', 'accounting', 'hrm'])
         ->and(array_sum(array_map(fn (array $section): int => count($section['pages']), $grouped)))->toBe(count(config('training.pages')))
         ->and(array_column($grouped[1]['pages'], 'key'))->toBe([
-            'admin.users', 'admin.roles', 'admin.permissions', 'admin.audit-logs', 'admin.sent-mails', 'admin.application-settings',
+            'admin.users', 'admin.roles', 'admin.companies', 'admin.permissions', 'admin.audit-logs', 'admin.sent-mails', 'admin.application-settings',
         ])
         ->and(array_column($grouped[2]['pages'], 'key'))->toBe(['profile.edit', 'security.edit', 'appearance.edit']);
 });

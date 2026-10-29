@@ -37,11 +37,19 @@ class PermissionDescriptions
         'admin.users.force-delete' => ['summary' => 'Permanently delete a user from Deleted.', 'note' => 'Cannot be undone.', 'where' => 'Admin → Users → Deleted'],
         'admin.users.reset-password' => ['summary' => 'Set a new password for another user.', 'where' => 'Admin → Users'],
         'admin.users.assign-roles' => ['summary' => 'Change which roles another user holds.', 'note' => 'Widens or narrows their access; guarded against self-escalation.', 'where' => 'Admin → Users'],
+        'admin.users.assign-companies' => ['summary' => 'Change which companies another user may work in.', 'note' => 'Decides whose Projects, Accounting and HRM records they can reach. Nobody changes their own.', 'where' => 'Admin → Users'],
 
         'admin.roles.view' => ['summary' => 'See the roles list with user and permission counts.', 'where' => 'Admin → Roles'],
         'admin.roles.create' => ['summary' => 'Create a new role and choose its permissions.', 'where' => 'Admin → Roles'],
         'admin.roles.update' => ['summary' => 'Rename a role and change its permissions.', 'note' => 'Affects every user holding the role.', 'where' => 'Admin → Roles'],
         'admin.roles.delete' => ['summary' => 'Delete a role that no user holds.', 'note' => 'The super-admin role can never be deleted.', 'where' => 'Admin → Roles'],
+
+        'admin.companies.view' => ['summary' => 'Open the Companies list (active and deleted tabs) and search it.', 'where' => 'Admin → Companies'],
+        'admin.companies.create' => ['summary' => 'Add a company.', 'where' => 'Admin → Companies'],
+        'admin.companies.update' => ['summary' => 'Rename a company, change its short code, and activate or deactivate it.', 'note' => 'An inactive company can no longer be selected in the header.', 'where' => 'Admin → Companies'],
+        'admin.companies.delete' => ['summary' => 'Move a company that nothing belongs to into Deleted — one, or several ticked at once.', 'note' => 'Refused while any department belongs to it. Reversible with restore.', 'where' => 'Admin → Companies'],
+        'admin.companies.restore' => ['summary' => 'Bring a company back from Deleted.', 'where' => 'Admin → Companies → Deleted'],
+        'admin.companies.force-delete' => ['summary' => 'Permanently delete companies from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Admin → Companies → Deleted'],
 
         'admin.permissions.view' => ['summary' => 'See every permission, what it allows and which roles hold it.', 'where' => 'Admin → Permissions'],
 
@@ -60,6 +68,13 @@ class PermissionDescriptions
         'projects.dashboard.view' => ['summary' => 'Open the Projects overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Projects → Overview'],
         'accounting.dashboard.view' => ['summary' => 'Open the Accounts overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Accounts → Overview'],
         'hrm.dashboard.view' => ['summary' => 'Open the HRM overview.', 'note' => 'A preview with sample data for now.', 'where' => 'HRM → Overview'],
+        'hrm.departments.view' => ['summary' => "Open the selected company's Departments list (active and deleted tabs) and search it.", 'where' => 'HRM → Departments'],
+        'hrm.departments.create' => ['summary' => 'Add a department to the selected company.', 'where' => 'HRM → Departments'],
+        'hrm.departments.update' => ['summary' => "Change a department's code or name, and activate or deactivate it.", 'where' => 'HRM → Departments'],
+        'hrm.departments.delete' => ['summary' => 'Move departments into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved.', 'where' => 'HRM → Departments'],
+        'hrm.departments.restore' => ['summary' => 'Bring a department back from Deleted.', 'where' => 'HRM → Departments → Deleted'],
+        'hrm.departments.force-delete' => ['summary' => 'Permanently delete departments from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'HRM → Departments → Deleted'],
+        'hrm.departments.import' => ['summary' => 'Create and update departments from a spreadsheet.', 'note' => 'Writes many rows at once into the selected company.', 'where' => 'HRM → Departments → Import'],
     ];
 
     /**
@@ -71,7 +86,7 @@ class PermissionDescriptions
      * @var array<string, array{label: string, summary: string, where: string}>
      */
     protected const array MODULES = [
-        'admin' => ['label' => 'Admin', 'summary' => 'Users, roles, the audit trail and application-wide settings.', 'where' => 'Admin menu'],
+        'admin' => ['label' => 'Admin', 'summary' => 'Users, roles, companies, the audit trail and application-wide settings.', 'where' => 'Admin menu'],
         'projects' => ['label' => 'Projects', 'summary' => 'Client projects: milestones, tasks, timesheets and billing requests.', 'where' => 'Projects menu'],
         'accounting' => ['label' => 'Accounts', 'summary' => "Each company's books: vouchers, ledgers, statements, customers and invoices.", 'where' => 'Accounts menu'],
         'hrm' => ['label' => 'HRM', 'summary' => 'The workforce: employees, attendance, leave and payroll.', 'where' => 'HRM menu'],

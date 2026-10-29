@@ -3,10 +3,12 @@
 namespace App\Providers;
 
 use App\Models\Admin\BrandingSetting;
+use App\Models\Admin\Company;
 use App\Models\Admin\MailSetting;
 use App\Models\Admin\Permission;
 use App\Models\Admin\QuickLoginSetting;
 use App\Models\Admin\Role;
+use App\Models\Hrm\Department;
 use App\Models\ImportLimit;
 use App\Models\SheetImport;
 use App\Models\User;
@@ -38,6 +40,8 @@ class AppServiceProvider extends ServiceProvider
     public const array MORPH_MAP = [
         'user' => User::class,
         'role' => Role::class,
+        'company' => Company::class,
+        'department' => Department::class,
         'permission' => Permission::class,
         'mail-setting' => MailSetting::class,
         'quick-login-setting' => QuickLoginSetting::class,

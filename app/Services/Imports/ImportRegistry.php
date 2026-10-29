@@ -2,6 +2,7 @@
 
 namespace App\Services\Imports;
 
+use App\Services\Hrm\DepartmentImportBlueprint;
 use RuntimeException;
 
 /**
@@ -13,7 +14,7 @@ use RuntimeException;
  * the runner, so `sheet_imports.import_key` always resolves to a real blueprint
  * or fails loudly rather than silently (ARCHITECTURE.md §9.13).
  *
- * **Empty until the first master table imports.** The engine is proved by
+ * The engine itself is proved by
  * test-only blueprints, which the feature tests register by binding a subclass
  * that overrides {@see self::BLUEPRINTS} — the reason {@see self::resolve()}
  * reads it through `static::`.
@@ -23,7 +24,9 @@ class ImportRegistry
     /**
      * @var array<string, class-string<ImportBlueprint>>
      */
-    protected const array BLUEPRINTS = [];
+    protected const array BLUEPRINTS = [
+        'hrm.departments' => DepartmentImportBlueprint::class,
+    ];
 
     /**
      * Resolve a blueprint by its key.

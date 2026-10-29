@@ -7,10 +7,12 @@ use App\Mail\Admin\MailSettingTestMail;
 use App\Mail\Admin\UserPasswordResetMail;
 use App\Mail\Admin\UserWelcomeMail;
 use App\Models\Admin\AuditLog;
+use App\Models\Admin\Company;
 use App\Models\Admin\MailSetting;
 use App\Models\Admin\QuickLoginSetting;
 use App\Models\Admin\Role;
 use App\Models\Admin\SentMail;
+use App\Models\Hrm\Department;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
 use App\Services\Training\TrainingRegistry;
@@ -118,6 +120,26 @@ function trainingColleagues(): array
     return $users;
 }
 
+/**
+ * Invented group companies, keyed by short code in lower case.
+ *
+ * @return array<string, Company>
+ */
+function trainingCompanies(): array
+{
+    $companies = [];
+
+    foreach ([['Palmal Garments Ltd.', 'PGL'], ['Palmal Knit Composite Ltd.', 'PKC'], ['Palmal Packaging Ltd.', 'PPL', 'I']] as $row) {
+        $companies[strtolower($row[1])] = Company::factory()->create([
+            'name' => $row[0],
+            'short_code' => $row[1],
+            'status' => $row[2] ?? 'A',
+        ]);
+    }
+
+    return $companies;
+}
+
 test('dashboard', function () {
     $actor = trainingActor();
     $actor->notify(new AccountChanged('Your roles were changed', 'You now hold: super-admin.'));
@@ -150,12 +172,34 @@ test('admin.users', function () {
         ->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'roles');
 
+    trainingCompanies();
+    $page = visitForTraining(route('admin.users.index', absolute: false), 1600)
+        ->click('[aria-label="Companies for Tanvir Hossain"]')
+        ->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'companies');
+
     $page = visitForTraining(route('admin.users.index', absolute: false), 1600)
         ->click('[aria-label="Set password for Tanvir Hossain"]')
         ->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'password');
 
     $page = visitForTraining(route('admin.users.index', ['view' => 'trashed'], absolute: false), 1600)->assertSee('Rafiq Islam');
+    captureTrainingShot($page, $key, 'deleted');
+});
+
+test('admin.companies', function () {
+    $key = 'admin.companies';
+    trainingActor();
+    trainingCompanies();
+    Company::factory()->create(['name' => 'Palmal Washing Ltd.', 'short_code' => 'PWL'])->delete();
+
+    $page = visitForTraining(route('admin.companies.index', absolute: false))->assertSee('Palmal Garments Ltd.');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-company"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+
+    $page = visitForTraining(route('admin.companies.index', ['view' => 'trashed'], absolute: false))->assertSee('Palmal Washing Ltd.');
     captureTrainingShot($page, $key, 'deleted');
 });
 
@@ -170,6 +214,28 @@ test('admin.roles', function () {
 
     $page->click('[data-test="new-role"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
+});
+
+test('hrm.departments', function () {
+    $key = 'hrm.departments';
+    $actor = trainingActor();
+    $companies = trainingCompanies();
+    $actor->forceFill(['selected_company_id' => $companies['pgl']->id])->saveQuietly();
+
+    foreach ([['HR', 'Human Resources'], ['PROD', 'Production'], ['FIN', 'Finance & Accounts'], ['QA', 'Quality Assurance'], ['MERCH', 'Merchandising']] as [$code, $name]) {
+        Department::factory()->for($companies['pgl'])->create(['code' => $code, 'name' => $name]);
+    }
+
+    $page = visitForTraining(route('hrm.departments.index', absolute: false))->assertSee('Human Resources');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-department"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+
+    $page = visitForTraining(route('hrm.departments.index', absolute: false))
+        ->click('[data-test="import-departments"]')
+        ->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'import');
 });
 
 test('admin.permissions', function () {
