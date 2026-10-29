@@ -3,6 +3,8 @@
 use App\Http\Controllers\Hrm\DashboardController;
 use App\Http\Controllers\Hrm\DepartmentController;
 use App\Http\Controllers\Hrm\DepartmentImportController;
+use App\Http\Controllers\Hrm\DesignationController;
+use App\Http\Controllers\Hrm\DesignationImportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 | Each company's workforce. Name prefix `hrm.`, URL prefix `hrm/`. Every
 | route is gated by a permission — see ARCHITECTURE.md §9.1. Every record is
 | the selected company's (§9.10): the models' scope, not the routes, sees to
-| that.
+| that — except designations, which are group-wide (owner, 2026-10-29).
 |
 | 🧪 POC: the overview still shows sample data; Departments is the first real
 | screen. See documentation/hrm.md for the agreed scope.
@@ -78,4 +80,56 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:hrm.departments.force-delete')
             ->name('departments.force-delete');
+
+        // Designations are group-wide (§9.10): no company scope on these.
+        // Before the resource, so `import` is not read as a {designation} id.
+        Route::get('designations/import/template', [DesignationImportController::class, 'template'])
+            ->middleware('permission:hrm.designations.import')
+            ->name('designations.import.template');
+
+        Route::post('designations/import', [DesignationImportController::class, 'store'])
+            ->middleware('permission:hrm.designations.import')
+            ->name('designations.import.store');
+
+        Route::post('designations/imports/{sheetImport}/review', [DesignationImportController::class, 'review'])
+            ->middleware('permission:hrm.designations.import')
+            ->name('designations.import.review');
+
+        Route::post('designations/imports/{sheetImport}/confirm', [DesignationImportController::class, 'confirm'])
+            ->middleware('permission:hrm.designations.import')
+            ->name('designations.import.confirm');
+
+        Route::get('designations/imports/{sheetImport}/rejects', [DesignationImportController::class, 'rejects'])
+            ->middleware('permission:hrm.designations.import')
+            ->name('designations.import.rejects');
+
+        Route::delete('designations/imports/{sheetImport}', [DesignationImportController::class, 'cancel'])
+            ->middleware('permission:hrm.designations.import')
+            ->name('designations.import.cancel');
+
+        // Before the resource, so `bulk` is not read as a {designation} id.
+        Route::delete('designations/bulk', [DesignationController::class, 'bulkDestroy'])
+            ->middleware('permission:hrm.designations.delete')
+            ->name('designations.bulk-destroy');
+
+        Route::delete('designations/bulk/force', [DesignationController::class, 'bulkForceDelete'])
+            ->middleware('permission:hrm.designations.force-delete')
+            ->name('designations.bulk-force-delete');
+
+        Route::resource('designations', DesignationController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:hrm.designations.view')
+            ->middlewareFor(['store'], 'permission:hrm.designations.create')
+            ->middlewareFor(['update'], 'permission:hrm.designations.update')
+            ->middlewareFor(['destroy'], 'permission:hrm.designations.delete');
+
+        Route::put('designations/{designation}/restore', [DesignationController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:hrm.designations.restore')
+            ->name('designations.restore');
+
+        Route::delete('designations/{designation}/force', [DesignationController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:hrm.designations.force-delete')
+            ->name('designations.force-delete');
     });

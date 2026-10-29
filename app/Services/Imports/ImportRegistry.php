@@ -3,6 +3,7 @@
 namespace App\Services\Imports;
 
 use App\Services\Hrm\DepartmentImportBlueprint;
+use App\Services\Hrm\DesignationImportBlueprint;
 use RuntimeException;
 
 /**
@@ -26,6 +27,7 @@ class ImportRegistry
      */
     protected const array BLUEPRINTS = [
         'hrm.departments' => DepartmentImportBlueprint::class,
+        'hrm.designations' => DesignationImportBlueprint::class,
     ];
 
     /**

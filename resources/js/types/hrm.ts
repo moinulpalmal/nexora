@@ -15,3 +15,19 @@ export type DepartmentFilters = ListFilters & {
     /** Which record set is listed — a tab, not a column filter. */
     view: 'active' | 'trashed';
 };
+
+/** One row of the designations list, as `DesignationController::index()` projects it. */
+export type DesignationListItem = {
+    id: number;
+    code: string;
+    name: string;
+    /** `App\Enums\RecordStatus` — `'A'` or `'I'`. Not a deletion. */
+    status: string;
+    created_at: string | null;
+    deleted_at: string | null;
+};
+
+export type DesignationFilters = ListFilters & {
+    /** Which record set is listed — a tab, not a column filter. */
+    view: 'active' | 'trashed';
+};

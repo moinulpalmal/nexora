@@ -164,3 +164,18 @@ test('each module role holds its own module and nothing else', function () {
             ->and($names->every(fn (string $name): bool => str_starts_with($name, $prefix)))->toBeTrue();
     }
 });
+
+test('an hr officer may add and correct designations but not remove them', function () {
+    $this->seed(RolePermissionSeeder::class);
+
+    $officer = Role::findByName('hr-officer');
+
+    expect($officer->hasPermissionTo('hrm.designations.view'))->toBeTrue()
+        ->and($officer->hasPermissionTo('hrm.designations.create'))->toBeTrue()
+        ->and($officer->hasPermissionTo('hrm.designations.update'))->toBeTrue()
+        ->and($officer->hasPermissionTo('hrm.designations.import'))->toBeTrue()
+        ->and($officer->hasPermissionTo('hrm.designations.delete'))->toBeFalse()
+        ->and($officer->hasPermissionTo('hrm.designations.restore'))->toBeFalse()
+        ->and($officer->hasPermissionTo('hrm.designations.force-delete'))->toBeFalse()
+        ->and($officer->hasPermissionTo('hrm.departments.delete'))->toBeTrue();
+});

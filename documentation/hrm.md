@@ -68,8 +68,9 @@ Projects needs employees, so a small **HRM-lite** slice ships first:
 
 ## 4. Main entities
 
-- **Department** (built, [§4.1](#41-departments--built)), **Designation**: company-level lookups
-  (HRM-lite).
+- **Department** (built, [§4.1](#41-departments--built)): a company-level lookup (HRM-lite).
+- **Designation** (built, [§4.2](#42-designations--built)): a **group-wide** lookup — one list of job
+  titles every company shares (HRM-lite; owner, 2026-10-29).
 - **Section / Line**: the factory-floor units under a department (phase 1).
 - **Employee**: employee code, name, company, department, designation, joining date, status,
   optional User, and **cost rate**. Phase 1 adds personal and job details and documents.
@@ -118,6 +119,35 @@ company-scoped master table. `Models/Hrm/Department`, `Hrm\DepartmentController`
   another.
 - Roles by rule: `hr-officer` receives every `hrm.departments.*`, `viewer` the `.view`.
 
+### 4.2 Designations — built
+
+HRM → Designations (`hrm.designations.index`, `pages/hrm/designations/index.tsx`), the first
+**group-wide** master table: **no `company_id`** — the same job titles for every company, and the page
+works with no company selected (owner, 2026-10-29; ARCHITECTURE §9.10). `Models/Hrm/Designation`,
+`Hrm\DesignationController`, `Hrm\DesignationService`, tests in `tests/Feature/Hrm/DesignationTest.php`
+and `DesignationImportTest.php`.
+
+| Column | Rule |
+| --- | --- |
+| `code` | Required, up to 20, letters and digits joined by single `-`/`_`; stored in capitals. |
+| `name` | Required, up to 100; trimmed, inner spaces collapsed. |
+| `status` | `A` / `I`. Inactive keeps the designation on record but out of new entries. |
+| actor stamps, timestamps, `deleted_at` | Restorable: Active / Deleted tabs. |
+
+- **Duplicates**: `code` and `name` are each unique **across the whole table**, ignoring case and
+  spacing, **deleted designations included** — the refusal says to restore the deleted one. Unique
+  indexes on `code` and on `name` back the rule.
+- **Bulk delete** on both tabs, as departments.
+- **No deletion guard yet**: nothing references a designation. Employees will add the first clause to
+  `DesignationService::deletionBlocker()`.
+- **Import** (`hrm.designations.import`; `Hrm\DesignationImportBlueprint`, a row writer): columns
+  Code, Name, optional Status; the same matching and rejection rules as departments, with no company
+  — the staged file stores none, and switching company does not affect it.
+- **Roles** (owner, 2026-10-29): `hr-officer` may view, create, update and import, but **not** delete,
+  restore or force-delete — one officer's delete would remove the title from every company.
+  `RolePermissionSeeder::ROLE_EXCLUSIONS` takes those three back after the `hrm.` rule matches; they
+  stay with super-admin unless granted to a role by hand. `viewer` gets the `.view`.
+
 ## 5. Workflows and approvals
 
 Approvals follow the ERP-wide pattern ([ARCHITECTURE §9.11](../ARCHITECTURE.md#911-approvals-planned)):
@@ -134,14 +164,15 @@ that stops anyone approving their own record.
 
 ## 6. Draft permission catalogue
 
-*Draft — not seeded*, except `hrm.dashboard.view` and
-`hrm.departments.{view,create,update,delete,restore,force-delete,import}`, which are. Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
+*Draft — not seeded*, except `hrm.dashboard.view`,
+`hrm.departments.{view,create,update,delete,restore,force-delete,import}` and
+`hrm.designations.{view,create,update,delete,restore,force-delete,import}`, which are. Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
 §6.2](../ARCHITECTURE.md#62-routes-and-permissions)).
 
 | Permission | Allows |
 | --- | --- |
 | `hrm.departments.{view,create,update,delete,restore,force-delete,import}` | Departments (HRM-lite) — **seeded** |
-| `hrm.designations.{view,create,update,delete}` | Designations (HRM-lite) |
+| `hrm.designations.{view,create,update,delete,restore,force-delete,import}` | Designations (HRM-lite, group-wide) — **seeded** |
 | `hrm.employees.{view,create,update,delete}` | Employees (HRM-lite) |
 | `hrm.sections.{view,create,update,delete}` | Sections and lines |
 | `hrm.shifts.{view,manage}` | Shifts and rosters |

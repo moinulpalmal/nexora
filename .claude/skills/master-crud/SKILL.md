@@ -53,6 +53,7 @@ props and a third of the page. Propose one with your reasoning and let the owner
 | Question | Shape | Sibling to read | Reference |
 | --- | --- | --- | --- |
 | The same fact for every company; retired by status | **Global** | `admin/roles` | `references/global.md` |
+| As global *and* restorable, inside an ERP module (owner's exception to §9.10) | **Global + restorable** | `hrm/designations` (code + name, import, role exclusions) | `references/global.md` + `references/restorable.md` |
 | As global, but a deleted row must be restorable (Active/Deleted tabs) | **Restorable** | `admin/users` | `references/restorable.md` |
 | A row means nothing outside the company that keeps it (§9.10: every Projects, Accounting and HRM record) | **Company-scoped** | `hrm/departments` (restorable too) | `references/company-scoped.md` |
 | A parent whose form edits a list of child rows with no identity of their own | **Parent + child ladder** | *none yet* | `references/child-table.md` |

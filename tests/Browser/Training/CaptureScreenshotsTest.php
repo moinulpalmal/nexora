@@ -13,6 +13,7 @@ use App\Models\Admin\QuickLoginSetting;
 use App\Models\Admin\Role;
 use App\Models\Admin\SentMail;
 use App\Models\Hrm\Department;
+use App\Models\Hrm\Designation;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
 use App\Services\Training\TrainingRegistry;
@@ -234,6 +235,26 @@ test('hrm.departments', function () {
 
     $page = visitForTraining(route('hrm.departments.index', absolute: false))
         ->click('[data-test="import-departments"]')
+        ->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'import');
+});
+
+test('hrm.designations', function () {
+    $key = 'hrm.designations';
+    trainingActor();
+
+    foreach ([['OP', 'Operator'], ['SR-OP', 'Senior Operator'], ['SUP', 'Supervisor'], ['QI', 'Quality Inspector'], ['MGR', 'Production Manager']] as [$code, $name]) {
+        Designation::factory()->create(['code' => $code, 'name' => $name]);
+    }
+
+    $page = visitForTraining(route('hrm.designations.index', absolute: false))->assertSee('Senior Operator');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-designation"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+
+    $page = visitForTraining(route('hrm.designations.index', absolute: false))
+        ->click('[data-test="import-designations"]')
         ->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'import');
 });

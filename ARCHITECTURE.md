@@ -69,7 +69,7 @@ app/
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5);
-                              Hrm/ also Department, DepartmentImport
+                              Hrm/ also Department, DepartmentImport, Designation, DesignationImport
   Http/Middleware/            EnsureUserIsActive, HandleAppearance, HandleInertiaRequests
   Http/Requests/              ListRequest, BulkRequest (module-less) + Admin/, Settings/, Hrm/,
                               Imports/ (ImportConfirmRequest, shared by every importer)
@@ -80,7 +80,7 @@ app/
   Models/SheetImport.php, ImportLimit.php   (at the root — the import engine's own records, §9.13)
   Models/Admin/               Role, Permission, Company, AuditLog, MailSetting, QuickLoginSetting,
                               BrandingSetting, SentMail
-  Models/Hrm/                 Department (company-scoped, §9.10)
+  Models/Hrm/                 Department (company-scoped, §9.10), Designation (group-wide, §9.10)
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
   Providers/                  AppServiceProvider, FortifyServiceProvider
@@ -88,7 +88,8 @@ app/
                               PermissionService, PermissionDescriptions, AuditRecorder,
                               AuditLogService, MailSettingService, QuickLoginService,
                               BrandingService, UserCredentialMailer
-  Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer)
+  Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer),
+                              DesignationService, DesignationImportBlueprint
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
   Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
                               ImportBlueprint, ImportRegistry, the DTOs ImportLimits/Outcome/Preview
@@ -113,7 +114,8 @@ resources/
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
     components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview;
-                              hrm/ also the department form dialog and the no-company panel
+                              hrm/ also the department and designation form dialogs and the
+                              no-company panel
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
                               table of contents; guides/{general,admin,settings,hrm,shared}/ (§5)
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
@@ -237,7 +239,7 @@ Reference: [`documentation/accounting.md`](documentation/accounting.md).
 separation (phase 3). **An Employee is not a User**: it has an optional link to one, and creating an
 employee never creates an account. The employee's **cost rate** is what Projects prices hours with.
 **Built so far: Departments** (`hrm/departments`, with import) — the first company-scoped master
-table. The module stays 🧪 while its overview still shows sample data; the sidebar group is already
+table — and **Designations** (`hrm/designations`, with import), the first group-wide one (§9.10). The module stays 🧪 while its overview still shows sample data; the sidebar group is already
 a list of links, each behind its own `useCan`. Reference: [`documentation/hrm.md`](documentation/hrm.md).
 
 ## 6. Naming conventions
@@ -428,7 +430,10 @@ A confirmation raised from inside another dialog closes its parent through `onSu
   2026-10-28). `admin` is the system-administration role and gets no module prefix. Each seeded role
   has a demo account (`DemoUserSeeder`: `admin`, `viewer`, `pm`, `accountant`, `hr`) outside
   production. `SUPER_ADMIN_ONLY` keeps the audit log, mail
-  settings, quick login and sent mails from being handed out by rule.
+  settings, quick login and sent mails from being handed out by rule. `ROLE_EXCLUSIONS` takes named
+  permissions back from one role after its rules match: `hr-officer` gets no
+  `hrm.designations.{delete,restore,force-delete}`, because a designation is shared by every company
+  and an officer works for one (owner, 2026-10-29).
 - **`super-admin` passes every check** through `Gate::before` in `AppServiceProvider`. Routes and the
   UI check **permissions, never role names**.
 - **Authorization = route `permission:` middleware + service `*Blocker()` guards. No Policy classes**
@@ -550,7 +555,10 @@ them (owner, 2026-10-26). The buttons submit the real login form.
 
 *(owner, 2026-10-28; built 2026-10-29)* One installation serves several Palmal Group companies.
 **Every Projects, Accounting and HRM record carries its company**, and each company has its own
-ledger, fiscal years and payroll. The company dimension is set up before the first ERP table so that
+ledger, fiscal years and payroll. **The one exception is HRM → Designations**: a group-wide list
+with no `company_id`, the same job titles for every company — the master-crud *global* shape
+(restorable, unique across the table, no `BelongsToCompany`, no no-company panel; owner, 2026-10-29).
+Add a second group-wide table only on the owner's word, and name it here. The company dimension is set up before the first ERP table so that
 no table needs a later migration to add it. Reference:
 [`documentation/admin.md` §10](documentation/admin.md#10-companies).
 

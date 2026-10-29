@@ -75,6 +75,13 @@ class PermissionDescriptions
         'hrm.departments.restore' => ['summary' => 'Bring a department back from Deleted.', 'where' => 'HRM → Departments → Deleted'],
         'hrm.departments.force-delete' => ['summary' => 'Permanently delete departments from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'HRM → Departments → Deleted'],
         'hrm.departments.import' => ['summary' => 'Create and update departments from a spreadsheet.', 'note' => 'Writes many rows at once into the selected company.', 'where' => 'HRM → Departments → Import'],
+        'hrm.designations.view' => ['summary' => 'Open the Designations list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'HRM → Designations'],
+        'hrm.designations.create' => ['summary' => 'Add a designation.', 'note' => 'Every company sees it.', 'where' => 'HRM → Designations'],
+        'hrm.designations.update' => ['summary' => "Change a designation's code or name, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'HRM → Designations'],
+        'hrm.designations.delete' => ['summary' => 'Move designations into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved. Not granted to HR officers by default.', 'where' => 'HRM → Designations'],
+        'hrm.designations.restore' => ['summary' => 'Bring a designation back from Deleted.', 'where' => 'HRM → Designations → Deleted'],
+        'hrm.designations.force-delete' => ['summary' => 'Permanently delete designations from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'HRM → Designations → Deleted'],
+        'hrm.designations.import' => ['summary' => 'Create and update designations from a spreadsheet.', 'note' => 'Writes many rows at once, shared by every company.', 'where' => 'HRM → Designations → Import'],
     ];
 
     /**

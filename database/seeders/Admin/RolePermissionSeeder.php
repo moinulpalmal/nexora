@@ -55,6 +55,26 @@ class RolePermissionSeeder extends Seeder
         'accounting.dashboard' => ['view'],
         'hrm.dashboard' => ['view'],
         'hrm.departments' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],
+        // Group-wide (§9.10): one list every company shares.
+        'hrm.designations' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],
+    ];
+
+    /**
+     * Permissions a role's rules would match but the role must not receive.
+     *
+     * Designations are shared by every company, so an HR officer — who works
+     * for one — may add and correct them but not remove one from all of them
+     * (owner, 2026-10-29). Applied after {@see self::ROLES}; an administrator
+     * can still grant one to a role by hand.
+     *
+     * @var array<string, list<string>>
+     */
+    protected const array ROLE_EXCLUSIONS = [
+        'hr-officer' => [
+            'hrm.designations.delete',
+            'hrm.designations.restore',
+            'hrm.designations.force-delete',
+        ],
     ];
 
     /**
@@ -116,7 +136,8 @@ class RolePermissionSeeder extends Seeder
                 $name === Role::SUPER_ADMIN
                     ? $permissions
                     : $permissions->filter(
-                        fn (Permission $permission): bool => $this->matchesAny($permission->name, $rules),
+                        fn (Permission $permission): bool => $this->matchesAny($permission->name, $rules)
+                            && ! in_array($permission->name, self::ROLE_EXCLUSIONS[$name] ?? [], true),
                     ),
             );
         }

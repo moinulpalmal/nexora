@@ -133,6 +133,11 @@ return [
             'title_en' => 'Departments', 'title_bn' => 'বিভাগ', 'status' => 'written',
             'shots' => ['overview' => 'The departments of an invented company', 'form' => 'The New department dialog', 'import' => 'The department import dialog'],
         ],
+        'hrm.designations' => [
+            'route' => 'hrm.designations.index', 'guide' => 'hrm/designations', 'section' => 'hrm', 'sort' => 30,
+            'title_en' => 'Designations', 'title_bn' => 'পদবি', 'status' => 'written',
+            'shots' => ['overview' => 'The designations every company shares', 'form' => 'The New designation dialog', 'import' => 'The designation import dialog'],
+        ],
 
     ],
 
@@ -147,6 +152,8 @@ return [
         // A workbook download and a rejected-rows download — files, not screens (ARCHITECTURE.md §9.13).
         'hrm.departments.import.template',
         'hrm.departments.import.rejects',
+        'hrm.designations.import.template',
+        'hrm.designations.import.rejects',
         'admin.audit-logs.history',
         'admin.sent-mails.show',
         'training.index',

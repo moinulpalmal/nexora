@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import {
+    Briefcase,
     Building2,
     FolderKanban,
     Network,
@@ -39,6 +40,7 @@ import { index as sentMailsIndex } from '@/routes/admin/sent-mails';
 import { index as usersIndex } from '@/routes/admin/users';
 import { dashboard as hrmDashboard } from '@/routes/hrm';
 import { index as departmentsIndex } from '@/routes/hrm/departments';
+import { index as designationsIndex } from '@/routes/hrm/designations';
 import { dashboard as projectsDashboard } from '@/routes/projects';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
@@ -80,6 +82,7 @@ export function AppSidebar() {
     const canViewAccounting = useCan('accounting.dashboard.view');
     const canViewHrm = useCan('hrm.dashboard.view');
     const canViewDepartments = useCan('hrm.departments.view');
+    const canViewDesignations = useCan('hrm.designations.view');
 
     const adminNavLinks: (NavItem & { visible: boolean })[] = [
         {
@@ -144,6 +147,12 @@ export function AppSidebar() {
             href: departmentsIndex(),
             icon: Network,
             visible: canViewDepartments,
+        },
+        {
+            title: 'Designations',
+            href: designationsIndex(),
+            icon: Briefcase,
+            visible: canViewDesignations,
         },
     ];
 

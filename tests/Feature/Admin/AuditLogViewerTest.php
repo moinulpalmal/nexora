@@ -67,6 +67,7 @@ test('the model type filter is the morph map, never hand-listed', function () {
             ['value' => 'branding-setting', 'label' => 'Branding setting'],
             ['value' => 'company', 'label' => 'Company'],
             ['value' => 'department', 'label' => 'Department'],
+            ['value' => 'designation', 'label' => 'Designation'],
             ['value' => 'import-limit', 'label' => 'Import limit'],
             ['value' => 'mail-setting', 'label' => 'Mail setting'],
             ['value' => 'permission', 'label' => 'Permission'],
