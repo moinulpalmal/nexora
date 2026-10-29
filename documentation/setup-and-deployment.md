@@ -45,6 +45,9 @@ npx playwright install chromium # only for the browser test suite
 | `superadmin` (or `SUPER_ADMIN_USERNAME`) | `password` (or `SUPER_ADMIN_PASSWORD`) | super-admin |
 | `admin` | `password` | admin |
 | `viewer` | `password` | viewer |
+| `pm` | `password` | project-manager |
+| `accountant` | `password` | accountant |
+| `hr` | `password` | hr-officer |
 
 Sign in with the username or the email. Turn on Admin → Application Settings → Quick Login for
 one-click buttons on the login page (local/testing only).

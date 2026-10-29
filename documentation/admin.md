@@ -43,6 +43,8 @@ Routes: `routes/admin.php`, prefix `admin/`, names `admin.*`. Every route carrie
 | `avatar_path` | optional photo, jpg/png/webp ≤ 2 MB, `public` disk `avatars/{uuid}.ext` |
 | `theme` | the user's own choice (Settings → Appearance) |
 | `last_login_at`, `last_login_ip` | stamped on every sign-in |
+| `must_change_password` | set when someone else set the password ([§2.4](#24-passwords-and-the-credential-mails)); cleared when the user saves their own |
+| `selected_company_id` | the company the user works in, remembered across sessions ([§10.3](#103-the-selected-company)) |
 | `inserted_by`, `last_updated_by` | stamped by `ActorObserver` |
 
 A user signs in with **either their username or their email** in one field.
@@ -123,6 +125,8 @@ its sentence, and the code that checks it — `PermissionDescriptionsTest` fails
 | `admin.users.view` / `create` / `update` / `delete` / `restore` / `force-delete` | the users list and its actions |
 | `admin.users.reset-password` | set another user's password |
 | `admin.users.assign-roles` | change another user's roles |
+| `admin.users.assign-companies` | change the companies another user may work in ([§10.2](#102-user--company-access)) |
+| `admin.companies.view` / `create` / `update` / `delete` / `restore` / `force-delete` | the Company master ([§10.1](#101-the-company-master--admin--companies)) |
 | `admin.roles.view` / `create` / `update` / `delete` | roles |
 | `admin.permissions.view` | the catalogue |
 | `admin.audit-logs.view` ★ | the audit trail |
@@ -141,7 +145,7 @@ its sentence, and the code that checks it — `PermissionDescriptionsTest` fails
 | `viewer` | every `*.view` except ★ | read-only |
 | `project-manager` | every `projects.*` | the Projects module |
 | `accountant` | every `accounting.*` | the Accounting module (menu: Accounts) |
-| `hr-officer` | every `hrm.*` | the HRM module |
+| `hr-officer` | every `hrm.*` except `hrm.designations.{delete,restore,force-delete}` | the HRM module; designations are shared by every company, so their removal stays with super-admin (`ROLE_EXCLUSIONS`, [`hrm.md` §4.2](hrm.md#42-designations--built)) |
 
 Each non-super role has a demo account outside production (`admin`, `viewer`, `pm`, `accountant`,
 `hr`, password `password`), offered by Quick Login.
@@ -157,10 +161,12 @@ super-admin role cannot be edited or deleted (`error`). Every grant change is au
 
 ## 4. The audit trail
 
-- Every create/update/delete/restore of `User`, `Role`, `Permission`, `MailSetting`,
-  `QuickLoginSetting`, `BrandingSetting`, `ImportLimit` is recorded with old and new values; secrets (`password`, `remember_token`, the
-  SMTP password) never are.
-- Also recorded: role and permission grants, administrator password resets, force deletes, mails
+- Every create/update/delete/restore of `User`, `Role`, `Permission`, `Company`, `MailSetting`,
+  `QuickLoginSetting`, `BrandingSetting`, `ImportLimit`, the HRM `Department`, `Designation` and
+  `Employee`, and `SheetImport` (staged, confirmed, cancelled — not the rows it wrote) is recorded with
+  old and new values; secrets (`password`, `remember_token`, the SMTP password) never are. The
+  record-type filter is the morph map (`AppServiceProvider::MORPH_MAP`).
+- Also recorded: role, permission and company grants (`companies-changed`), administrator password resets, force deletes, mails
   queued, the mail-server password changing, test mails, sign-ins, sign-outs and failed sign-ins (the
   login typed, never the password).
 - Console writes (seeders, tinker, migrations) are **not** audited — another reason not to change data
@@ -187,8 +193,9 @@ One page, a tab per setting, each with its own `.view` / `.update` pair; the pag
 
 ### 5.2 Quick Login
 
-A development aid: one-click sign-in buttons on `/login` for the seeded `superadmin`, `admin` and
-`viewer` accounts (password `password`). **Shown only when switched on *and* `APP_ENV` is `local` or
+A development aid: one-click sign-in buttons on `/login` for the seeded `superadmin` and the demo
+accounts of `DemoUserSeeder::ACCOUNTS` — `admin`, `viewer`, `pm`, `accountant`, `hr` (password
+`password`). **Shown only when switched on *and* `APP_ENV` is `local` or
 `testing`** — production never renders them, whatever the switch says. An account that is missing or
 inactive gets no button.
 
@@ -248,6 +255,9 @@ a panel in `components/admin/application-settings/`, and a tab entry in the page
 
 ## 9. Testing
 
+Each Admin screen has a training guide under `resources/js/components/training/guides/admin/`,
+changed in the same change as its screen ([`training.md` §8](training.md#8-status)).
+
 `tests/Feature/Admin/`: `UserTest`, `RoleTest`, `CompanyTest`, `UserCompanyAssignmentTest`, `PermissionCatalogueTest`, `RbacTest`,
 `PermissionDescriptionsTest`, `AuditTrailTest`, `AuditLogViewerTest`, `ApplicationSettingTest`,
 `BrandingSettingTest`, `ImportLimitTest`, `SentMailTest`; the header switcher is
@@ -283,8 +293,8 @@ the company list because it is master data every module needs and no one busines
   `admin.companies.force-delete`. A company something belongs to cannot be ticked; the server re-checks
   each and names any it kept in a `warning` toast.
 - **Deletion guard:** `CompanyService::deletionBlocker()` refuses delete and permanent delete while
-  any department belongs to the company, deleted departments included (the count drops the company
-  scope). The button is disabled with the reason on hover; the server answers a `warning` toast.
+  any department or employee belongs to the company, deleted ones included (the counts drop the
+  company scope) — departments are checked first, then employees, and the sentence names which. The button is disabled with the reason on hover; the server answers a `warning` toast.
   Deactivating is the normal way to retire a company.
 - No spreadsheet import — a handful of rows, entered by hand.
 - Permissions: `admin.companies.{view,create,update,delete,restore,force-delete}` — the `admin` role

@@ -56,7 +56,7 @@ modules:
 
 | Phase | Delivers |
 | --- | --- |
-| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)). **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)). **Accounting → Customers** ([`accounting.md`](accounting.md#3-phases)). |
+| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)) — **built**. **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)) — **built** 2026-10-29; employees carry the monthly salary the cost rate will come from. **Accounting → Customers** ([`accounting.md`](accounting.md#3-phases)) — not yet built. |
 | **1 — delivery** | Projects with contract terms, milestones, tasks (list + board), project members with billing rates, timesheets with approval. |
 | **2 — billing** | Billing requests from approved milestones and hours. They wait as **ready to invoice** until Accounting's invoices exist, then become invoices. |
 | **3 — profitability** | Budget against actual per project and per milestone, using the employee cost rate. |

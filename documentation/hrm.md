@@ -27,6 +27,7 @@ record never depends on a user account.
 | Name / permission prefix | `hrm.` |
 | URL prefix | `hrm/` |
 | Pages | `pages/hrm/*` |
+| Training guides | `components/training/guides/hrm/` — `departments`, `designations`, `employees` written; the overview `pending` while it shows sample data |
 
 **Every record belongs to a company** ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
 

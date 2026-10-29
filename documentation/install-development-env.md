@@ -147,12 +147,19 @@ folders from a teammate (or install them from your own source) into your own
 project you open and are never committed here. Anything the whole team should share belongs in
 `.claude/skills/` instead (create it with `skill-creator`).
 
-### 6.6 The architecture hook
+### 6.6 The documentation hooks
 
-`.claude/settings.json` runs `.claude/hooks/architecture-sync.mjs` after every file edit Claude makes.
-It reminds Claude to update `ARCHITECTURE.md` when a structural file changes. It needs only Node, and
-is committed, so there is nothing to install. If it ever fires on a change that is not structural,
-tell Claude why and carry on.
+`.claude/settings.json` runs two hooks after every file edit Claude makes, through Write/Edit or
+Serena's editing tools:
+
+- `.claude/hooks/architecture-sync.mjs` reminds Claude to update `ARCHITECTURE.md` when a structural
+  file changes.
+- `.claude/hooks/docs-sync.mjs` reminds Claude that a module's code changed while its
+  `documentation/{module}.md`, or a changed screen's training guide, did not. It also runs when
+  Claude tries to finish, and refuses until they are updated (owner, 2026-10-29).
+
+They need only Node, and are committed, so there is nothing to install. If one fires on a change that
+is genuinely not structural or not user-visible, tell Claude why and carry on.
 
 ## 7. Things to know
 
