@@ -29,8 +29,8 @@ export default function DesignationsGuide() {
         <Guide>
             <GuideSection kind="purpose">
                 <Para
-                    en="The job titles used across the group — Operator, Supervisor, Manager and so on. Employees will point at them. There is one list for every company: a designation added here is offered in all of them, whichever company is selected in the header."
-                    bn="গ্রুপজুড়ে ব্যবহৃত পদবিগুলো — Operator, Supervisor, Manager ইত্যাদি। কর্মীরা এগুলোর সাথে যুক্ত থাকবে। সব কোম্পানির জন্য একটিই তালিকা: এখানে যোগ করা পদবি হেডারে যে কোম্পানিই বেছে নেওয়া থাকুক, সবগুলোতেই দেখানো হয়।"
+                    en="The job titles used across your organization — Operator, Supervisor, Manager and so on. Employees will point at them. There is one list for every company: a designation added here is offered in all of them, whichever company is selected in the header."
+                    bn="প্রতিষ্ঠানজুড়ে ব্যবহৃত পদবিগুলো — Operator, Supervisor, Manager ইত্যাদি। কর্মীরা এগুলোর সাথে যুক্ত থাকবে। সব কোম্পানির জন্য একটিই তালিকা: এখানে যোগ করা পদবি হেডারে যে কোম্পানিই বেছে নেওয়া থাকুক, সবগুলোতেই দেখানো হয়।"
                 />
             </GuideSection>
 
@@ -195,8 +195,8 @@ export default function DesignationsGuide() {
                 />
                 <Bullets>
                     <Bullet
-                        en="There is no company field: every designation belongs to the whole group."
-                        bn="কোনো কোম্পানি ঘর নেই: প্রতিটি পদবি পুরো গ্রুপের।"
+                        en="There is no company field: every designation is shared by every company."
+                        bn="কোনো কোম্পানি ঘর নেই: প্রতিটি পদবি পুরো প্রতিষ্ঠানের।"
                     />
                 </Bullets>
                 <ListBasics deletedTab />

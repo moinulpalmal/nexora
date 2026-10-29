@@ -27,8 +27,8 @@ export default function CompaniesGuide() {
         <Guide>
             <GuideSection kind="purpose">
                 <Para
-                    en="The list of group companies. Every Projects, Accounting and HRM record belongs to one of them, and people work in one company at a time, chosen from the switcher in the header. This screen is where companies are added, renamed, retired and, when nothing belongs to them, deleted."
-                    bn="গ্রুপের কোম্পানিগুলোর তালিকা। Projects, Accounting ও HRM-এর প্রতিটি রেকর্ড এগুলোর কোনো একটির অধীনে থাকে, আর সবাই একবারে একটি কোম্পানিতে কাজ করেন — হেডারের সুইচার থেকে সেটি বেছে নেন। এই স্ক্রিনে কোম্পানি যোগ, নাম বদল, অবসরে পাঠানো এবং — যখন কোনো রেকর্ড এর অধীনে নেই — মোছা হয়।"
+                    en="The list of your organization's companies. Every Projects, Accounting and HRM record belongs to one of them, and people work in one company at a time, chosen from the switcher in the header. This screen is where companies are added, renamed, retired and, when nothing belongs to them, deleted."
+                    bn="আপনার প্রতিষ্ঠানের কোম্পানিগুলোর তালিকা। Projects, Accounting ও HRM-এর প্রতিটি রেকর্ড এগুলোর কোনো একটির অধীনে থাকে, আর সবাই একবারে একটি কোম্পানিতে কাজ করেন — হেডারের সুইচার থেকে সেটি বেছে নেন। এই স্ক্রিনে কোম্পানি যোগ, নাম বদল, অবসরে পাঠানো এবং — যখন কোনো রেকর্ড এর অধীনে নেই — মোছা হয়।"
                 />
             </GuideSection>
 

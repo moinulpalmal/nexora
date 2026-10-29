@@ -122,7 +122,7 @@ function trainingColleagues(): array
 }
 
 /**
- * Invented group companies, keyed by short code in lower case.
+ * Invented companies, keyed by short code in lower case.
  *
  * @return array<string, Company>
  */
@@ -262,7 +262,7 @@ test('hrm.designations', function () {
 test('admin.permissions', function () {
     trainingActor();
 
-    $page = visitForTraining(route('admin.permissions.index', absolute: false))->assertSee('admin.users.view');
+    $page = visitForTraining(route('admin.permissions.index', absolute: false))->assertSee('admin.roles.view');
     captureTrainingShot($page, 'admin.permissions', 'overview');
 });
 

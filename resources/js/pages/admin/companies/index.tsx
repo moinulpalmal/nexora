@@ -101,7 +101,7 @@ export default function CompaniesIndex({
                 <div className="flex items-start justify-between gap-4">
                     <Heading
                         title="Companies"
-                        description="The group companies every Projects, Accounting and HRM record belongs to. Retire a company by making it inactive; it can be deleted only while nothing belongs to it."
+                        description="The companies every Projects, Accounting and HRM record belongs to. Retire a company by making it inactive; it can be deleted only while nothing belongs to it."
                     />
 
                     {canCreate && !isDeleted && (
