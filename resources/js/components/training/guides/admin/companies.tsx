@@ -82,14 +82,14 @@ export default function CompaniesGuide() {
                         en={
                             <>
                                 Press <Ui>New company</Ui>, enter the name and a
-                                short code such as <Ui>PGL</Ui>, and save with{' '}
+                                short code such as <Ui>ATL</Ui>, and save with{' '}
                                 <Ui>Save &amp; close</Ui>.
                             </>
                         }
                         bn={
                             <>
                                 <Ui>New company</Ui> চাপুন, নাম ও একটি সংক্ষিপ্ত
-                                কোড দিন, যেমন <Ui>PGL</Ui>, তারপর{' '}
+                                কোড দিন, যেমন <Ui>ATL</Ui>, তারপর{' '}
                                 <Ui>Save &amp; close</Ui> দিয়ে সেভ করুন।
                             </>
                         }
@@ -163,17 +163,17 @@ export default function CompaniesGuide() {
 
             <GuideSection kind="messages">
                 <Message
-                    text='A company named "Palmal Garments Ltd." already exists.'
+                    text='A company named "Acme Trading Ltd." already exists.'
                     en="Another company has this name, perhaps in other capitals. Use a different name or edit that company."
                     bn="অন্য কোনো কোম্পানির এই নাম আছে, হয়তো ভিন্ন বড়-ছোট অক্ষরে। অন্য নাম দিন অথবা সেই কোম্পানিটি সম্পাদনা করুন।"
                 />
                 <Message
-                    text='A deleted company is named "Palmal Garments Ltd.". Restore it from the Deleted tab instead.'
+                    text='A deleted company is named "Acme Trading Ltd.". Restore it from the Deleted tab instead.'
                     en="A deleted company still holds the name. Restore that one rather than making a second."
                     bn="মুছে ফেলা একটি কোম্পানির এখনো এই নামটি আছে। দ্বিতীয়টি না বানিয়ে সেটিকেই ফিরিয়ে আনুন।"
                 />
                 <Message
-                    text='The short code "PGL" is already taken.'
+                    text='The short code "ATL" is already taken.'
                     en="Another company uses this short code. Choose another."
                     bn="অন্য কোনো কোম্পানি এই সংক্ষিপ্ত কোড ব্যবহার করছে। অন্যটি বেছে নিন।"
                 />

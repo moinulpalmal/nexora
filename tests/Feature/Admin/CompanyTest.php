@@ -24,8 +24,8 @@ use App\Models\User;
 function companyPayload(array $overrides = []): array
 {
     return [
-        'name' => 'Palmal Garments Ltd.',
-        'short_code' => 'PGL',
+        'name' => 'Acme Trading Ltd.',
+        'short_code' => 'ATL',
         'status' => RecordStatus::Active->value,
         ...$overrides,
     ];
@@ -90,13 +90,13 @@ test('the list renders with its allow-lists and counts', function () {
 
 test('the list filters by short code prefix and lists deleted companies on their tab', function () {
     $this->actingAs(userWithPermissions('admin.companies.view'));
-    Company::factory()->create(['short_code' => 'PGL']);
-    Company::factory()->create(['short_code' => 'XPG']);
+    Company::factory()->create(['short_code' => 'ATL']);
+    Company::factory()->create(['short_code' => 'XAT']);
     $gone = Company::factory()->create(['short_code' => 'OLD']);
     $gone->delete();
 
-    $this->get(route('admin.companies.index', ['filter' => ['short_code' => 'PG']]))
-        ->assertInertia(fn ($page) => $page->has('companies.data', 1)->where('companies.data.0.short_code', 'PGL'));
+    $this->get(route('admin.companies.index', ['filter' => ['short_code' => 'AT']]))
+        ->assertInertia(fn ($page) => $page->has('companies.data', 1)->where('companies.data.0.short_code', 'ATL'));
 
     $this->get(route('admin.companies.index', ['view' => 'trashed']))
         ->assertInertia(fn ($page) => $page->has('companies.data', 1)->where('companies.data.0.id', $gone->id));
@@ -110,44 +110,44 @@ test('a company is created with its name tidied and its code uppercased', functi
     $this->actingAs(userWithPermissions('admin.companies.create'));
 
     $response = $this->post(route('admin.companies.store'), companyPayload([
-        'name' => '  Palmal   Garments  Ltd. ',
-        'short_code' => ' pgl ',
+        'name' => '  Acme   Trading  Ltd. ',
+        'short_code' => ' atl ',
     ]));
 
     assertToast($response, 'success');
 
     $company = Company::query()->sole();
 
-    expect($company->name)->toBe('Palmal Garments Ltd.')
-        ->and($company->short_code)->toBe('PGL')
+    expect($company->name)->toBe('Acme Trading Ltd.')
+        ->and($company->short_code)->toBe('ATL')
         ->and($company->inserted_by)->toBe(auth()->id());
 });
 
 test('a name or short code already used is refused whatever its case or spacing', function (string $field, string $value) {
-    Company::factory()->create(['name' => 'Palmal Garments Ltd.', 'short_code' => 'PGL']);
+    Company::factory()->create(['name' => 'Acme Trading Ltd.', 'short_code' => 'ATL']);
 
     $this->actingAs(userWithPermissions('admin.companies.create'))
         ->post(route('admin.companies.store'), companyPayload(['name' => 'Other', 'short_code' => 'OTH', $field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
-    'name, other case' => ['name', 'palmal garments ltd.'],
-    'name, extra spaces' => ['name', ' Palmal  Garments Ltd. '],
-    'short code, lower case' => ['short_code', 'pgl'],
+    'name, other case' => ['name', 'acme trading ltd.'],
+    'name, extra spaces' => ['name', ' Acme  Trading Ltd. '],
+    'short code, lower case' => ['short_code', 'atl'],
 ]);
 
 test('a deleted company keeps its values reserved and says to restore it', function () {
-    Company::factory()->create(['name' => 'Palmal Garments Ltd.', 'short_code' => 'PGL'])->delete();
+    Company::factory()->create(['name' => 'Acme Trading Ltd.', 'short_code' => 'ATL'])->delete();
 
     $this->actingAs(userWithPermissions('admin.companies.create'))
         ->post(route('admin.companies.store'), companyPayload())
         ->assertSessionHasErrors([
-            'name' => 'A deleted company is named "Palmal Garments Ltd.". Restore it from the Deleted tab instead.',
-            'short_code' => 'The short code "PGL" belongs to a deleted company. Restore it from the Deleted tab instead.',
+            'name' => 'A deleted company is named "Acme Trading Ltd.". Restore it from the Deleted tab instead.',
+            'short_code' => 'The short code "ATL" belongs to a deleted company. Restore it from the Deleted tab instead.',
         ]);
 });
 
 test('a company can be edited, keeping its own values', function () {
-    $company = Company::factory()->create(['name' => 'Palmal Garments Ltd.', 'short_code' => 'PGL']);
+    $company = Company::factory()->create(['name' => 'Acme Trading Ltd.', 'short_code' => 'ATL']);
 
     $this->actingAs(userWithPermissions('admin.companies.update'))
         ->put(route('admin.companies.update', $company), companyPayload(['status' => RecordStatus::Inactive->value]))
@@ -216,7 +216,7 @@ test('creating a company is audited', function () {
 
     $this->post(route('admin.companies.store'), companyPayload());
 
-    expect(AuditLog::where('event', 'created')->where('auditable_type', 'company')->sole()->new_values['short_code'])->toBe('PGL');
+    expect(AuditLog::where('event', 'created')->where('auditable_type', 'company')->sole()->new_values['short_code'])->toBe('ATL');
 });
 
 /*

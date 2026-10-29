@@ -21,7 +21,7 @@ file. What it established, named after what ships:
 
 ---
 
-## The rules (from §9.10, and proved in compozit's buyer scoping)
+## The rules (from §9.10, and proved in compozit's per-customer scoping)
 
 1. **`company_id` comes from the selected company, on the server — never from the form.** The form has
    no company picker; the service stamps it on create. A browser-sent `company_id` is ignored, not

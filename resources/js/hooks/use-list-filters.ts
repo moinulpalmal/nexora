@@ -79,7 +79,7 @@ type UrlBuilder = (options: RouteQueryOptions) => Destination;
  *                    can have changed since the last visit. `refresh()` is called
  *                    after arbitrary time has passed — another user may have
  *                    edited data an unrelated prop was built from (a pending
- *                    import banner, a buyer dropdown, a tab count) — so it must
+ *                    import banner, a customer dropdown, a tab count) — so it must
  *                    name every prop derived from a query, not just the rows, and
  *                    a page that names nothing gets everything rather than being
  *                    trusted to have judged `only` complete.
@@ -142,10 +142,10 @@ export function useListFilters<F extends ListFilters<string | string[]>>({
      * Change one filter cell, or several at once. Text cells debounce; dropdowns
      * and checklists (a list of ticked values) go immediately.
      *
-     * A cell may have to clear another in the *same* visit — the purchase-order
-     * list's buyer and department cells clear its BQS pick, which their cascade
+     * A cell may have to clear another in the *same* visit — a sales-order list's
+     * customer and department cells clear its contact pick, which their cascade
      * may have just dropped from the dropdown. Hence the second call shape, a
-     * patch of several columns: `setFilter({ buyer_id: '3', bqs_id: '' })`.
+     * patch of several columns: `setFilter({ customer_id: '3', contact_id: '' })`.
      * Calling the one-column form twice cannot do it, because both calls close
      * over the same `draft` and the second merge discards the first.
      *

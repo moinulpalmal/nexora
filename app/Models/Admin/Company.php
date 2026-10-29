@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
 
 /**
- * One Palmal Group company (ARCHITECTURE.md §9.10). A global Admin master:
+ * One company of the organization (ARCHITECTURE.md §9.10). A global Admin master:
  * the same row for every user, and the dimension every ERP record is scoped by.
  *
  * Restorable, like users: a deleted company moves to the Deleted tab and keeps

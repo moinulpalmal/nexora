@@ -74,7 +74,7 @@ export default function CompanyFormDialog({
                                         autoFocus
                                         autoComplete="off"
                                         maxLength={150}
-                                        placeholder="Palmal Garments Ltd."
+                                        placeholder="Acme Trading Ltd."
                                         aria-invalid={Boolean(errors.name)}
                                     />
                                     <InputError message={errors.name} />
@@ -91,7 +91,7 @@ export default function CompanyFormDialog({
                                         required
                                         autoComplete="off"
                                         maxLength={10}
-                                        placeholder="PGL"
+                                        placeholder="ATL"
                                         className="font-mono uppercase"
                                         aria-invalid={Boolean(
                                             errors.short_code,

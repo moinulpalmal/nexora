@@ -130,7 +130,7 @@ function trainingCompanies(): array
 {
     $companies = [];
 
-    foreach ([['Palmal Garments Ltd.', 'PGL'], ['Palmal Knit Composite Ltd.', 'PKC'], ['Palmal Packaging Ltd.', 'PPL', 'I']] as $row) {
+    foreach ([['Acme Trading Ltd.', 'ATL'], ['Acme Services Ltd.', 'ASL'], ['Acme Logistics Ltd.', 'ALL', 'I']] as $row) {
         $companies[strtolower($row[1])] = Company::factory()->create([
             'name' => $row[0],
             'short_code' => $row[1],
@@ -192,15 +192,15 @@ test('admin.companies', function () {
     $key = 'admin.companies';
     trainingActor();
     trainingCompanies();
-    Company::factory()->create(['name' => 'Palmal Washing Ltd.', 'short_code' => 'PWL'])->delete();
+    Company::factory()->create(['name' => 'Acme Retail Ltd.', 'short_code' => 'ARL'])->delete();
 
-    $page = visitForTraining(route('admin.companies.index', absolute: false))->assertSee('Palmal Garments Ltd.');
+    $page = visitForTraining(route('admin.companies.index', absolute: false))->assertSee('Acme Trading Ltd.');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-company"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 
-    $page = visitForTraining(route('admin.companies.index', ['view' => 'trashed'], absolute: false))->assertSee('Palmal Washing Ltd.');
+    $page = visitForTraining(route('admin.companies.index', ['view' => 'trashed'], absolute: false))->assertSee('Acme Retail Ltd.');
     captureTrainingShot($page, $key, 'deleted');
 });
 
@@ -221,10 +221,10 @@ test('hrm.departments', function () {
     $key = 'hrm.departments';
     $actor = trainingActor();
     $companies = trainingCompanies();
-    $actor->forceFill(['selected_company_id' => $companies['pgl']->id])->saveQuietly();
+    $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
 
-    foreach ([['HR', 'Human Resources'], ['PROD', 'Production'], ['FIN', 'Finance & Accounts'], ['QA', 'Quality Assurance'], ['MERCH', 'Merchandising']] as [$code, $name]) {
-        Department::factory()->for($companies['pgl'])->create(['code' => $code, 'name' => $name]);
+    foreach ([['HR', 'Human Resources'], ['PROD', 'Production'], ['FIN', 'Finance & Accounts'], ['QA', 'Quality Assurance'], ['SALES', 'Sales & Marketing']] as [$code, $name]) {
+        Department::factory()->for($companies['atl'])->create(['code' => $code, 'name' => $name]);
     }
 
     $page = visitForTraining(route('hrm.departments.index', absolute: false))->assertSee('Human Resources');

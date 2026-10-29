@@ -15,8 +15,10 @@ reserved or skipped on purpose.
 
 ## 1. What this application is
 
-Nexora is an **ERP for Palmal Group**, serving several group companies in one installation (owner,
-2026-10-28). This repository holds its **foundation**: the application shell, authentication, roles and permissions, the audit trail, and
+Nexora is a **general-purpose ERP for small organizations**, not built for any one organization
+or industry: one installation serves a single company or a small group of companies (owner,
+2026-10-28). **Keep it organization- and industry-neutral** — no client names or industry-specific
+wording in code, docs, sample data or fixtures (owner, 2026-10-29). This repository holds its **foundation**: the application shell, authentication, roles and permissions, the audit trail, and
 the Admin module (users, roles, the permission catalogue, the audit log, application settings and
 sent mail). Business modules are added on top of it, one module per folder in every layer
 ([§4](#4-the-organizing-rule)).
@@ -553,7 +555,7 @@ them (owner, 2026-10-26). The buttons submit the real login form.
 
 ### 9.10 Multi-company
 
-*(owner, 2026-10-28; built 2026-10-29)* One installation serves several Palmal Group companies.
+*(owner, 2026-10-28; built 2026-10-29)* One installation serves one organization's companies — one or several.
 **Every Projects, Accounting and HRM record carries its company**, and each company has its own
 ledger, fiscal years and payroll. **The one exception is HRM → Designations**: a group-wide list
 with no `company_id`, the same job titles for every company — the master-crud *global* shape

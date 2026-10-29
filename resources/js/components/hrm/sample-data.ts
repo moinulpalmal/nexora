@@ -30,15 +30,15 @@ export const recentJoiners: SampleJoiner[] = [
     {
         code: 'E-24181',
         name: 'Rafiq Islam',
-        department: 'Sewing',
-        designation: 'Operator',
+        department: 'Operations',
+        designation: 'Officer',
         joined: '27 Oct 2026',
     },
     {
         code: 'E-24180',
         name: 'Shirin Akter',
-        department: 'Sewing',
-        designation: 'Line Supervisor',
+        department: 'Operations',
+        designation: 'Supervisor',
         joined: '26 Oct 2026',
     },
     {

@@ -38,7 +38,7 @@ export default function ListToolbar({
     refreshing: boolean;
     /**
      * Whether to offer a page size. False only for a surface that renders its
-     * whole set — the TNA items sheet, which is grouped and therefore
+     * whole set — a grouped items sheet, which is therefore
      * unpaginated (ARCHITECTURE.md §8.6). Refresh and Clear filters still apply
      * there, which is why the whole bar is not simply dropped.
      */

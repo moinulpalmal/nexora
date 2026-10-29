@@ -38,7 +38,7 @@ export type TimeCell = {
 /**
  * One cell of the filter row.
  *
- * `time` is for a column holding an `HH:MM` value (the TNA alert schedule's
+ * `time` is for a column holding an `HH:MM` value (an alert schedule's
  * `run_at`). It matches exactly and pushes without a debounce, like a dropdown:
  * the browser only reports a time once it is complete.
  *

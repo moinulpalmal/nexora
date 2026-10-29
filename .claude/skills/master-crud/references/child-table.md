@@ -5,8 +5,8 @@ parent and its codes, a template and its steps, an account group and its lines. 
 their own table and are edited as a repeater ("ladder") inside the parent's modal; there is no
 separate screen for them.
 
-**There is no sibling in Nexora yet.** The pattern was proved in compozit (concerns with per-buyer
-codes, TNA templates with steps) and is restated here. Before building the first one, confirm the
+**There is no sibling in Nexora yet.** The pattern was proved in compozit (per-customer codes
+under a parent, templates with steps) and is restated here. Before building the first one, confirm the
 design with the owner; when it ships, **record it here and in SKILL.md's shape table as the sibling**.
 
 Not every "has many" is a ladder. If the children have their own identity, their own lifecycle or
@@ -31,9 +31,9 @@ Three decisions to state in the docblock, because each has a plausible alternati
 - **The parent cascades.** A child is *part of* its parent, so it owes no deletion guard on that side
   (§9.14). Any *other* master table the child points at restricts, and that table's service gains a
   `deletionBlocker()` clause — ask before editing it.
-- **The unique runs in the direction lookups need.** compozit's per-buyer codes were
-  `unique(buyer_id, code)` and deliberately *not* `unique(parent_id, buyer_id)`: one buyer's code must
-  name exactly one parent, while one parent may hold two codes under one buyer. Work out which
+- **The unique runs in the direction lookups need.** compozit's per-customer codes were
+  `unique(customer_id, code)` and deliberately *not* `unique(parent_id, customer_id)`: one customer's
+  code must name exactly one parent, while one parent may hold two codes under one customer. Work out which
   direction your lookups resolve and constrain that one.
 - **Codes are strings**, never cast to integers — a workbook hands them back as numbers, and a
   leading zero is significant.

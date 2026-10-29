@@ -40,7 +40,7 @@ and ledger ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
 - The chart of accounts: groups and ledger accounts, by type (asset, liability, equity, income,
   expense).
 - Fiscal years, defaulting to **July–June** (Bangladesh), with opening balances and year closing.
-- Currencies: base currency **BDT**, plus foreign-currency vouchers (USD export receipts) at a
+- Currencies: base currency **BDT**, plus foreign-currency vouchers (for example USD receipts from foreign customers) at a
   recorded exchange rate.
 - Vouchers: **payment, receipt, journal, contra**, with approval.
 - Ledgers, the trial balance, profit and loss, and the balance sheet.

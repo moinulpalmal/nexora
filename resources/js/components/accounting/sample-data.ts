@@ -44,7 +44,7 @@ export const recentVouchers: SampleVoucher[] = [
         number: 'RV-2026-0418',
         date: '27 Oct 2026',
         type: 'Receipt',
-        narration: 'Export proceeds — Northwind Apparel (USD 42,000)',
+        narration: 'Foreign receipt — Northwind Traders (USD 42,000)',
         amount: 'BDT 51,24,000',
         status: 'Posted',
     },

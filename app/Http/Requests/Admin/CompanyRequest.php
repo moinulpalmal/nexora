@@ -74,7 +74,7 @@ class CompanyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'short_code.regex' => __('Use letters and digits, optionally joined by single hyphens or underscores, e.g. "PGL".'),
+            'short_code.regex' => __('Use letters and digits, optionally joined by single hyphens or underscores, e.g. "ATL".'),
         ];
     }
 

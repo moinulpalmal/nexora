@@ -258,7 +258,7 @@ assertions turn auditing on with `config(['audit.console' => true])` after the f
 > **Built 2026-10-29** (owner's decisions of that day). The rule it sets is
 > [`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company).
 
-Nexora serves **several Palmal Group companies in one installation**. Every HRM, Accounting and
+Nexora serves **one or several companies of an organization in one installation**. Every HRM, Accounting and
 Projects record belongs to a company, and each company keeps its own ledger and payroll. Admin owns
 the company list because it is master data every module needs and no one business module owns.
 

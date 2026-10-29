@@ -14,8 +14,9 @@
 ## 1. Overview
 
 HRM holds **the people each company employs**: who they are, where they sit in the organisation,
-when they work, their leave, and, from phase 2, what they are paid. Palmal is a garments group, so
-most employees are factory workers on shifts and production lines who **never sign in**.
+when they work, their leave, and, from phase 2, what they are paid. In many small
+organizations most employees — shift, field or floor staff — **never sign in**, so an employee
+record never depends on a user account.
 
 | | |
 | --- | --- |
@@ -71,7 +72,7 @@ Projects needs employees, so a small **HRM-lite** slice ships first:
 - **Department** (built, [§4.1](#41-departments--built)): a company-level lookup (HRM-lite).
 - **Designation** (built, [§4.2](#42-designations--built)): a **group-wide** lookup — one list of job
   titles every company shares (HRM-lite; owner, 2026-10-29).
-- **Section / Line**: the factory-floor units under a department (phase 1).
+- **Section / Line**: the working units under a department, such as teams or lines (phase 1).
 - **Employee**: employee code, name, company, department, designation, joining date, status,
   optional User, and **cost rate**. Phase 1 adds personal and job details and documents.
 - **Shift** and **roster**: working hours, and who works which shift.

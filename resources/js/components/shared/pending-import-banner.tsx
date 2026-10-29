@@ -27,8 +27,8 @@ type Props = {
  *
  * **Deliberately a banner rather than a modal thrown on arrival.** The reader
  * did not open it, and a staged import survives on the server indefinitely, so
- * it is announced and they choose — the same treatment `merchandising/bqs`
- * gives its own pending import.
+ * it is announced and they choose — the treatment compozit's import screens
+ * proved.
  *
  * The cancel action is a terminal human decision ("never import this file"), so
  * it moves the row to `ImportStatus::Cancelled` rather than deleting it; the

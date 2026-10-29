@@ -39,14 +39,14 @@ export const recentProjects: SampleProject[] = [
     {
         code: 'PRJ-0012',
         name: 'Warehouse scanning rollout',
-        customer: 'Northwind Apparel',
+        customer: 'Northwind Traders',
         manager: 'Karim Ahmed',
         billing: 'Milestone',
         status: 'Active',
     },
     {
         code: 'PRJ-0011',
-        name: 'Buyer portal integration',
+        name: 'Customer portal integration',
         customer: 'Bluefin Retail',
         manager: 'Sadia Rahman',
         billing: 'Time & materials',
@@ -54,8 +54,8 @@ export const recentProjects: SampleProject[] = [
     },
     {
         code: 'PRJ-0010',
-        name: 'Line balancing study',
-        customer: 'Harbor Textiles',
+        name: 'Process improvement study',
+        customer: 'Harbor Logistics',
         manager: 'Tanvir Hossain',
         billing: 'Time & materials',
         status: 'On hold',
@@ -70,8 +70,8 @@ export const recentProjects: SampleProject[] = [
     },
     {
         code: 'PRJ-0013',
-        name: 'Sample room digitisation',
-        customer: 'Northwind Apparel',
+        name: 'Document archive digitisation',
+        customer: 'Northwind Traders',
         manager: 'Karim Ahmed',
         billing: 'Milestone',
         status: 'Planned',

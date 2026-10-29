@@ -127,7 +127,7 @@ abstract class ListRequest extends FormRequest
     }
 
     /**
-     * A list filter sent as one scalar — `filter[buyer_id]=5`, as every link
+     * A list filter sent as one scalar — `filter[customer_id]=5`, as every link
      * written before the checklists was (notifications included) — is read as a
      * list of that one value, so those links keep working.
      */
