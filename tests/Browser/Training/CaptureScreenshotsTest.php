@@ -311,6 +311,14 @@ test('hrm.employees', function () {
         ->click('[data-test="import-employees"]')
         ->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'import');
+
+    $page = visitForTraining(route('hrm.employees.index', absolute: false))
+        ->click('[data-test="new-employee"]')
+        ->click('[data-test="employee-department"]')
+        ->type(':focus', 'Quality Control')
+        ->click('[data-test="combobox-create"]')
+        ->assertVisible('#inline-department-name');
+    captureTrainingShot($page, $key, 'inline-create');
 });
 
 test('admin.permissions', function () {

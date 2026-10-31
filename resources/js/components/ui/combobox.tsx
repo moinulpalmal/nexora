@@ -134,7 +134,17 @@ type SingleProps = SharedProps & {
      * (ARCHITECTURE.md §8.5).
      */
     clearable?: boolean;
+    /**
+     * Offers a `Create "<query>"` row whenever the typed search matches no
+     * option's label exactly; choosing it calls this with the trimmed query and
+     * selects nothing. The caller creates the record and selects it once its
+     * options include it. Setting it always shows the search box.
+     */
+    onCreate?: (query: string) => void;
 };
+
+/** The sentinel item behind the `onCreate` row; never a real option value. */
+const CREATE_VALUE = '__combobox_create__';
 
 type MultipleProps = SharedProps & {
     multiple: true;
@@ -168,6 +178,7 @@ function SingleCombobox({
     defaultValue = null,
     onChange,
     clearable = true,
+    onCreate,
     // Destructured only to keep it out of `rest`: it is the discriminant, not a
     // DOM attribute, and spreading it onto the trigger `<button>` makes React
     // hydrate a `multiple` attribute the server never rendered.
@@ -207,7 +218,24 @@ function SingleCombobox({
         null;
 
     const showSearch =
-        searchUrl !== undefined || options.length >= SEARCH_THRESHOLD;
+        onCreate !== undefined ||
+        searchUrl !== undefined ||
+        options.length >= SEARCH_THRESHOLD;
+
+    const createQuery = query.trim();
+    const canCreate =
+        onCreate !== undefined &&
+        createQuery !== '' &&
+        ![...options, ...remote.options].some(
+            (option) =>
+                option.label.toLowerCase() === createQuery.toLowerCase(),
+        );
+    const items: ComboboxOption[] = canCreate
+        ? [
+              ...visible,
+              { value: CREATE_VALUE, label: `Create “${createQuery}”` },
+          ]
+        : visible;
 
     const {
         isOpen,
@@ -218,7 +246,7 @@ function SingleCombobox({
         highlightedIndex,
         selectItem,
     } = useCombobox({
-        items: visible,
+        items,
         itemToString: (option) => option?.label ?? '',
         selectedItem: selected,
         inputValue: query,
@@ -244,6 +272,12 @@ function SingleCombobox({
             }
         },
         onSelectedItemChange: ({ selectedItem }) => {
+            if (selectedItem?.value === CREATE_VALUE) {
+                onCreate?.(createQuery);
+
+                return;
+            }
+
             const next = selectedItem?.value ?? null;
 
             if (!isControlled) {
@@ -252,6 +286,8 @@ function SingleCombobox({
 
             onChange?.(next);
         },
+        // `selectedItem` is always passed in, so choosing the create row (an
+        // action, not a choice) leaves the trigger showing the prior selection.
         stateReducer: (state, { changes, type }) =>
             type === useCombobox.stateChangeTypes.InputClick
                 ? { ...changes, isOpen: state.isOpen }
@@ -295,7 +331,7 @@ function SingleCombobox({
      */
     const tipDetails = isOpen
         ? highlightedIndex >= 0
-            ? visible[highlightedIndex]?.details
+            ? items[highlightedIndex]?.details
             : undefined
         : pointing
           ? selected?.details
@@ -395,14 +431,19 @@ function SingleCombobox({
                 loading={remote.loading}
                 isOpen={isOpen}
             >
-                {visible.length === 0 && <EmptyRow loading={remote.loading} />}
+                {items.length === 0 && <EmptyRow loading={remote.loading} />}
 
-                {visible.map((option, index) => (
+                {items.map((option, index) => (
                     <OptionRow
                         key={option.value}
                         option={option}
                         highlighted={highlightedIndex === index}
                         selected={sameValue(option.value, selectedValue)}
+                        data-test={
+                            option.value === CREATE_VALUE
+                                ? 'combobox-create'
+                                : undefined
+                        }
                         {...getItemProps({ item: option, index })}
                     />
                 ))}

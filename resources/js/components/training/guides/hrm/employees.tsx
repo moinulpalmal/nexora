@@ -76,8 +76,8 @@ export default function EmployeesGuide() {
 
             <GuideSection kind="before">
                 <Para
-                    en="Check the company switcher in the header: the list, and every employee you add, belongs to the company shown there. The departments you can choose are that company's; designations are shared by every company. Add the departments and designations first — an employee needs one of each."
-                    bn="হেডারের কোম্পানি সুইচারটি দেখে নিন: তালিকা এবং আপনি যত কর্মচারী যোগ করবেন সবাই সেখানে দেখানো কোম্পানির। যেসব বিভাগ বেছে নেওয়া যায় সেগুলো ওই কোম্পানির; পদবি সব কোম্পানির জন্য একই। আগে বিভাগ ও পদবি যোগ করে নিন — প্রতিটি কর্মচারীর একটি বিভাগ ও একটি পদবি লাগে।"
+                    en="Check the company switcher in the header: the list, and every employee you add, belongs to the company shown there. The departments you can choose are that company's; designations are shared by every company. An employee needs one of each — add them first, or create them from the employee form if you may."
+                    bn="হেডারের কোম্পানি সুইচারটি দেখে নিন: তালিকা এবং আপনি যত কর্মচারী যোগ করবেন সবাই সেখানে দেখানো কোম্পানির। যেসব বিভাগ বেছে নেওয়া যায় সেগুলো ওই কোম্পানির; পদবি সব কোম্পানির জন্য একই। প্রতিটি কর্মচারীর একটি বিভাগ ও একটি পদবি লাগে — আগে যোগ করে নিন, অথবা অনুমতি থাকলে কর্মচারীর ফর্ম থেকেই তৈরি করুন।"
                 />
             </GuideSection>
 
@@ -116,6 +116,37 @@ export default function EmployeesGuide() {
                             id="form"
                             en="New employee: the employee's details and the Sign-in account box."
                             bn="New employee: কর্মচারীর তথ্য ও Sign-in account অংশ।"
+                        />
+                    </Step>
+                    <Step
+                        en={
+                            <>
+                                Department or designation not in the list? If
+                                you may add one, type its name in the search box
+                                and choose <Ui>Create “…”</Ui>. The full form
+                                opens over the employee, the name filled in and
+                                a code suggested; save it and it is chosen for
+                                the employee, with everything you typed kept. A
+                                new department belongs to the company in the
+                                header; a designation is for every company.
+                            </>
+                        }
+                        bn={
+                            <>
+                                বিভাগ বা পদবি তালিকায় নেই? যোগ করার অনুমতি
+                                থাকলে সার্চ বক্সে নামটি লিখে <Ui>Create “…”</Ui>{' '}
+                                বেছে নিন। কর্মচারীর ফর্মের ওপরে পুরো ফর্মটি
+                                খোলে, নাম বসানো ও একটি কোড প্রস্তাব করা থাকে;
+                                সেভ করলে সেটিই কর্মচারীর জন্য বেছে নেওয়া হয়,
+                                আর আপনার লেখা সব থেকে যায়। নতুন বিভাগ হেডারের
+                                কোম্পানির; পদবি সব কোম্পানির জন্য।
+                            </>
+                        }
+                    >
+                        <Shot
+                            id="inline-create"
+                            en="Add department stacked over New employee, the typed name filled in."
+                            bn="New employee-এর ওপরে Add department, লেখা নামটি বসানো।"
                         />
                     </Step>
                     <Step

@@ -316,7 +316,13 @@ function DialogContent({
             // what stops the key from closing the panel. `close` still runs when
             // something calls `dialog.close()` — the state sync below.
             onCancel={(event) => event.preventDefault()}
-            onClose={() => setOpen(false)}
+            // Only its own: React carries a stacked dialog's `close` up the
+            // component tree, which would shut the panel underneath as well.
+            onClose={(event) => {
+                if (event.target === event.currentTarget) {
+                    setOpen(false);
+                }
+            }}
         >
             <div
                 data-slot="dialog-content"

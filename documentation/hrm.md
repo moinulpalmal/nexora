@@ -183,6 +183,17 @@ tests in `tests/Feature/Hrm/EmployeeTest.php` and `EmployeeImportTest.php` (owne
 An employee keeps a department or designation that was deactivated after they joined it; only a new
 choice must be active. Ids are filters (`Equals`) on the list, not sort keys.
 
+**Creating a department or designation from the form** (owner, 2026-10-31): with
+`hrm.departments.create` (or `hrm.designations.create`) the Department (Designation) combobox
+offers `Create "<typed>"` when the search matches no name. It stacks the full
+`department-form-dialog` / `designation-form-dialog` over the employee form, Name prefilled and Code
+suggested as the name in capitals with hyphens (`Human Resources` → `HUMAN-RESOURCES`, at most 20),
+and posts to the ordinary `hrm.departments.store` / `hrm.designations.store` — same rules, same
+permission gate, a department stamped with the header company. The save keeps the page state; the
+reloaded options carry the new code and the employee form selects it, everything typed kept. "Save
+& add another" is not offered there. An inactive one is created but cannot be chosen. Browser test:
+`tests/Browser/EmployeeInlineLookupTest.php`.
+
 **The sign-in account** (`hrm.employees.create-account`; without it the form has no box and the
 account is left as it is):
 

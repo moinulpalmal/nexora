@@ -1,6 +1,6 @@
 import { Form } from '@inertiajs/react';
 import type { ReactNode } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import InputError from '@/components/input-error';
 import FormDialogFooter from '@/components/shared/form-dialog-footer';
 import Combobox from '@/components/ui/combobox';
@@ -33,6 +33,11 @@ export default function DepartmentFormDialog({
     title,
     description,
     children,
+    open: openProp,
+    onOpenChange,
+    initialValues,
+    onCreated,
+    idPrefix = '',
 }: {
     submit: RouteFormDefinition<'post'>;
     /** `RecordStatus::options()` — active/inactive. */
@@ -40,15 +45,43 @@ export default function DepartmentFormDialog({
     department?: DepartmentListItem;
     title: string;
     description: string;
-    children: ReactNode;
+    /** The trigger; omitted when the caller controls `open`. */
+    children?: ReactNode;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    /** Prefills a new department — the inline create from another form. */
+    initialValues?: { code: string; name: string };
+    /**
+     * Called with the saved code (in capitals) after a create, so the calling
+     * form can select the new department once the reloaded options carry it.
+     * Turns off "Save & add another" and keeps the page's state.
+     */
+    onCreated?: (code: string) => void;
+    /** Keeps the field ids unique when stacked over another form. */
+    idPrefix?: string;
 }) {
-    const [open, setOpen] = useState(false);
-    const close = useCallback(() => setOpen(false), []);
+    const [ownOpen, setOwnOpen] = useState(false);
+    const isControlled = openProp !== undefined;
+    const open = isControlled ? openProp : ownOpen;
+    const setOpen = useCallback(
+        (next: boolean) => {
+            if (!isControlled) {
+                setOwnOpen(next);
+            }
+
+            onOpenChange?.(next);
+        },
+        [isControlled, onOpenChange],
+    );
+    const close = useCallback(() => setOpen(false), [setOpen]);
     const { formKey, formProps, setIntent } = useFormDialog(close);
+    const code = useRef(initialValues?.code ?? department?.code ?? '');
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
+            {children !== undefined && (
+                <DialogTrigger asChild>{children}</DialogTrigger>
+            )}
 
             <DialogContent className="max-w-4xl">
                 <DialogTitle>{title}</DialogTitle>
@@ -58,18 +91,33 @@ export default function DepartmentFormDialog({
                     key={formKey}
                     {...submit}
                     {...formProps}
-                    options={{ preserveScroll: true }}
+                    onSuccess={() => {
+                        onCreated?.(code.current.trim().toUpperCase());
+                        formProps.onSuccess();
+                    }}
+                    options={{
+                        preserveScroll: true,
+                        preserveState: onCreated !== undefined,
+                    }}
                     className="mt-4 space-y-4"
                 >
                     {({ processing, errors }) => (
                         <>
                             <div className="field-grid">
                                 <div className="grid content-start gap-1.5">
-                                    <Label htmlFor="code">Code</Label>
+                                    <Label htmlFor={`${idPrefix}code`}>
+                                        Code
+                                    </Label>
                                     <Input
-                                        id="code"
+                                        id={`${idPrefix}code`}
                                         name="code"
-                                        defaultValue={department?.code}
+                                        defaultValue={
+                                            department?.code ??
+                                            initialValues?.code
+                                        }
+                                        onChange={(event) => {
+                                            code.current = event.target.value;
+                                        }}
                                         required
                                         autoFocus
                                         autoComplete="off"
@@ -86,11 +134,16 @@ export default function DepartmentFormDialog({
                                 </div>
 
                                 <div className="grid content-start gap-1.5">
-                                    <Label htmlFor="name">Name</Label>
+                                    <Label htmlFor={`${idPrefix}name`}>
+                                        Name
+                                    </Label>
                                     <Input
-                                        id="name"
+                                        id={`${idPrefix}name`}
                                         name="name"
-                                        defaultValue={department?.name}
+                                        defaultValue={
+                                            department?.name ??
+                                            initialValues?.name
+                                        }
                                         required
                                         autoComplete="off"
                                         maxLength={100}
@@ -101,9 +154,11 @@ export default function DepartmentFormDialog({
                                 </div>
 
                                 <div className="grid content-start gap-1.5">
-                                    <Label htmlFor="status">Status</Label>
+                                    <Label htmlFor={`${idPrefix}status`}>
+                                        Status
+                                    </Label>
                                     <Combobox
-                                        id="status"
+                                        id={`${idPrefix}status`}
                                         name="status"
                                         defaultValue={
                                             department?.status ??
@@ -124,7 +179,10 @@ export default function DepartmentFormDialog({
 
                             <FormDialogFooter
                                 processing={processing}
-                                addAnother={department === undefined}
+                                addAnother={
+                                    department === undefined &&
+                                    onCreated === undefined
+                                }
                                 onIntent={setIntent}
                                 saveTestId="save-department"
                             />

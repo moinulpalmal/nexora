@@ -25,7 +25,7 @@
 | `dialog` | native `<dialog>`; no backdrop/Escape dismissal; X always shown; children unmount on close |
 | `sheet` | the same primitive placed at an edge (mobile sidebar) |
 | `dropdown-menu` | popover API, light-dismiss |
-| `combobox` | downshift; single or `multiple`; `searchUrl` for server-side search; the only picker — **no native `<select>`** |
+| `combobox` | downshift; single or `multiple`; `searchUrl` for server-side search; single-select `onCreate(query)` adds a `Create "<query>"` row (`data-test="combobox-create"`) when no label matches exactly — an action that selects nothing, the caller creates and then selects; the only picker — **no native `<select>`** |
 | `hover-card` | the permission help cards |
 | `sidebar` | the app sidebar (collapsible to icons) |
 | `sonner` | toasts in daisyUI colours |

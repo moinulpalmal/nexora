@@ -1,6 +1,10 @@
 import { Form } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
+import DepartmentController from '@/actions/App/Http/Controllers/Hrm/DepartmentController';
+import DesignationController from '@/actions/App/Http/Controllers/Hrm/DesignationController';
+import DepartmentFormDialog from '@/components/hrm/department-form-dialog';
+import DesignationFormDialog from '@/components/hrm/designation-form-dialog';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import FormDialogFooter from '@/components/shared/form-dialog-footer';
@@ -16,6 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useCan } from '@/hooks/use-can';
 import { useFormDialog } from '@/hooks/use-form-dialog';
 import { RECORD_STATUS } from '@/lib/enums';
 import type {
@@ -38,6 +43,22 @@ function choosable(options: EmployeeLookupOption[], current?: number) {
                 option.value === current,
         )
         .map(({ value, label, hint }) => ({ value, label, hint }));
+}
+
+type LookupKind = 'department' | 'designation';
+
+/**
+ * A starting code for an inline-created department or designation: the name
+ * in capitals, each run of other characters one hyphen, cut to the 20 the
+ * server allows (`Human Resources` → `HUMAN-RESOURCES`). The user may edit it.
+ */
+function suggestCode(name: string): string {
+    return name
+        .toUpperCase()
+        .replace(/[^A-Z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 20)
+        .replace(/-+$/, '');
 }
 
 /**
@@ -91,6 +112,8 @@ export default function EmployeeFormDialog({
         status: employee?.status ?? RECORD_STATUS.Active,
         applicationUser: employee?.is_application_user ?? false,
         password: '',
+        departmentId: employee?.department_id ?? null,
+        designationId: employee?.designation_id ?? null,
     });
     const [fields, setFields] = useState(initial);
 
@@ -98,13 +121,59 @@ export default function EmployeeFormDialog({
         setFields(initial());
     }
 
-    const { status, applicationUser, password } = fields;
+    const { status, applicationUser, password, departmentId, designationId } =
+        fields;
     const setStatus = (next: string) =>
         setFields((current) => ({ ...current, status: next }));
     const setApplicationUser = (next: boolean) =>
         setFields((current) => ({ ...current, applicationUser: next }));
     const setPassword = (next: string) =>
         setFields((current) => ({ ...current, password: next }));
+
+    /*
+     * The inline create (owner, 2026-10-31): typing a department or designation
+     * that does not exist offers "Create …", which stacks the full form over
+     * this one. Its save reloads the page props; `created` waits for the new
+     * code to appear among the options and then selects it. Each draft is a new
+     * `key`, so the stacked form starts from what was typed this time.
+     */
+    const canCreateDepartment = useCan('hrm.departments.create');
+    const canCreateDesignation = useCan('hrm.designations.create');
+    const [draft, setDraft] = useState<{
+        kind: LookupKind;
+        name: string;
+        open: boolean;
+        key: number;
+    }>({ kind: 'department', name: '', open: false, key: 0 });
+    const [created, setCreated] = useState<{
+        kind: LookupKind;
+        code: string;
+    } | null>(null);
+
+    const openDraft = (kind: LookupKind) => (name: string) =>
+        setDraft((current) => ({
+            kind,
+            name,
+            open: true,
+            key: current.key + 1,
+        }));
+    const closeDraft = (next: boolean) =>
+        setDraft((current) => ({ ...current, open: next }));
+
+    if (created !== null) {
+        const found = (
+            created.kind === 'department' ? departments : designations
+        ).find((option) => option.hint.toUpperCase() === created.code);
+
+        if (found !== undefined) {
+            setCreated(null);
+            setFields((current) =>
+                created.kind === 'department'
+                    ? { ...current, departmentId: found.value }
+                    : { ...current, designationId: found.value },
+            );
+        }
+    }
 
     const needsPassword =
         canManageAccount &&
@@ -223,7 +292,21 @@ export default function EmployeeFormDialog({
                                     <Combobox
                                         id="department_id"
                                         name="department_id"
-                                        defaultValue={employee?.department_id}
+                                        value={departmentId}
+                                        onChange={(value) =>
+                                            setFields((current) => ({
+                                                ...current,
+                                                departmentId:
+                                                    value === null
+                                                        ? null
+                                                        : Number(value),
+                                            }))
+                                        }
+                                        onCreate={
+                                            canCreateDepartment
+                                                ? openDraft('department')
+                                                : undefined
+                                        }
                                         options={choosable(
                                             departments,
                                             employee?.department_id,
@@ -246,7 +329,21 @@ export default function EmployeeFormDialog({
                                     <Combobox
                                         id="designation_id"
                                         name="designation_id"
-                                        defaultValue={employee?.designation_id}
+                                        value={designationId}
+                                        onChange={(value) =>
+                                            setFields((current) => ({
+                                                ...current,
+                                                designationId:
+                                                    value === null
+                                                        ? null
+                                                        : Number(value),
+                                            }))
+                                        }
+                                        onCreate={
+                                            canCreateDesignation
+                                                ? openDraft('designation')
+                                                : undefined
+                                        }
                                         options={choosable(
                                             designations,
                                             employee?.designation_id,
@@ -467,6 +564,47 @@ export default function EmployeeFormDialog({
                         </>
                     )}
                 </Form>
+
+                {/* Outside the employee <Form>: a form may not hold a form. */}
+                {canCreateDepartment && (
+                    <DepartmentFormDialog
+                        key={`department-${draft.kind === 'department' ? draft.key : 0}`}
+                        submit={DepartmentController.store.form()}
+                        statuses={statuses}
+                        title="Add department"
+                        description="Added to the company selected in the header, then chosen for this employee."
+                        open={draft.open && draft.kind === 'department'}
+                        onOpenChange={closeDraft}
+                        initialValues={{
+                            name: draft.name,
+                            code: suggestCode(draft.name),
+                        }}
+                        onCreated={(code) =>
+                            setCreated({ kind: 'department', code })
+                        }
+                        idPrefix="inline-department-"
+                    />
+                )}
+
+                {canCreateDesignation && (
+                    <DesignationFormDialog
+                        key={`designation-${draft.kind === 'designation' ? draft.key : 0}`}
+                        submit={DesignationController.store.form()}
+                        statuses={statuses}
+                        title="Add designation"
+                        description="Added for every company, then chosen for this employee."
+                        open={draft.open && draft.kind === 'designation'}
+                        onOpenChange={closeDraft}
+                        initialValues={{
+                            name: draft.name,
+                            code: suggestCode(draft.name),
+                        }}
+                        onCreated={(code) =>
+                            setCreated({ kind: 'designation', code })
+                        }
+                        idPrefix="inline-designation-"
+                    />
+                )}
             </DialogContent>
         </Dialog>
     );
