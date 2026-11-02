@@ -105,8 +105,8 @@ export default function CompaniesGuide() {
                         bn="কোনো কোম্পানিকে অবসরে পাঠাতে এটি সম্পাদনা করে অবস্থা Inactive করুন। তখন আর কেউ এটি বেছে নিতে পারবেন না, তবে এর রেকর্ডগুলো থেকে যাবে।"
                     />
                     <Step
-                        en="To delete several at once, tick their rows — the box in the heading ticks every row on the page — and press Delete in the bar that appears. A company that departments, employees or clients belong to cannot be ticked."
-                        bn="একসাথে কয়েকটি মুছতে সারিগুলোতে টিক দিন — শিরোনামের বক্সটি পেজের সব সারিতে টিক দেয় — তারপর যে বারটি দেখা যায় তাতে Delete চাপুন। যে কোম্পানির অধীনে বিভাগ, কর্মচারী বা ক্লায়েন্ট আছে সেটিতে টিক দেওয়া যায় না।"
+                        en="To delete several at once, tick their rows — the box in the heading ticks every row on the page — and press Delete in the bar that appears. A company that departments, employees, clients or suppliers belong to cannot be ticked."
+                        bn="একসাথে কয়েকটি মুছতে সারিগুলোতে টিক দিন — শিরোনামের বক্সটি পেজের সব সারিতে টিক দেয় — তারপর যে বারটি দেখা যায় তাতে Delete চাপুন। যে কোম্পানির অধীনে বিভাগ, কর্মচারী, ক্লায়েন্ট বা সরবরাহকারী আছে সেটিতে টিক দেওয়া যায় না।"
                     />
                     <Step
                         en="A deleted company waits on the Deleted tab, where it can be restored or deleted for good — one at a time, or ticked together and removed with Delete permanently."
@@ -192,6 +192,11 @@ export default function CompaniesGuide() {
                     en="The same rule for Projects clients, checked once the company has no departments or employees left."
                     bn="Projects-এর ক্লায়েন্টদের জন্যও একই নিয়ম, কোম্পানির আর কোনো বিভাগ বা কর্মচারী না থাকলে এটি যাচাই হয়।"
                 />
+                <Message
+                    text="2 suppliers belong to this company. Deactivate the company instead, or delete them for good first."
+                    en="The same rule for Projects suppliers, checked once the company has no departments, employees or clients left."
+                    bn="Projects-এর সরবরাহকারীদের জন্যও একই নিয়ম, কোম্পানির আর কোনো বিভাগ, কর্মচারী বা ক্লায়েন্ট না থাকলে এটি যাচাই হয়।"
+                />
             </GuideSection>
 
             <GuideSection kind="mistakes">
@@ -217,6 +222,11 @@ export default function CompaniesGuide() {
                     to="projects.clients"
                     en="The clients that belong to each company."
                     bn="প্রতিটি কোম্পানির অধীনের ক্লায়েন্টরা।"
+                />
+                <RelatedGuide
+                    to="projects.suppliers"
+                    en="The suppliers that belong to each company."
+                    bn="প্রতিটি কোম্পানির অধীনের সরবরাহকারীরা।"
                 />
             </GuideSection>
         </Guide>

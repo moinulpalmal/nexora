@@ -1,7 +1,8 @@
 # Projects Module — Reference
 
 > **📋 Planned — built so far: the project stage enum ([§4](#project-stages)), Clients
-> ([§4](#clients--built)) and Tender Types ([§4](#tender-types--built)).** This is the agreed scope for the Project Management module (owner,
+> ([§4](#clients--built)), Supplier Categories ([§4](#supplier-categories--built)), Suppliers
+> ([§4](#suppliers--built)) and Tender Types ([§4](#tender-types--built)).** This is the agreed scope for the Project Management module (owner,
 > 2026-10-28). It describes *what* the module will do and *why*; where things will live and what they
 > are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is built, this
 > file becomes its reference and the planned parts shrink as they ship.
@@ -16,7 +17,8 @@
 
 Project Management runs **client projects from contract to invoice**: what was agreed with the
 customer, who works on it, the tasks and milestones, the hours logged, and what is ready to bill.
-It keeps the **client list** the whole ERP bills. It does not issue invoices itself. It raises **billing requests**, and Accounting turns them into
+It keeps the **client list** the whole ERP bills and the **supplier list** the whole ERP buys from
+(owner, 2026-11-02). It does not issue invoices itself. It raises **billing requests**, and Accounting turns them into
 invoices ([§7](#7-links-to-other-modules)).
 
 | | |
@@ -46,7 +48,8 @@ A user works in one selected company at a time and sees only that company's proj
 
 - Issuing invoices, receiving payments and the customer ledger belong to **Accounting**.
 - Payroll, attendance and leave belong to **HRM**. A timesheet is not attendance.
-- Purchasing and material costs on a project. These can be added once Accounting has payables.
+- Purchasing and material costs on a project. These can be added once Accounting has payables;
+  the supplier list they will use is already here ([§4](#suppliers--built)).
 - Gantt charts, resource levelling and dependencies between tasks. Reconsider after phase 1.
 
 ## 3. Phases
@@ -57,7 +60,7 @@ modules:
 
 | Phase | Delivers |
 | --- | --- |
-| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)) — **built**. **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)) — **built** 2026-10-29; employees carry the monthly salary the cost rate will come from. **Projects → Clients** ([§4](#clients--built)) — **built** 2026-11-02, in place of the planned Accounting → Customers. |
+| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)) — **built**. **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)) — **built** 2026-10-29; employees carry the monthly salary the cost rate will come from. **Projects → Clients** ([§4](#clients--built)) — **built** 2026-11-02, in place of the planned Accounting → Customers. **Projects → Suppliers** and their **Supplier Categories** ([§4](#suppliers--built)) — **built** 2026-11-02, in place of Accounting phase 2's planned supplier list. |
 | **1 — delivery** | Projects with contract terms, milestones, tasks (list + board), project members with billing rates, timesheets with approval. |
 | **2 — billing** | Billing requests from approved milestones and hours. They wait as **ready to invoice** until Accounting's invoices exist, then become invoices. |
 | **3 — profitability** | Budget against actual per project and per milestone, using the employee cost rate. |
@@ -121,6 +124,87 @@ is built ([`accounting.md`](accounting.md)).
   `admin` role holds none (it takes no module prefix).
 
 Tests: `tests/Feature/ProjectManagement/ClientTest.php`. Guide: Projects → Clients.
+
+### Supplier categories — built
+
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Supplier Categories**
+(`projects/supplier-categories`, `projects.supplier-categories.index`) is what kind of supplier each
+one is — materials, services, subcontractors, equipment hire and the like. Every supplier is in
+exactly one. A class of supplier is not a fact about one company, so the list is **group-wide**: one
+list every company shares, with no `company_id` — the third ERP exception to
+[ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company), shaped as Tender Types with a
+description, and guarded like HRM → Designations.
+
+| Column | Rule |
+| --- | --- |
+| `code` | Required, up to 20, letters and digits joined by single `-`/`_`, stored in capitals. Unique **across the whole table**, ignoring case, deleted categories included. |
+| `name` | Required, up to 100, trimmed and inner spaces collapsed. Unique like the code. |
+| `description` | Optional free text. Shown in the form, not the list. |
+| `status` | `A` / `I` ([§9.3.1](../ARCHITECTURE.md#931-activeinactive-status)). An inactive category is kept by the suppliers already in it but not offered for new ones or for a change of category. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. Every change is in the audit trail (record type *Supplier category*). |
+
+- **Group-wide**: the page works whether or not a company is selected; an edit or delete shows in
+  every company.
+- **Active / Deleted tabs**, **bulk delete** on both, a deleted category keeps its code and name
+  reserved and creating a duplicate says to restore it instead.
+- **The list** filters by code (starts with), name (contains) and status; it sorts by code, name,
+  status and created date.
+- **Deletion guard** ([ARCHITECTURE §9.14](../ARCHITECTURE.md#914-master-data-and-deletion-guards)):
+  `suppliers.supplier_category_id` restricts on delete, and `SupplierCategoryService::deletionBlocker()`
+  refuses a delete or permanent delete while any supplier, in any company, deleted ones included, is
+  in the category — "Used by 3 suppliers. Move them to another category, or deactivate this one
+  instead." as a `warning` toast. Bulk delete removes the free categories and names the kept ones.
+  **Deactivating a category in use is allowed** (owner, 2026-11-02).
+- **No spreadsheet import and no seed** (owner, 2026-11-02): a handful of rows entered by hand; a new
+  installation starts with none, so categories must be made before the first supplier.
+- **Roles:** `project-manager` holds every `projects.supplier-categories.*` by rule — unlike tender
+  types, there is no `ROLE_EXCLUSIONS` entry (owner, 2026-11-02, "mapped like Clients") — `viewer` the
+  `.view`; the `admin` role holds none.
+
+Tests: `tests/Feature/ProjectManagement/SupplierCategoryTest.php`. Guide: Projects → Supplier
+categories.
+
+### Suppliers — built
+
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Suppliers** (`projects/suppliers`,
+`projects.suppliers.index`) is the firms the company buys from — and **the ERP's one supplier list**.
+It was planned as part of Accounting's payables; the owner placed it here, as with Clients, and
+Accounting's bills will point at the same rows and add their own billing fields (currency, payment
+terms, payable account) when Accounting phase 2 is built ([`accounting.md`](accounting.md)).
+
+| Column | Rule |
+| --- | --- |
+| `company_id` | The selected company, stamped on create; never a form field ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)). |
+| `supplier_category_id` | **Required**, a group-wide [supplier category](#supplier-categories--built). Must be active and not deleted to be chosen; a supplier whose category was later deactivated keeps it on edit. |
+| `code`, `name`, `contact_person`, `phone`, `email`, `address`, `description`, `status` | Exactly as on a [client](#clients--built): code and name unique **within the company**, ignoring case, deleted suppliers included; the email not unique. |
+| `tin` | Optional, exactly 12 digits. **Not unique** (owner, 2026-11-02): branches of one firm may share it. |
+| `bin` | Optional VAT registration (BIN), up to 20: digits optionally joined by single `-`. Not unique. |
+| `trade_license_no` | Optional, up to 50, free text. |
+| `bank_name`, `bank_branch`, `bank_account_name` | Optional, up to 150 each, trimmed and inner spaces collapsed. |
+| `bank_account_number` | Optional, up to 30: letters, digits, spaces and `-` (an IBAN abroad), stored in capitals. |
+| `bank_routing_number` | Optional, up to 20 digits. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. Every change is in the audit trail (record type *Supplier*). |
+
+- **One bank account per supplier** (owner, 2026-11-02), held as columns on the row; the bank
+  details, address, description and trade licence are read in the form, not the list.
+- **Company-scoped**, shaped as Clients: another company's supplier is a 404; with no company
+  selected the page shows the no-company panel and hides **New supplier**.
+- **Active / Deleted tabs**, **bulk delete** on both, a deleted supplier keeps its code and name
+  reserved.
+- **The list** shows code, name, category, contact person, phone, email, TIN, BIN and status. It
+  filters by code, phone, TIN and BIN (starts with), name, contact person and email (contains),
+  category and status (dropdowns); it sorts by code and name.
+- **No deletion guard yet**: nothing points at a supplier until Accounting's bills (or Projects'
+  purchases) are built; that table adds `supplier_id` with `restrictOnDelete()` and a
+  `SupplierService::deletionBlocker()` clause.
+- **Outward guards:** a company that still has suppliers, deleted ones included, cannot be deleted
+  ([`admin.md` §10.1](admin.md#101-the-company-master--admin--companies)); a category suppliers use
+  cannot be deleted (above).
+- **No spreadsheet import** (owner, 2026-11-02): suppliers are entered by hand.
+- **Roles:** `project-manager` holds every `projects.suppliers.*` by rule, `viewer` the `.view`; the
+  `admin` role holds none.
+
+Tests: `tests/Feature/ProjectManagement/SupplierTest.php`. Guide: Projects → Suppliers.
 
 ### Tender types — built
 
@@ -216,15 +300,17 @@ that stops anyone approving their own record.
 
 ## 6. Draft permission catalogue
 
-*Draft — not seeded*, except `projects.clients.*` and `projects.tender-types.*`
-(`{view,create,update,delete,restore,force-delete}` each), which shipped with Clients
-([§4](#clients--built)) and Tender Types ([§4](#tender-types--built)). Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
+*Draft — not seeded*, except `projects.clients.*`, `projects.supplier-categories.*`,
+`projects.suppliers.*` and `projects.tender-types.*` (`{view,create,update,delete,restore,force-delete}`
+each), which shipped with their screens ([§4](#4-main-entities)). Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
 §6.2](../ARCHITECTURE.md#62-routes-and-permissions)). Each is added to `RolePermissionSeeder::CATALOGUE`
 and `PermissionDescriptions` when its screen is built.
 
 | Permission | Allows |
 | --- | --- |
 | `projects.clients.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's clients |
+| `projects.supplier-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the supplier categories every company shares |
+| `projects.suppliers.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's suppliers |
 | `projects.tender-types.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the tender types every company shares |
 | `projects.projects.{view,create,update,delete}` | Manage projects and their contract terms |
 | `projects.projects.reopen` | Move a project out of Completed or Cancelled ([§4](#project-stages)) |
@@ -243,7 +329,7 @@ and `PermissionDescriptions` when its screen is built.
 | --- | --- | --- |
 | Admin | Companies, user↔company access | — |
 | HRM | Employees (members, project managers), the employee **cost rate** | — |
-| Accounting | Currencies | **Clients** (the one customer list), billing requests → invoices. Later, project cost as a draft voucher ([ARCHITECTURE §9.12](../ARCHITECTURE.md#912-posting-to-the-ledger-planned)) |
+| Accounting | Currencies | **Clients** (the one customer list), **Suppliers** (the one supplier list, for bills), billing requests → invoices. Later, project cost as a draft voucher ([ARCHITECTURE §9.12](../ARCHITECTURE.md#912-posting-to-the-ledger-planned)) |
 
 ## 8. Open decisions
 

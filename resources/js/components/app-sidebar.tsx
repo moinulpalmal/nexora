@@ -17,6 +17,8 @@ import {
     Mail,
     ShieldCheck,
     SlidersHorizontal,
+    Tags,
+    Truck,
     Users,
     UsersRound,
 } from 'lucide-react';
@@ -51,6 +53,8 @@ import { index as designationsIndex } from '@/routes/hrm/designations';
 import { index as employeesIndex } from '@/routes/hrm/employees';
 import { dashboard as projectsDashboard } from '@/routes/projects';
 import { index as clientsIndex } from '@/routes/projects/clients';
+import { index as supplierCategoriesIndex } from '@/routes/projects/supplier-categories';
+import { index as suppliersIndex } from '@/routes/projects/suppliers';
 import { index as tenderTypesIndex } from '@/routes/projects/tender-types';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
@@ -92,6 +96,10 @@ export function AppSidebar() {
 
     const canViewProjects = useCan('projects.dashboard.view');
     const canViewClients = useCan('projects.clients.view');
+    const canViewSupplierCategories = useCan(
+        'projects.supplier-categories.view',
+    );
+    const canViewSuppliers = useCan('projects.suppliers.view');
     const canViewTenderTypes = useCan('projects.tender-types.view');
     const canViewAccounting = useCan('accounting.dashboard.view');
     const canViewHrm = useCan('hrm.dashboard.view');
@@ -174,6 +182,18 @@ export function AppSidebar() {
             href: clientsIndex(),
             icon: Handshake,
             visible: canViewClients,
+        },
+        {
+            title: 'Supplier Categories',
+            href: supplierCategoriesIndex(),
+            icon: Tags,
+            visible: canViewSupplierCategories,
+        },
+        {
+            title: 'Suppliers',
+            href: suppliersIndex(),
+            icon: Truck,
+            visible: canViewSuppliers,
         },
         {
             title: 'Tender Types',

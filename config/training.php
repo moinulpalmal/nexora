@@ -133,6 +133,16 @@ return [
             'title_en' => 'Clients', 'title_bn' => 'ক্লায়েন্ট', 'status' => 'written',
             'shots' => ['overview' => 'The clients of an invented company', 'form' => 'The New client dialog'],
         ],
+        'projects.supplier-categories' => [
+            'route' => 'projects.supplier-categories.index', 'guide' => 'projects/supplier-categories', 'section' => 'projects', 'sort' => 24,
+            'title_en' => 'Supplier categories', 'title_bn' => 'সরবরাহকারীর শ্রেণি', 'status' => 'written',
+            'shots' => ['overview' => 'The supplier categories every company shares', 'form' => 'The New supplier category dialog'],
+        ],
+        'projects.suppliers' => [
+            'route' => 'projects.suppliers.index', 'guide' => 'projects/suppliers', 'section' => 'projects', 'sort' => 26,
+            'title_en' => 'Suppliers', 'title_bn' => 'সরবরাহকারী', 'status' => 'written',
+            'shots' => ['overview' => 'The suppliers of an invented company', 'form' => 'The New supplier dialog'],
+        ],
         'projects.tender-types' => [
             'route' => 'projects.tender-types.index', 'guide' => 'projects/tender-types', 'section' => 'projects', 'sort' => 30,
             'title_en' => 'Tender types', 'title_bn' => 'দরপত্রের ধরন', 'status' => 'written',

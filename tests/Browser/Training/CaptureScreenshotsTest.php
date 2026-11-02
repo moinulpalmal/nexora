@@ -17,6 +17,8 @@ use App\Models\Hrm\Department;
 use App\Models\Hrm\Designation;
 use App\Models\Hrm\Employee;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\Supplier;
+use App\Models\ProjectManagement\SupplierCategory;
 use App\Models\ProjectManagement\TenderType;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
@@ -283,6 +285,53 @@ test('projects.clients', function () {
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-client"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
+test('projects.supplier-categories', function () {
+    $key = 'projects.supplier-categories';
+    trainingActor();
+
+    foreach ([['MAT', 'Materials'], ['SRV', 'Services'], ['SUB', 'Subcontractors'], ['EQP', 'Equipment Hire'], ['CON', 'Consultants']] as [$code, $name]) {
+        SupplierCategory::factory()->create(['code' => $code, 'name' => $name]);
+    }
+
+    $page = visitForTraining(route('projects.supplier-categories.index', absolute: false))->assertSee('Subcontractors');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-supplier-category"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
+test('projects.suppliers', function () {
+    $key = 'projects.suppliers';
+    $actor = trainingActor();
+    $companies = trainingCompanies();
+    $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
+
+    $categories = [
+        'MAT' => SupplierCategory::factory()->create(['code' => 'MAT', 'name' => 'Materials']),
+        'SRV' => SupplierCategory::factory()->create(['code' => 'SRV', 'name' => 'Services']),
+        'SUB' => SupplierCategory::factory()->create(['code' => 'SUB', 'name' => 'Subcontractors']),
+    ];
+
+    $suppliers = [
+        ['BM-01', 'Buildmart Supplies Ltd.', 'MAT', 'Rafiq Ahmed', '+880 1811 223344', 'sales@buildmart.example.com', '123456789012', '000123456-0101'],
+        ['STEEL', 'Riverside Steel Works', 'MAT', 'Nusrat Jahan', '+880 1712 998877', 'orders@riverside.example.com', '234567890123', '000234567-0101'],
+        ['CLN', 'Brightway Cleaning Services', 'SRV', 'Tanvir Hasan', '+880 1913 445566', 'hello@brightway.example.com', '345678901234', null],
+        ['ELEC-02', 'Delta Electrical Contractors', 'SUB', 'Farhana Akter', '+880 1611 778899', 'info@delta.example.com', null, '000345678-0101'],
+    ];
+
+    foreach ($suppliers as [$code, $name, $category, $contact, $phone, $email, $tin, $bin]) {
+        Supplier::factory()->for($companies['atl'])->for($categories[$category], 'category')->create([
+            'code' => $code, 'name' => $name, 'contact_person' => $contact, 'phone' => $phone, 'email' => $email, 'tin' => $tin, 'bin' => $bin,
+        ]);
+    }
+
+    $page = visitForTraining(route('projects.suppliers.index', absolute: false))->assertSee('Buildmart Supplies Ltd.');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-supplier"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 

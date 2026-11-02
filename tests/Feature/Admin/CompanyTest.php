@@ -5,6 +5,7 @@ use App\Models\Admin\AuditLog;
 use App\Models\Admin\Company;
 use App\Models\Hrm\Department;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\Supplier;
 use App\Models\User;
 
 /*
@@ -194,6 +195,18 @@ test('a company with clients cannot be deleted, deleted clients included, and th
 
     assertToast($this->delete(route('admin.companies.destroy', $company)), 'warning')
         ->assertSessionHas('inertia.flash_data.toast.message', '2 clients belong to this company. Deactivate the company instead, or delete them for good first.');
+
+    expect($company->refresh()->trashed())->toBeFalse();
+});
+
+test('a company with suppliers cannot be deleted, deleted suppliers included, and the toast names them', function () {
+    $company = Company::factory()->create();
+    Supplier::factory()->for($company)->count(2)->create()->each->delete();
+
+    $this->actingAs(userWithPermissions('admin.companies.delete'));
+
+    assertToast($this->delete(route('admin.companies.destroy', $company)), 'warning')
+        ->assertSessionHas('inertia.flash_data.toast.message', '2 suppliers belong to this company. Deactivate the company instead, or delete them for good first.');
 
     expect($company->refresh()->trashed())->toBeFalse();
 });

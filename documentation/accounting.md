@@ -18,6 +18,10 @@ feed it, and the statements read from it. It also owns **sales invoices**. It do
 customer list: the ERP's one customer list is **Projects → Clients**, kept per company (owner,
 2026-11-02, moving it from here — Projects needs a client for every project before Accounting
 exists). Invoices will point at those clients ([`projects.md` §4](projects.md#clients--built)).
+Nor does it own the **supplier list**: the ERP's one supplier list is **Projects → Suppliers**, kept
+per company and classified by group-wide supplier categories (owner, 2026-11-02). Phase 2's bills
+will point at those suppliers and add their billing fields — currency, payment terms, payable account
+([`projects.md` §4](projects.md#suppliers--built)).
 
 | | |
 | --- | --- |
@@ -51,7 +55,7 @@ and ledger ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
 
 **Later**
 
-- Payables (suppliers, bills, payments), bank reconciliation, VAT and TDS (tax deducted at source)
+- Payables (bills and payments to Projects' suppliers), bank reconciliation, VAT and TDS (tax deducted at source)
   under Bangladesh rules, cost centres, budgets and cheque printing.
 
 **Out of scope**
@@ -67,7 +71,7 @@ Build order across the ERP is **Company (Admin) → Projects → Accounting → 
 | --- | --- |
 | **1 — ledger** | Chart of accounts, fiscal years, currencies and rates, vouchers with approval, ledgers, trial balance, P&L, balance sheet. |
 | **1b — receivables** | Sales invoices (manual, or from Projects' billing requests), receipts against invoices, customer ledger and ageing. |
-| **2 — payables and banking** | Suppliers, bills, payments, bank reconciliation. |
+| **2 — payables and banking** | Bills and payments (to Projects' suppliers, already built), bank reconciliation. |
 | **3 — tax and analysis** | VAT/TDS, cost centres, budgets. |
 
 ## 4. Main entities
@@ -126,7 +130,7 @@ that stops anyone approving their own voucher.
 | Module | Accounting uses | Accounting provides |
 | --- | --- | --- |
 | Admin | Companies, user↔company access | — |
-| Projects | Billing requests, **clients** (the one customer list) | Currencies, invoices |
+| Projects | Billing requests, **clients** (the one customer list), **suppliers** (the one supplier list) | Currencies, invoices |
 | HRM | Payroll draft vouchers (HRM phase 2) | Ledger accounts that payroll posts to |
 
 ## 8. Open decisions

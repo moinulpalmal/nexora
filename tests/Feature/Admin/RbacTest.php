@@ -189,6 +189,18 @@ test('a project manager may add and correct tender types but not remove them, an
     expect(Role::findByName('project-manager')->hasPermissionTo('projects.clients.delete'))->toBeTrue();
 });
 
+test('a project manager holds every supplier and supplier category permission, the viewer only view, and admin none', function () {
+    $this->seed(RolePermissionSeeder::class);
+
+    foreach (['suppliers', 'supplier-categories'] as $resource) {
+        foreach (['view', 'create', 'update', 'delete', 'restore', 'force-delete'] as $action) {
+            expect(Role::findByName('project-manager')->hasPermissionTo("projects.{$resource}.{$action}"))->toBeTrue()
+                ->and(Role::findByName('viewer')->hasPermissionTo("projects.{$resource}.{$action}"))->toBe($action === 'view')
+                ->and(Role::findByName('admin')->hasPermissionTo("projects.{$resource}.{$action}"))->toBeFalse();
+        }
+    }
+});
+
 test('an hr officer may add and correct designations but not remove them', function () {
     $this->seed(RolePermissionSeeder::class);
 

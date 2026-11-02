@@ -315,8 +315,9 @@ the company list because it is master data every module needs and no one busines
   `admin.companies.force-delete`. A company something belongs to cannot be ticked; the server re-checks
   each and names any it kept in a `warning` toast.
 - **Deletion guard:** `CompanyService::deletionBlocker()` refuses delete and permanent delete while
-  any department, employee or Projects client belongs to the company, deleted ones included (the
-  counts drop the company scope) — departments are checked first, then employees, then clients, and
+  any department, employee, Projects client or Projects supplier belongs to the company, deleted ones
+  included (the counts drop the company scope) — departments are checked first, then employees, then
+  clients, then suppliers, and
   the sentence names which. The button is disabled with the reason on hover; the server answers a `warning` toast.
   Deactivating is the normal way to retire a company.
 - No spreadsheet import — a handful of rows, entered by hand.

@@ -24,7 +24,7 @@ sent mail). Business modules are added on top of it, one module per folder in ev
 ([§4](#4-the-organizing-rule)).
 
 The first business modules are **Project Management**, **Accounts** and **HRM**. Each is a 🧪 POC,
-two with their first slices built (Projects → Clients, Tender Types; HRM → Departments, Designations, Employees);
+two with their first slices built (Projects → Clients, Suppliers, Supplier Categories, Tender Types; HRM → Departments, Designations, Employees);
 their agreed scope is in [§5](#5-module-registry) and in their module docs.
 
 Accounts are **created by administrators only** — there is no public registration — and sign in with
@@ -72,7 +72,7 @@ app/
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5);
-                              ProjectManagement/ also Client, TenderType;
+                              ProjectManagement/ also Client, Supplier, SupplierCategory, TenderType;
                               Hrm/ also Department, DepartmentImport, Designation, DesignationImport,
                               Employee, EmployeeImport
   Http/Middleware/            EnsureUserIsActive, EnsurePasswordIsChanged, HandleAppearance, HandleInertiaRequests
@@ -87,8 +87,8 @@ app/
   Models/Admin/               Role, Permission, Company, AuditLog, MailSetting, QuickLoginSetting,
                               BrandingSetting, SentMail
   Models/Hrm/                 Department, Employee (company-scoped, §9.10), Designation (group-wide, §9.10)
-  Models/ProjectManagement/   Client (company-scoped, §9.10 — the ERP's one customer list),
-                              TenderType (group-wide, §9.10)
+  Models/ProjectManagement/   Client, Supplier (company-scoped, §9.10 — the ERP's one customer
+                              and one supplier list), SupplierCategory, TenderType (group-wide, §9.10)
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
   Providers/                  AppServiceProvider, FortifyServiceProvider
@@ -99,7 +99,7 @@ app/
   Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer),
                               DesignationService, DesignationImportBlueprint, EmployeeService,
                               EmployeeImportBlueprint
-  Services/ProjectManagement/ ClientService, TenderTypeService
+  Services/ProjectManagement/ ClientService, SupplierService, SupplierCategoryService, TenderTypeService
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
   Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
                               ImportBlueprint, ImportRegistry, the DTOs ImportLimits/Outcome/Preview
@@ -125,11 +125,13 @@ resources/
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
     components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview;
-                              projects/ also the client and tender type form dialogs;
+                              projects/ also the client, supplier, supplier category and tender
+                              type form dialogs;
                               hrm/ also the department, designation and employee form dialogs
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
                               table of contents; guides/{general,admin,settings,projects,hrm,shared}/
-                              (§5) — projects/ holds clients, tender types; hrm/ departments, designations, employees
+                              (§5) — projects/ holds clients, suppliers, supplier categories, tender types;
+                              hrm/ departments, designations, employees
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
     hooks/                    use-can, use-list-filters, use-form-dialog, use-appearance, …
     layouts/                  app, auth, settings
@@ -143,7 +145,7 @@ routes/
   settings.php                the user's own account settings
   training.php                the in-app manual (ungated)
   projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each; projects.php
-                              also clients, tender types; hrm.php also departments, designations, employees and
+                              also clients, suppliers, supplier categories, tender types; hrm.php also departments, designations, employees and
                               their imports)
   channels.php                private broadcast channels
 tests/
@@ -251,13 +253,20 @@ restorable in the `hrm/departments` shape, with bulk delete and no import. Proje
 every project needs a client before Accounting exists; Accounting's invoices will point at the same
 rows. **Tender Types** (`projects/tender-types`; owner, 2026-11-02) — how a project was procured —
 are group-wide, the second ERP exception to §9.10, in the `hrm/designations` shape without import.
+**Suppliers** (`projects/suppliers`; owner, 2026-11-02) are **the ERP's one supplier list** — Projects
+keeps it as it keeps clients, and Accounting's bills will point at the same rows — company-scoped and
+restorable in the Clients shape, plus TIN/BIN, trade licence and one bank account, each classified by
+a required **Supplier Category** (`projects/supplier-categories`), group-wide (the third ERP exception
+to §9.10) and guarded against deletion while suppliers use it — the `Employee` → `Designation`
+pairing. Neither has an import.
 The module stays 🧪 while its overview still shows sample data; the sidebar group is already a
 list of links, each behind its own `useCan`. Reference:
 [`documentation/projects.md`](documentation/projects.md).
 
 **Accounting** keeps each company's double-entry ledger: chart of accounts, fiscal years (default
 July–June), BDT plus foreign-currency vouchers with approval, and statements. It also owns
-**sales invoices** — to Projects' clients, the one customer list (owner, 2026-11-02). It is named *Accounting*, not
+**sales invoices** — to Projects' clients, the one customer list — and **supplier bills**, to
+Projects' suppliers, the one supplier list (owner, 2026-11-02). It is named *Accounting*, not
 *Accounts*, because "account" already means a sign-in account here; the menu may still say Accounts.
 Reference: [`documentation/accounting.md`](documentation/accounting.md).
 
@@ -604,9 +613,10 @@ them (owner, 2026-10-26). The buttons submit the real login form.
 
 *(owner, 2026-10-28; built 2026-10-29)* One installation serves one organization's companies — one or several.
 **Every Projects, Accounting and HRM record carries its company**, and each company has its own
-ledger, fiscal years and payroll. **The exceptions are HRM → Designations** (owner, 2026-10-29) **and
-Projects → Tender Types** (owner, 2026-11-02): group-wide lists with no `company_id` — the same job
-titles, the same procurement methods, for every company — in the master-crud *global* shape
+ledger, fiscal years and payroll. **The exceptions are HRM → Designations** (owner, 2026-10-29), **Projects
+→ Tender Types and Projects → Supplier Categories** (owner, 2026-11-02): group-wide lists with no
+`company_id` — the same job titles, the same procurement methods, the same supplier classes, for every
+company — in the master-crud *global* shape
 (restorable, unique across the table, no `BelongsToCompany`, no no-company panel). Add another
 group-wide table only on the owner's word, and name it here. The company dimension is set up before the first ERP table so that
 no table needs a later migration to add it. Reference:
@@ -709,7 +719,7 @@ renders `components/shared/sheet-import-dialog.tsx` and `pending-import-banner.t
 ### 9.14 Master data and deletion guards
 
 *(owner, 2026-10-28)* A **master table** is reference data other records point at — companies,
-departments, designations, clients, the chart of accounts. Each belongs to the module that owns its
+departments, designations, clients, suppliers, the chart of accounts. Each belongs to the module that owns its
 subject ([§5](#5-module-registry)); there is no shared "master data" module. The `master-crud` skill
 builds them.
 

@@ -14,6 +14,8 @@ use App\Models\Hrm\Designation;
 use App\Models\Hrm\Employee;
 use App\Models\ImportLimit;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\Supplier;
+use App\Models\ProjectManagement\SupplierCategory;
 use App\Models\ProjectManagement\TenderType;
 use App\Models\SheetImport;
 use App\Models\User;
@@ -52,6 +54,8 @@ class AppServiceProvider extends ServiceProvider
         'employee' => Employee::class,
         'client' => Client::class,
         'tender-type' => TenderType::class,
+        'supplier-category' => SupplierCategory::class,
+        'supplier' => Supplier::class,
         'permission' => Permission::class,
         'mail-setting' => MailSetting::class,
         'quick-login-setting' => QuickLoginSetting::class,

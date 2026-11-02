@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProjectManagement\ClientController;
 use App\Http\Controllers\ProjectManagement\DashboardController;
+use App\Http\Controllers\ProjectManagement\SupplierCategoryController;
+use App\Http\Controllers\ProjectManagement\SupplierController;
 use App\Http\Controllers\ProjectManagement\TenderTypeController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +56,59 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:projects.clients.force-delete')
             ->name('clients.force-delete');
+
+        // Group-wide (owner, 2026-11-02): every company's suppliers are
+        // classified by one list (§9.10).
+        Route::delete('supplier-categories/bulk', [SupplierCategoryController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.supplier-categories.delete')
+            ->name('supplier-categories.bulk-destroy');
+
+        Route::delete('supplier-categories/bulk/force', [SupplierCategoryController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.supplier-categories.force-delete')
+            ->name('supplier-categories.bulk-force-delete');
+
+        Route::resource('supplier-categories', SupplierCategoryController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.supplier-categories.view')
+            ->middlewareFor(['store'], 'permission:projects.supplier-categories.create')
+            ->middlewareFor(['update'], 'permission:projects.supplier-categories.update')
+            ->middlewareFor(['destroy'], 'permission:projects.supplier-categories.delete');
+
+        Route::put('supplier-categories/{supplier_category}/restore', [SupplierCategoryController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.supplier-categories.restore')
+            ->name('supplier-categories.restore');
+
+        Route::delete('supplier-categories/{supplier_category}/force', [SupplierCategoryController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.supplier-categories.force-delete')
+            ->name('supplier-categories.force-delete');
+
+        // The ERP's one supplier list, kept per company (owner, 2026-11-02).
+        Route::delete('suppliers/bulk', [SupplierController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.suppliers.delete')
+            ->name('suppliers.bulk-destroy');
+
+        Route::delete('suppliers/bulk/force', [SupplierController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.suppliers.force-delete')
+            ->name('suppliers.bulk-force-delete');
+
+        Route::resource('suppliers', SupplierController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.suppliers.view')
+            ->middlewareFor(['store'], 'permission:projects.suppliers.create')
+            ->middlewareFor(['update'], 'permission:projects.suppliers.update')
+            ->middlewareFor(['destroy'], 'permission:projects.suppliers.delete');
+
+        Route::put('suppliers/{supplier}/restore', [SupplierController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.suppliers.restore')
+            ->name('suppliers.restore');
+
+        Route::delete('suppliers/{supplier}/force', [SupplierController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.suppliers.force-delete')
+            ->name('suppliers.force-delete');
 
         // Group-wide, not the selected company's (owner, 2026-11-02): a
         // procurement method is the same for every company (§9.10).

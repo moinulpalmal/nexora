@@ -57,6 +57,10 @@ class RolePermissionSeeder extends Seeder
         'projects.dashboard' => ['view'],
         // The ERP's one customer list, kept per company (owner, 2026-11-02).
         'projects.clients' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        // Group-wide (§9.10): one list every company's suppliers are classified by (owner, 2026-11-02).
+        'projects.supplier-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        // The ERP's one supplier list, kept per company (owner, 2026-11-02).
+        'projects.suppliers' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Group-wide (§9.10): one list of procurement methods every company shares (owner, 2026-11-02).
         'projects.tender-types' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         'accounting.dashboard' => ['view'],
