@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Admin\BrandingSetting;
 use App\Models\Admin\Company;
+use App\Models\Admin\Country;
 use App\Models\Admin\MailSetting;
 use App\Models\Admin\Permission;
 use App\Models\Admin\QuickLoginSetting;
@@ -44,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
         'user' => User::class,
         'role' => Role::class,
         'company' => Company::class,
+        'country' => Country::class,
         'department' => Department::class,
         'designation' => Designation::class,
         'employee' => Employee::class,

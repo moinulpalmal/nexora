@@ -165,6 +165,18 @@ test('each module role holds its own module and nothing else', function () {
     }
 });
 
+test('countries are the administrator\'s, and the viewer may only read them', function () {
+    $this->seed(RolePermissionSeeder::class);
+
+    $countries = ['view', 'create', 'update', 'delete', 'restore', 'force-delete'];
+
+    foreach ($countries as $action) {
+        expect(Role::findByName('admin')->hasPermissionTo("admin.countries.{$action}"))->toBeTrue()
+            ->and(Role::findByName('viewer')->hasPermissionTo("admin.countries.{$action}"))->toBe($action === 'view')
+            ->and(Role::findByName('hr-officer')->hasPermissionTo("admin.countries.{$action}"))->toBeFalse();
+    }
+});
+
 test('an hr officer may add and correct designations but not remove them', function () {
     $this->seed(RolePermissionSeeder::class);
 

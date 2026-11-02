@@ -8,6 +8,7 @@ use App\Mail\Admin\UserPasswordResetMail;
 use App\Mail\Admin\UserWelcomeMail;
 use App\Models\Admin\AuditLog;
 use App\Models\Admin\Company;
+use App\Models\Admin\Country;
 use App\Models\Admin\MailSetting;
 use App\Models\Admin\QuickLoginSetting;
 use App\Models\Admin\Role;
@@ -19,6 +20,7 @@ use App\Models\ProjectManagement\Client;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
 use App\Services\Training\TrainingRegistry;
+use Database\Seeders\Admin\CountrySeeder;
 use Database\Seeders\Admin\DemoUserSeeder;
 use Database\Seeders\Admin\RolePermissionSeeder;
 use Illuminate\Support\Facades\File;
@@ -203,6 +205,22 @@ test('admin.companies', function () {
     captureTrainingShot($page, $key, 'form');
 
     $page = visitForTraining(route('admin.companies.index', ['view' => 'trashed'], absolute: false))->assertSee('Acme Retail Ltd.');
+    captureTrainingShot($page, $key, 'deleted');
+});
+
+test('admin.countries', function () {
+    $key = 'admin.countries';
+    trainingActor();
+    (new CountrySeeder)->run();
+    Country::where('iso2', 'AQ')->sole()->delete();
+
+    $page = visitForTraining(route('admin.countries.index', absolute: false))->assertSee('Afghanistan');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-country"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+
+    $page = visitForTraining(route('admin.countries.index', ['view' => 'trashed'], absolute: false))->assertSee('Antarctica');
     captureTrainingShot($page, $key, 'deleted');
 });
 

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\Admin\CountrySeeder;
 use Database\Seeders\Admin\DemoUserSeeder;
 use Database\Seeders\Admin\RolePermissionSeeder;
 use Database\Seeders\Admin\SuperAdminSeeder;
@@ -22,6 +23,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RolePermissionSeeder::class,
             SuperAdminSeeder::class,
+            CountrySeeder::class,
         ]);
 
         if (! app()->isProduction()) {

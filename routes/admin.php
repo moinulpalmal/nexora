@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ApplicationSettingController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandingSettingController;
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\Admin\EnumController;
 use App\Http\Controllers\Admin\ImportLimitController;
 use App\Http\Controllers\Admin\MailSettingController;
@@ -90,6 +91,32 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:admin.companies.force-delete')
             ->name('companies.force-delete');
+
+        // Before the resource, so `bulk` is not read as a {country} id.
+        Route::delete('countries/bulk', [CountryController::class, 'bulkDestroy'])
+            ->middleware('permission:admin.countries.delete')
+            ->name('countries.bulk-destroy');
+
+        Route::delete('countries/bulk/force', [CountryController::class, 'bulkForceDelete'])
+            ->middleware('permission:admin.countries.force-delete')
+            ->name('countries.bulk-force-delete');
+
+        Route::resource('countries', CountryController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:admin.countries.view')
+            ->middlewareFor(['store'], 'permission:admin.countries.create')
+            ->middlewareFor(['update'], 'permission:admin.countries.update')
+            ->middlewareFor(['destroy'], 'permission:admin.countries.delete');
+
+        Route::put('countries/{country}/restore', [CountryController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:admin.countries.restore')
+            ->name('countries.restore');
+
+        Route::delete('countries/{country}/force', [CountryController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:admin.countries.force-delete')
+            ->name('countries.force-delete');
 
         Route::resource('roles', RoleController::class)
             ->only(['index', 'store', 'update', 'destroy'])

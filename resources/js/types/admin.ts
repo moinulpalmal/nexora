@@ -50,6 +50,27 @@ export type CompanyFilters = ListFilters & {
     view: 'active' | 'trashed';
 };
 
+/** One row of the countries list, as `CountryController::index()` projects it. */
+export type CountryListItem = {
+    id: number;
+    name: string;
+    iso2: string;
+    iso3: string;
+    numeric_code: string | null;
+    dial_code: string | null;
+    currency_code: string | null;
+    nationality: string | null;
+    /** `App\Enums\RecordStatus` — `'A'` or `'I'`. Not a deletion. */
+    status: string;
+    created_at: string | null;
+    deleted_at: string | null;
+};
+
+export type CountryFilters = ListFilters & {
+    /** Which record set is listed — a tab, not a column filter. */
+    view: 'active' | 'trashed';
+};
+
 /** A company offered in a user's Companies dialog. */
 export type CompanyGrantOption = {
     id: number;

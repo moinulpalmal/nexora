@@ -3,6 +3,7 @@ import {
     Briefcase,
     Building2,
     FolderKanban,
+    Globe,
     Network,
     GraduationCap,
     Handshake,
@@ -37,6 +38,7 @@ import { dashboard as accountingDashboard } from '@/routes/accounting';
 import { edit as applicationSettingsEdit } from '@/routes/admin/application-settings';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
 import { index as companiesIndex } from '@/routes/admin/companies';
+import { index as countriesIndex } from '@/routes/admin/countries';
 import { index as enumsIndex } from '@/routes/admin/enums';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
@@ -75,6 +77,7 @@ export function AppSidebar() {
     const canViewUsers = useCan('admin.users.view');
     const canViewRoles = useCan('admin.roles.view');
     const canViewCompanies = useCan('admin.companies.view');
+    const canViewCountries = useCan('admin.countries.view');
     const canViewPermissions = useCan('admin.permissions.view');
     const canViewEnums = useCan('admin.enums.view');
     const canViewAuditLogs = useCan('admin.audit-logs.view');
@@ -111,6 +114,12 @@ export function AppSidebar() {
             href: companiesIndex(),
             icon: Building2,
             visible: canViewCompanies,
+        },
+        {
+            title: 'Countries',
+            href: countriesIndex(),
+            icon: Globe,
+            visible: canViewCountries,
         },
         {
             title: 'Permissions',

@@ -67,6 +67,11 @@ return [
             'title_en' => 'Companies', 'title_bn' => 'কোম্পানি', 'status' => 'written',
             'shots' => ['overview' => 'The companies list with invented companies', 'form' => 'The New company dialog', 'deleted' => 'The Deleted tab with a deleted company'],
         ],
+        'admin.countries' => [
+            'route' => 'admin.countries.index', 'guide' => 'admin/countries', 'section' => 'admin', 'sort' => 27,
+            'title_en' => 'Countries', 'title_bn' => 'দেশ', 'status' => 'written',
+            'shots' => ['overview' => 'The countries list with the seeded ISO countries', 'form' => 'The New country dialog', 'deleted' => 'The Deleted tab with a deleted country'],
+        ],
         'admin.roles' => [
             'route' => 'admin.roles.index', 'guide' => 'admin/roles', 'section' => 'admin', 'sort' => 20,
             'title_en' => 'Roles', 'title_bn' => 'রোল', 'status' => 'written',

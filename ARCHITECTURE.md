@@ -106,7 +106,7 @@ config/                       audit.php, permission.php, reverb.php, broadcastin
                               training.php (the guide registry), sheet-import.php (+ Laravel's)
 database/
   migrations/                 flat — the migrator does not recurse
-  seeders/Admin/              RolePermissionSeeder, SuperAdminSeeder, DemoUserSeeder
+  seeders/Admin/              RolePermissionSeeder, SuperAdminSeeder, DemoUserSeeder, CountrySeeder
 public/
   images/training/            guide screenshots, {key}/{shot}.png, committed. Never public/training/:
                               Apache would serve that folder instead of the /training route
@@ -211,7 +211,8 @@ follow [§11](#11-adding-a-new-module) for the rest and switch the status to ✅
 
 **Admin** owns: users (create, edit, deactivate, soft delete, restore, force delete, set password,
 assign roles, grant companies, avatar), roles (with the permission picker), the Company master
-([§9.10](#910-multi-company)), the read-only permission catalogue, the read-only enum catalogue
+([§9.10](#910-multi-company)), the Country master (group-wide, restorable, seeded with the ISO 3166-1
+list — [§9.14](#914-master-data-and-deletion-guards)), the read-only permission catalogue, the read-only enum catalogue
 ([§9.8](#98-the-enum-registry)), the
 audit log viewer, the Application Settings hub (Mail Server, Quick Login, Branding, Import Limits tabs)
 and Sent Mails. Full
@@ -721,6 +722,14 @@ that is *part of* its parent (a parent's code rows) cascades instead and owes no
 nothing references yet ships **without** a blocker, and says so in its service's docblock — a blocker
 that can only return `null` reads as a guard while guarding nothing. Blockers live in the service,
 never a policy ([§9.1](#91-rbac-roles--permissions)).
+
+**Master tables ship empty** — rows arrive by import or by hand — **except Admin → Countries**
+(owner, 2026-11-02): a standard list every installation needs, so `CountrySeeder` (called from
+`DatabaseSeeder`) inserts the ISO 3166-1 countries. It is idempotent and only *adds*: a country whose
+ISO codes or name are already taken, a deleted row included, is skipped, so an admin's edits are never
+overwritten; a country deleted *permanently* comes back on the next seed. Countries are group-wide like
+HRM → Designations, but they are Admin's, not an ERP record, so §9.10's single ERP exception still
+stands. Add another seeded master only on the owner's word, and name it here.
 
 ## 10. Adding a feature to an existing module
 

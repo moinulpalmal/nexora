@@ -104,7 +104,7 @@ class EmployeeRequest extends FormRequest
                     ->whereNull('deleted_at')
                     ->where(fn (Builder $query) => $query
                         ->where('status', RecordStatus::Active->value)
-                        ->orWhere('id', $employee?->department_id ?? 0)),
+                        ->orWhere('id', $employee->department_id ?? 0)),
             ],
             'designation_id' => [
                 'required',
@@ -113,7 +113,7 @@ class EmployeeRequest extends FormRequest
                     ->whereNull('deleted_at')
                     ->where(fn (Builder $query) => $query
                         ->where('status', RecordStatus::Active->value)
-                        ->orWhere('id', $employee?->designation_id ?? 0)),
+                        ->orWhere('id', $employee->designation_id ?? 0)),
             ],
             'official_mobile_no' => ['nullable', 'string', 'regex:'.self::MOBILE_PATTERN],
             'personal_mobile_no' => ['nullable', 'string', 'regex:'.self::MOBILE_PATTERN],

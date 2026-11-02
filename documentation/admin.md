@@ -23,6 +23,7 @@
 | i. Application Settings → Import Limits | `Admin\ImportLimitController`, `Admin\ImportLimitService` | same page | `admin.import-limits.{view,update}` ★ |
 | k. Enum catalogue ([§3.4](#34-the-enum-catalogue)) | `Admin\EnumController`, `Admin\EnumService` | `pages/admin/enums/index.tsx` | `admin.enums.view` |
 | j. Companies ([§10](#10-companies)) | `Admin\CompanyController`, `Admin\CompanyService`, `Admin\SelectedCompany` | `pages/admin/companies/index.tsx` | `admin.companies.*`, `admin.users.assign-companies` |
+| l. Countries ([§11](#11-countries)) | `Admin\CountryController`, `Admin\CountryService`, `Admin\CountrySeeder` | `pages/admin/countries/index.tsx` | `admin.countries.*` |
 
 ★ `SUPER_ADMIN_ONLY` — no role receives it by rule; an administrator can still grant it by hand.
 
@@ -350,3 +351,38 @@ permission gate) and remembered in `users.selected_company_id` between sessions 
 A company-scoped model uses `Concerns\BelongsToCompany`: its queries see only the selected company
 (another company's row binds as a 404) and the company is stamped on create. A user with no company
 still reaches Admin and Settings; an ERP page shows a "no company" panel instead of its table.
+
+## 11. Countries
+
+*(owner, 2026-11-02)* Admin → Countries is a **group-wide** master table — one list every company
+shares, no `company_id` — shaped as HRM → Designations: restorable, Active / Deleted tabs, bulk delete
+on both tabs, every action a dialog. It is the one master table that **ships filled** (ARCHITECTURE
+§9.14).
+
+| Column | Rule |
+| --- | --- |
+| `name` | Required, up to 100. Trimmed, inner spaces collapsed. Unique across every country, ignoring case, soft-deleted ones included. |
+| `iso2` | Required, exactly two letters (ISO 3166-1 alpha-2). Stored in capitals; unique like the name. |
+| `iso3` | Required, exactly three letters (alpha-3). Stored in capitals; unique like the name. |
+| `numeric_code` | Optional, exactly three digits (`050`), kept as text for the leading zero. Not unique. |
+| `dial_code` | Optional, `+` and up to four digits, with an optional `-` area part (`+880`, `+1-684`). Not unique. |
+| `currency_code` | Optional, three letters (ISO 4217), stored in capitals. Not unique (`EUR`). |
+| `nationality` | Optional, up to 100 (`Bangladeshi`). |
+| `status` | `A` / `I`. An inactive country stays on record but is not offered for new entries. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. |
+
+- **Seeded.** `Database\Seeders\Admin\CountrySeeder` (called from `DatabaseSeeder`) holds the 249
+  ISO 3166-1 entries. It only **adds**: a country whose ISO codes or name are already taken — by any
+  row, a deleted one included, ignoring case — is skipped, so re-running `db:seed` never overwrites an
+  admin's edit or collides with a renamed country. A country deleted **permanently** is added back on
+  the next seed, so deactivating is the way to retire one. Seeded rows are console writes and carry
+  no audit entry.
+- A deleted country **keeps its name and ISO codes reserved**; creating a duplicate says to restore it
+  instead.
+- **List:** filters on ISO 2, ISO 3, dial code and currency (starts with), name and nationality
+  (contains) and status; sorts on everything but nationality.
+- **No deletion guard yet**: nothing references a country. The first table with a `country_id` adds
+  `CountryService::deletionBlocker()` with its `restrictOnDelete()` foreign key (ARCHITECTURE §9.14).
+- No spreadsheet import — the seeder is the bulk-load path.
+- Permissions: `admin.countries.{view,create,update,delete,restore,force-delete}` — the `admin` role
+  receives them by rule, `viewer` the `.view`; no ERP role.

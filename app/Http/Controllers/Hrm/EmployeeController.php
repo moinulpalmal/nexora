@@ -229,7 +229,7 @@ class EmployeeController extends Controller
      */
     private function departmentOptions(): array
     {
-        return Department::query()
+        return array_values(Department::query()
             ->orderBy('name')
             ->get(['id', 'code', 'name', 'status'])
             ->map(fn (Department $department): array => [
@@ -238,8 +238,7 @@ class EmployeeController extends Controller
                 'hint' => $department->code,
                 'status' => $department->status->value,
             ])
-            ->values()
-            ->all();
+            ->all());
     }
 
     /**
@@ -247,7 +246,7 @@ class EmployeeController extends Controller
      */
     private function designationOptions(): array
     {
-        return Designation::query()
+        return array_values(Designation::query()
             ->orderBy('name')
             ->get(['id', 'code', 'name', 'status'])
             ->map(fn (Designation $designation): array => [
@@ -256,8 +255,7 @@ class EmployeeController extends Controller
                 'hint' => $designation->code,
                 'status' => $designation->status->value,
             ])
-            ->values()
-            ->all();
+            ->all());
     }
 
     private function saved(string $message, ?string $mailedTo): RedirectResponse

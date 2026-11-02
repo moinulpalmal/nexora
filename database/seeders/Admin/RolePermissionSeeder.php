@@ -35,6 +35,7 @@ class RolePermissionSeeder extends Seeder
         'admin.users' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'reset-password', 'assign-roles', 'assign-companies'],
         'admin.roles' => ['view', 'create', 'update', 'delete'],
         'admin.companies' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'admin.countries' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // `view` alone: the catalogue is defined in code, never edited in the UI.
         'admin.permissions' => ['view'],
         // `view` alone: enums are code, like the permission catalogue.

@@ -113,7 +113,10 @@ overrides.
 7. **Import** — on by default for a master table (§9.13). Ask for the sheet columns and which field
    each maps to, and whether the source workbooks carry several tabs. Skip it only if the owner says
    so, and say in your summary that the table then has no bulk-load path.
-8. **Seed data** — none. Master tables ship empty; rows arrive by import or by hand.
+8. **Seed data** — none by default: master tables ship empty; rows arrive by import or by hand.
+   The exception is a standard reference list every installation needs, on the owner's word —
+   Admin → Countries (`database/seeders/Admin/CountrySeeder.php`, ARCHITECTURE.md §9.14) is the
+   sibling: idempotent, additive only, called from `DatabaseSeeder`.
 
 ---
 
@@ -282,7 +285,7 @@ looks like.
       the table makes a new statement about them. Edit **in place** with the reason; never append a
       note that contradicts a line above it.
 
-No seeder.
+No seeder, unless the owner asked for one (see Step 2, item 8).
 
 ---
 

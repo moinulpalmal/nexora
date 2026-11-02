@@ -156,5 +156,6 @@ you updated it or why the change did not need it.
 
 ## Not registered
 
-**No seeder.** Master tables ship empty; rows arrive by import or by hand. If import was skipped, say
+**No seeder** by default. Master tables ship empty; rows arrive by import or by hand — except a
+standard list the owner asks to seed, as `Admin\CountrySeeder` (ARCHITECTURE.md §9.14). If import was skipped, say
 plainly that the table has no bulk-load path.

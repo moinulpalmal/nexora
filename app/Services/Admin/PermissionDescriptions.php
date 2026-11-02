@@ -51,6 +51,13 @@ class PermissionDescriptions
         'admin.companies.restore' => ['summary' => 'Bring a company back from Deleted.', 'where' => 'Admin → Companies → Deleted'],
         'admin.companies.force-delete' => ['summary' => 'Permanently delete companies from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Admin → Companies → Deleted'],
 
+        'admin.countries.view' => ['summary' => 'Open the Countries list (active and deleted tabs) and search it.', 'where' => 'Admin → Countries'],
+        'admin.countries.create' => ['summary' => 'Add a country that is not in the seeded ISO list.', 'where' => 'Admin → Countries'],
+        'admin.countries.update' => ['summary' => 'Edit a country\'s name, codes and nationality, and activate or deactivate it.', 'note' => 'The change shows in every company.', 'where' => 'Admin → Countries'],
+        'admin.countries.delete' => ['summary' => 'Move countries into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore. Deactivating is the usual way to retire a country.', 'where' => 'Admin → Countries'],
+        'admin.countries.restore' => ['summary' => 'Bring a country back from Deleted.', 'where' => 'Admin → Countries → Deleted'],
+        'admin.countries.force-delete' => ['summary' => 'Permanently delete countries from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone. Re-running the database seeder adds a permanently deleted ISO country back.', 'where' => 'Admin → Countries → Deleted'],
+
         'admin.permissions.view' => ['summary' => 'See every permission, what it allows and which roles hold it.', 'where' => 'Admin → Permissions'],
         'admin.enums.view' => ['summary' => 'See every fixed list of values the application uses — its choices, and what is stored for each.', 'where' => 'Admin → Enums'],
 
