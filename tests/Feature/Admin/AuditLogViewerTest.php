@@ -65,6 +65,8 @@ test('the model type filter is the morph map, never hand-listed', function () {
         ->get(route('admin.audit-logs.index'))
         ->assertInertia(fn ($page) => $page->where('modelTypes', [
             ['value' => 'branding-setting', 'label' => 'Branding setting'],
+            ['value' => 'certification', 'label' => 'Certification'],
+            ['value' => 'certification-category', 'label' => 'Certification category'],
             ['value' => 'client', 'label' => 'Client'],
             ['value' => 'company', 'label' => 'Company'],
             ['value' => 'country', 'label' => 'Country'],

@@ -65,6 +65,9 @@ class RolePermissionSeeder extends Seeder
         'projects.tender-types' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Group-wide (§9.10): one list of units of measure every company shares, seeded (owner, 2026-11-02).
         'projects.units' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        // Group-wide (§9.10): one catalogue of standards and its categories, seeded (owner, 2026-11-02).
+        'projects.certification-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.certifications' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         'accounting.dashboard' => ['view'],
         'hrm.dashboard' => ['view'],
         'hrm.departments' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],
@@ -80,8 +83,9 @@ class RolePermissionSeeder extends Seeder
      *
      * Designations are shared by every company, so an HR officer — who works
      * for one — may add and correct them but not remove one from all of them
-     * (owner, 2026-10-29). Tender types and units of measure are shared the same
-     * way, so a project manager is held to the same rule (owner, 2026-11-02).
+     * (owner, 2026-10-29). Tender types, units of measure, certifications and
+     * certification categories are shared the same way, so a project manager is
+     * held to the same rule (owner, 2026-11-02).
      * Applied after
      * {@see self::ROLES}; an administrator can still grant one to a role by hand.
      *
@@ -100,6 +104,12 @@ class RolePermissionSeeder extends Seeder
             'projects.units.delete',
             'projects.units.restore',
             'projects.units.force-delete',
+            'projects.certification-categories.delete',
+            'projects.certification-categories.restore',
+            'projects.certification-categories.force-delete',
+            'projects.certifications.delete',
+            'projects.certifications.restore',
+            'projects.certifications.force-delete',
         ],
     ];
 

@@ -2,8 +2,9 @@
 
 > **📋 Planned — built so far: the project stage enum ([§4](#project-stages)), Clients
 > ([§4](#clients--built)), Supplier Categories ([§4](#supplier-categories--built)), Suppliers
-> ([§4](#suppliers--built)), Tender Types ([§4](#tender-types--built)) and Units of Measure
-> ([§4](#units-of-measure--built)).** This is the agreed scope for the Project Management module (owner,
+> ([§4](#suppliers--built)), Tender Types ([§4](#tender-types--built)), Units of Measure
+> ([§4](#units-of-measure--built)), Certification Categories
+> ([§4](#certification-categories--built)) and Certifications ([§4](#certifications--built)).** This is the agreed scope for the Project Management module (owner,
 > 2026-10-28). It describes *what* the module will do and *why*; where things will live and what they
 > are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is built, this
 > file becomes its reference and the planned parts shrink as they ship.
@@ -284,6 +285,74 @@ grouped by what they measure, so there are no conversions between them (owner, 2
 
 Tests: `tests/Feature/ProjectManagement/UnitTest.php`. Guide: Projects → Units of measure.
 
+### Certification categories — built
+
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Certification Categories**
+(`projects/certification-categories`, `projects.certification-categories.index`, model
+`CertificationCategory`) groups the certifications below — quality management, environmental,
+social compliance, textile & apparel, steel & metals, pipes & plastics and the like. **Group-wide**
+(the fifth ERP exception to [ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)), and shaped
+exactly as Supplier Categories: `code` (up to 20) and `name` (up to 100) each unique across the table,
+ignoring case, deleted categories included; optional `description`; `status`; restorable with
+Active / Deleted tabs and bulk delete on both; audited as *Certification category*.
+
+- **Deletion guard** ([ARCHITECTURE §9.14](../ARCHITECTURE.md#914-master-data-and-deletion-guards)):
+  `CertificationCategoryService::deletionBlocker()` refuses to delete — or permanently delete — a
+  category any certification uses, deleted certifications included ("Used by 3 certifications. Move
+  them to another category, or deactivate this one instead.", a warning toast). Bulk delete deletes
+  the free ones and names the rest. Deactivating a category in use is allowed: its certifications
+  keep it, new ones cannot choose it.
+- **Seeded**: `CertificationCategorySeeder` adds 16 categories — QMS, EMS, OHS, ISMS, ENMS, FSMS, LAB,
+  SOC, TXT, ELEC, STEEL, PIPE, MACH, RADAR, NAT (BSTI/BDS), OTHER — skipping any whose code or name is
+  taken, as `UnitSeeder`.
+- **No spreadsheet import.** **Roles:** as tender types — `project-manager` holds
+  `projects.certification-categories.{view,create,update}` but not `delete`, `restore` or
+  `force-delete` (`ROLE_EXCLUSIONS`); `viewer` holds the `.view`; the `admin` role holds none.
+
+Tests: `tests/Feature/ProjectManagement/CertificationCategoryTest.php`. Guide: Projects →
+Certification categories.
+
+### Certifications — built
+
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Certifications**
+(`projects/certifications`, `projects.certifications.index`, model `Certification`) is a **catalogue
+of standards** — ISO 9001, ISO 14001, amfori BSCI, OEKO-TEX, CE, the BSTI mark — that a supplier may
+hold or a tender may demand. A row is a standard, **not a certificate someone holds**: a held
+certificate, with its number, issuer and expiry, will be a table of its own pointing here, on the
+screens the owner names later. **Group-wide** (the sixth ERP exception to §9.10), shaped as Tender
+Types with a required category as Suppliers have.
+
+| Column | Rule |
+| --- | --- |
+| `certification_category_id` | Required; an **active** category to be chosen, though a certification keeps a category that was deactivated later. `restrictOnDelete()`. |
+| `code` | Required, up to 30, letters and digits joined by single `-`/`_`, stored in capitals (`ISO9001-2015`). Unique **across the whole table**, ignoring case, deleted certifications included. |
+| `name` | Required, up to 150, trimmed and inner spaces collapsed. Unique **per version**, ignoring case, deleted certifications included: ISO 9001 2008 and 2015 are two rows. A blank version counts as one edition, so two unversioned rows of one name clash (the request enforces this; the `(name, version)` unique index cannot, since NULLs differ). |
+| `issuing_body` | Optional, up to 150, free text (ISO, amfori, BSTI). |
+| `version` | Optional, up to 20, trimmed (`2015`, `2014/68/EU`). |
+| `description` | Optional, up to 5000. Shown in the form, not the list. |
+| `status` | `A` / `I`. An inactive certification stays on record but will not be offered for new entries. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. Every change is in the audit trail (record type *Certification*). |
+
+- **The list** filters by code and version (starts with), name and issuing body (contains), category
+  (a combobox) and status; it sorts by code, name, issuing body, version, status and created date —
+  not by category, a joined column.
+- **Seeded**: `CertificationSeeder`, after `CertificationCategorySeeder`, adds 48 standards — the ISO
+  management systems (9001, 14001, 45001, 27001, 50001, 22000, 17025) and HACCP; garment and textile
+  schemes (SA8000, amfori BSCI, WRAP, SMETA, OEKO-TEX 100, GOTS, GRS, OCS, bluesign, Higg FEM);
+  electrical (CE, UL, RoHS, IEC 60947, IEC 61439, ISO/IEC 17065); steel and plain sheets (ISO 1461,
+  ASTM A615, BS 4449, ISO 3834, AWS D1.1, ASTM A653, JIS G3302, EN 10346); pipes and plastics (ISO
+  4427, ISO 1452, ASTM D3035, ISO 15874); machinery (ASME U, PED, ISO 12100, API Q1); radar and
+  telecom (ITU-R M.1371, IEC 62388, IEC 60945, FCC, AS9100); and the BSTI mark with BDS ISO 9001 and
+  14001. It skips a row whose code, or name in that version, is taken, and a row whose category code
+  is gone.
+- **No spreadsheet import** (owner, 2026-11-02): standards beyond the seeded set are added by hand.
+- **No deletion guard yet**: nothing points at a certification. The first table with a
+  `certification_id` adds `restrictOnDelete()` and a `CertificationService::deletionBlocker()` clause.
+- **Roles:** as tender types — `project-manager` holds `projects.certifications.{view,create,update}`
+  only; `viewer` the `.view`; `admin` none.
+
+Tests: `tests/Feature/ProjectManagement/CertificationTest.php`. Guide: Projects → Certifications.
+
 ### Project stages
 
 *Built 2026-11-02 as `App\Enums\ProjectManagement\ProjectStage` (id `project-stage`). The projects
@@ -343,7 +412,8 @@ that stops anyone approving their own record.
 ## 6. Draft permission catalogue
 
 *Draft — not seeded*, except `projects.clients.*`, `projects.supplier-categories.*`,
-`projects.suppliers.*`, `projects.tender-types.*` and `projects.units.*`
+`projects.suppliers.*`, `projects.tender-types.*`, `projects.units.*`,
+`projects.certification-categories.*` and `projects.certifications.*`
 (`{view,create,update,delete,restore,force-delete}` each), which shipped with their screens ([§4](#4-main-entities)). Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
 §6.2](../ARCHITECTURE.md#62-routes-and-permissions)). Each is added to `RolePermissionSeeder::CATALOGUE`
 and `PermissionDescriptions` when its screen is built.
@@ -355,6 +425,8 @@ and `PermissionDescriptions` when its screen is built.
 | `projects.suppliers.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's suppliers |
 | `projects.tender-types.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the tender types every company shares |
 | `projects.units.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the units of measure every company shares |
+| `projects.certification-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the certification categories every company shares |
+| `projects.certifications.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the catalogue of certifications every company shares |
 | `projects.projects.{view,create,update,delete}` | Manage projects and their contract terms |
 | `projects.projects.reopen` | Move a project out of Completed or Cancelled ([§4](#project-stages)) |
 | `projects.milestones.{view,create,update,delete}` | Manage milestones |

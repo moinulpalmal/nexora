@@ -13,6 +13,8 @@ use App\Models\Hrm\Department;
 use App\Models\Hrm\Designation;
 use App\Models\Hrm\Employee;
 use App\Models\ImportLimit;
+use App\Models\ProjectManagement\Certification;
+use App\Models\ProjectManagement\CertificationCategory;
 use App\Models\ProjectManagement\Client;
 use App\Models\ProjectManagement\Supplier;
 use App\Models\ProjectManagement\SupplierCategory;
@@ -58,6 +60,8 @@ class AppServiceProvider extends ServiceProvider
         'supplier-category' => SupplierCategory::class,
         'unit' => Unit::class,
         'supplier' => Supplier::class,
+        'certification-category' => CertificationCategory::class,
+        'certification' => Certification::class,
         'permission' => Permission::class,
         'mail-setting' => MailSetting::class,
         'quick-login-setting' => QuickLoginSetting::class,

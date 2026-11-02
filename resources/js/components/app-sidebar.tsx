@@ -1,5 +1,6 @@
 import { Link } from '@inertiajs/react';
 import {
+    Award,
     Briefcase,
     Building2,
     FolderKanban,
@@ -53,6 +54,8 @@ import { index as departmentsIndex } from '@/routes/hrm/departments';
 import { index as designationsIndex } from '@/routes/hrm/designations';
 import { index as employeesIndex } from '@/routes/hrm/employees';
 import { dashboard as projectsDashboard } from '@/routes/projects';
+import { index as certificationCategoriesIndex } from '@/routes/projects/certification-categories';
+import { index as certificationsIndex } from '@/routes/projects/certifications';
 import { index as clientsIndex } from '@/routes/projects/clients';
 import { index as supplierCategoriesIndex } from '@/routes/projects/supplier-categories';
 import { index as suppliersIndex } from '@/routes/projects/suppliers';
@@ -104,6 +107,10 @@ export function AppSidebar() {
     const canViewSuppliers = useCan('projects.suppliers.view');
     const canViewTenderTypes = useCan('projects.tender-types.view');
     const canViewUnits = useCan('projects.units.view');
+    const canViewCertificationCategories = useCan(
+        'projects.certification-categories.view',
+    );
+    const canViewCertifications = useCan('projects.certifications.view');
     const canViewAccounting = useCan('accounting.dashboard.view');
     const canViewHrm = useCan('hrm.dashboard.view');
     const canViewDepartments = useCan('hrm.departments.view');
@@ -209,6 +216,18 @@ export function AppSidebar() {
             href: unitsIndex(),
             icon: Ruler,
             visible: canViewUnits,
+        },
+        {
+            title: 'Certification Categories',
+            href: certificationCategoriesIndex(),
+            icon: Tags,
+            visible: canViewCertificationCategories,
+        },
+        {
+            title: 'Certifications',
+            href: certificationsIndex(),
+            icon: Award,
+            visible: canViewCertifications,
         },
     ];
 

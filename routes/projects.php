@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ProjectManagement\CertificationCategoryController;
+use App\Http\Controllers\ProjectManagement\CertificationController;
 use App\Http\Controllers\ProjectManagement\ClientController;
 use App\Http\Controllers\ProjectManagement\DashboardController;
 use App\Http\Controllers\ProjectManagement\SupplierCategoryController;
@@ -164,4 +166,58 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:projects.units.force-delete')
             ->name('units.force-delete');
+
+        // Group-wide (owner, 2026-11-02): one list of certification
+        // categories every company shares, seeded (§9.10).
+        Route::delete('certification-categories/bulk', [CertificationCategoryController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.certification-categories.delete')
+            ->name('certification-categories.bulk-destroy');
+
+        Route::delete('certification-categories/bulk/force', [CertificationCategoryController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.certification-categories.force-delete')
+            ->name('certification-categories.bulk-force-delete');
+
+        Route::resource('certification-categories', CertificationCategoryController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.certification-categories.view')
+            ->middlewareFor(['store'], 'permission:projects.certification-categories.create')
+            ->middlewareFor(['update'], 'permission:projects.certification-categories.update')
+            ->middlewareFor(['destroy'], 'permission:projects.certification-categories.delete');
+
+        Route::put('certification-categories/{certification_category}/restore', [CertificationCategoryController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.certification-categories.restore')
+            ->name('certification-categories.restore');
+
+        Route::delete('certification-categories/{certification_category}/force', [CertificationCategoryController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.certification-categories.force-delete')
+            ->name('certification-categories.force-delete');
+
+        // Group-wide (owner, 2026-11-02): ISO 9001 is the same standard for
+        // every company (§9.10). A catalogue of standards, seeded.
+        Route::delete('certifications/bulk', [CertificationController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.certifications.delete')
+            ->name('certifications.bulk-destroy');
+
+        Route::delete('certifications/bulk/force', [CertificationController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.certifications.force-delete')
+            ->name('certifications.bulk-force-delete');
+
+        Route::resource('certifications', CertificationController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.certifications.view')
+            ->middlewareFor(['store'], 'permission:projects.certifications.create')
+            ->middlewareFor(['update'], 'permission:projects.certifications.update')
+            ->middlewareFor(['destroy'], 'permission:projects.certifications.delete');
+
+        Route::put('certifications/{certification}/restore', [CertificationController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.certifications.restore')
+            ->name('certifications.restore');
+
+        Route::delete('certifications/{certification}/force', [CertificationController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.certifications.force-delete')
+            ->name('certifications.force-delete');
     });

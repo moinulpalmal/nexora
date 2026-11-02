@@ -6,6 +6,8 @@ use Database\Seeders\Admin\CountrySeeder;
 use Database\Seeders\Admin\DemoUserSeeder;
 use Database\Seeders\Admin\RolePermissionSeeder;
 use Database\Seeders\Admin\SuperAdminSeeder;
+use Database\Seeders\ProjectManagement\CertificationCategorySeeder;
+use Database\Seeders\ProjectManagement\CertificationSeeder;
 use Database\Seeders\ProjectManagement\UnitSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -26,6 +28,8 @@ class DatabaseSeeder extends Seeder
             SuperAdminSeeder::class,
             CountrySeeder::class,
             UnitSeeder::class,
+            CertificationCategorySeeder::class,
+            CertificationSeeder::class,
         ]);
 
         if (! app()->isProduction()) {

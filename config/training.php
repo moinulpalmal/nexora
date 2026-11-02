@@ -153,6 +153,16 @@ return [
             'title_en' => 'Units of measure', 'title_bn' => 'পরিমাপের একক', 'status' => 'written',
             'shots' => ['overview' => 'The standard units every company shares', 'form' => 'The New unit dialog'],
         ],
+        'projects.certification-categories' => [
+            'route' => 'projects.certification-categories.index', 'guide' => 'projects/certification-categories', 'section' => 'projects', 'sort' => 50,
+            'title_en' => 'Certification categories', 'title_bn' => 'সার্টিফিকেশনের শ্রেণি', 'status' => 'written',
+            'shots' => ['overview' => 'The certification categories every company shares', 'form' => 'The New certification category dialog'],
+        ],
+        'projects.certifications' => [
+            'route' => 'projects.certifications.index', 'guide' => 'projects/certifications', 'section' => 'projects', 'sort' => 52,
+            'title_en' => 'Certifications', 'title_bn' => 'সার্টিফিকেশন', 'status' => 'written',
+            'shots' => ['overview' => 'The standard certifications every company shares', 'form' => 'The New certification dialog'],
+        ],
         'accounting.dashboard' => [
             'route' => 'accounting.dashboard', 'guide' => 'accounting/dashboard', 'section' => 'accounting', 'sort' => 10,
             'title_en' => 'Accounts overview', 'title_bn' => 'হিসাবের সারসংক্ষেপ', 'status' => 'pending',

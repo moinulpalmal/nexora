@@ -26,6 +26,8 @@ use App\Services\Training\TrainingRegistry;
 use Database\Seeders\Admin\CountrySeeder;
 use Database\Seeders\Admin\DemoUserSeeder;
 use Database\Seeders\Admin\RolePermissionSeeder;
+use Database\Seeders\ProjectManagement\CertificationCategorySeeder;
+use Database\Seeders\ProjectManagement\CertificationSeeder;
 use Database\Seeders\ProjectManagement\UnitSeeder;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
@@ -360,6 +362,31 @@ test('projects.units', function () {
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-unit"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
+test('projects.certification-categories', function () {
+    $key = 'projects.certification-categories';
+    trainingActor();
+    (new CertificationCategorySeeder)->run();
+
+    $page = visitForTraining(route('projects.certification-categories.index', absolute: false))->assertSee('Environmental Management');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-certification-category"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
+test('projects.certifications', function () {
+    $key = 'projects.certifications';
+    trainingActor();
+    (new CertificationCategorySeeder)->run();
+    (new CertificationSeeder)->run();
+
+    $page = visitForTraining(route('projects.certifications.index', absolute: false))->assertSee('BDS ISO 9001 Quality Management Systems');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-certification"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
