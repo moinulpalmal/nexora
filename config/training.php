@@ -133,6 +133,11 @@ return [
             'title_en' => 'Clients', 'title_bn' => 'ক্লায়েন্ট', 'status' => 'written',
             'shots' => ['overview' => 'The clients of an invented company', 'form' => 'The New client dialog'],
         ],
+        'projects.tender-types' => [
+            'route' => 'projects.tender-types.index', 'guide' => 'projects/tender-types', 'section' => 'projects', 'sort' => 30,
+            'title_en' => 'Tender types', 'title_bn' => 'দরপত্রের ধরন', 'status' => 'written',
+            'shots' => ['overview' => 'The tender types every company shares', 'form' => 'The New tender type dialog'],
+        ],
         'accounting.dashboard' => [
             'route' => 'accounting.dashboard', 'guide' => 'accounting/dashboard', 'section' => 'accounting', 'sort' => 10,
             'title_en' => 'Accounts overview', 'title_bn' => 'হিসাবের সারসংক্ষেপ', 'status' => 'pending',

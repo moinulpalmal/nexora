@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProjectManagement\ClientController;
 use App\Http\Controllers\ProjectManagement\DashboardController;
+use App\Http\Controllers\ProjectManagement\TenderTypeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -53,4 +54,31 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:projects.clients.force-delete')
             ->name('clients.force-delete');
+
+        // Group-wide, not the selected company's (owner, 2026-11-02): a
+        // procurement method is the same for every company (§9.10).
+        Route::delete('tender-types/bulk', [TenderTypeController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.tender-types.delete')
+            ->name('tender-types.bulk-destroy');
+
+        Route::delete('tender-types/bulk/force', [TenderTypeController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.tender-types.force-delete')
+            ->name('tender-types.bulk-force-delete');
+
+        Route::resource('tender-types', TenderTypeController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.tender-types.view')
+            ->middlewareFor(['store'], 'permission:projects.tender-types.create')
+            ->middlewareFor(['update'], 'permission:projects.tender-types.update')
+            ->middlewareFor(['destroy'], 'permission:projects.tender-types.delete');
+
+        Route::put('tender-types/{tender_type}/restore', [TenderTypeController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.tender-types.restore')
+            ->name('tender-types.restore');
+
+        Route::delete('tender-types/{tender_type}/force', [TenderTypeController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.tender-types.force-delete')
+            ->name('tender-types.force-delete');
     });

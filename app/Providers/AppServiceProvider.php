@@ -14,6 +14,7 @@ use App\Models\Hrm\Designation;
 use App\Models\Hrm\Employee;
 use App\Models\ImportLimit;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\TenderType;
 use App\Models\SheetImport;
 use App\Models\User;
 use App\Services\Admin\MailSettingService;
@@ -50,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
         'designation' => Designation::class,
         'employee' => Employee::class,
         'client' => Client::class,
+        'tender-type' => TenderType::class,
         'permission' => Permission::class,
         'mail-setting' => MailSetting::class,
         'quick-login-setting' => QuickLoginSetting::class,

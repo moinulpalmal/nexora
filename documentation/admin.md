@@ -146,7 +146,7 @@ its sentence, and the code that checks it — `PermissionDescriptionsTest` fails
 | `super-admin` | everything | passes every check via `Gate::before`; cannot be edited or deleted |
 | `admin` | every `admin.*` and `settings.*` except ★ | day-to-day administration |
 | `viewer` | every `*.view` except ★ | read-only |
-| `project-manager` | every `projects.*` | the Projects module |
+| `project-manager` | every `projects.*` except `projects.tender-types.{delete,restore,force-delete}` | the Projects module; tender types are shared by every company, so their removal stays with super-admin (`ROLE_EXCLUSIONS`, [`projects.md` §4](projects.md#tender-types--built)) |
 | `accountant` | every `accounting.*` | the Accounting module (menu: Accounts) |
 | `hr-officer` | every `hrm.*` except `hrm.designations.{delete,restore,force-delete}` | the HRM module; designations are shared by every company, so their removal stays with super-admin (`ROLE_EXCLUSIONS`, [`hrm.md` §4.2](hrm.md#42-designations--built)) |
 
@@ -185,7 +185,7 @@ and — for an enum people pick from on screen — its label. Like the permissio
 
 - Every create/update/delete/restore of `User`, `Role`, `Permission`, `Company`, `MailSetting`,
   `QuickLoginSetting`, `BrandingSetting`, `ImportLimit`, the HRM `Department`, `Designation` and
-  `Employee`, the Projects `Client`, and `SheetImport` (staged, confirmed, cancelled — not the rows it wrote) is recorded with
+  `Employee`, the Projects `Client` and `TenderType`, and `SheetImport` (staged, confirmed, cancelled — not the rows it wrote) is recorded with
   old and new values; secrets (`password`, `remember_token`, the SMTP password) never are. The
   record-type filter is the morph map (`AppServiceProvider::MORPH_MAP`).
 - Also recorded: role, permission and company grants (`companies-changed`), administrator password resets, force deletes, mails

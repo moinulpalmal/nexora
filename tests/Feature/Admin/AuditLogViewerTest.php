@@ -77,6 +77,7 @@ test('the model type filter is the morph map, never hand-listed', function () {
             ['value' => 'quick-login-setting', 'label' => 'Quick login setting'],
             ['value' => 'role', 'label' => 'Role'],
             ['value' => 'sheet-import', 'label' => 'Sheet import'],
+            ['value' => 'tender-type', 'label' => 'Tender type'],
             ['value' => 'user', 'label' => 'User'],
         ]));
 });

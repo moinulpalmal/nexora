@@ -1,7 +1,7 @@
 # Projects Module — Reference
 
-> **📋 Planned — built so far: the project stage enum ([§4](#project-stages)) and Clients
-> ([§4](#clients--built)).** This is the agreed scope for the Project Management module (owner,
+> **📋 Planned — built so far: the project stage enum ([§4](#project-stages)), Clients
+> ([§4](#clients--built)) and Tender Types ([§4](#tender-types--built)).** This is the agreed scope for the Project Management module (owner,
 > 2026-10-28). It describes *what* the module will do and *why*; where things will live and what they
 > are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is built, this
 > file becomes its reference and the planned parts shrink as they ship.
@@ -122,6 +122,42 @@ is built ([`accounting.md`](accounting.md)).
 
 Tests: `tests/Feature/ProjectManagement/ClientTest.php`. Guide: Projects → Clients.
 
+### Tender types — built
+
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Tender Types**
+(`projects/tender-types`, `projects.tender-types.index`) is how a project was procured — open
+tendering, limited tendering, request for quotation, direct procurement and the like. A procurement
+method is a classification, not a fact about one company, so the list is **group-wide**: one list
+every company shares, with no `company_id` — the second ERP exception to
+[ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company), shaped as HRM → Designations.
+
+| Column | Rule |
+| --- | --- |
+| `code` | Required, up to 20, letters and digits joined by single `-`/`_`, stored in capitals. Unique **across the whole table**, ignoring case, deleted tender types included. |
+| `name` | Required, up to 100, trimmed and inner spaces collapsed. Unique like the code. |
+| `status` | `A` / `I` ([§9.3.1](../ARCHITECTURE.md#931-activeinactive-status)). An inactive tender type stays on record but will not be offered for new projects. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. Every change is in the audit trail (record type *Tender type*). |
+
+- **Group-wide**: the page works whether or not a company is selected, and every company sees the
+  same rows — an edit or delete shows in all of them.
+- **Active / Deleted tabs.** Delete moves a tender type to Deleted, where it can be restored or
+  deleted for good; a deleted tender type keeps its code and name reserved, and creating a duplicate
+  says to restore it instead.
+- **Bulk delete** on both tabs ([ARCHITECTURE §8.6](../ARCHITECTURE.md#86-every-list-is-paginated-sortable-and-filtered-per-column)).
+- **The list** filters by code (starts with), name (contains) and status; it sorts by code, name,
+  status and created date, by code by default.
+- **No deletion guard yet**: nothing points at a tender type until projects are built. The projects
+  table adds `tender_type_id` with `restrictOnDelete()` and a `TenderTypeService::deletionBlocker()`
+  clause ([ARCHITECTURE §9.14](../ARCHITECTURE.md#914-master-data-and-deletion-guards)).
+- **No spreadsheet import and no seed** (owner, 2026-11-02): the list is a handful of rows entered by
+  hand, so there is no bulk-load path, and a new installation starts with none.
+- **Roles:** `project-manager` holds `projects.tender-types.{view,create,update}` but not
+  `delete`, `restore` or `force-delete` (`ROLE_EXCLUSIONS`, owner, 2026-11-02): the list is shared by
+  every company, so removing a tender type stays with super-admin — the rule HR officers follow for
+  designations. `viewer` holds the `.view`; the `admin` role holds none.
+
+Tests: `tests/Feature/ProjectManagement/TenderTypeTest.php`. Guide: Projects → Tender types.
+
 ### Project stages
 
 *Built 2026-11-02 as `App\Enums\ProjectManagement\ProjectStage` (id `project-stage`). The projects
@@ -180,14 +216,16 @@ that stops anyone approving their own record.
 
 ## 6. Draft permission catalogue
 
-*Draft — not seeded*, except `projects.clients.{view,create,update,delete,restore,force-delete}`, which
-shipped with Clients ([§4](#clients--built)). Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
+*Draft — not seeded*, except `projects.clients.*` and `projects.tender-types.*`
+(`{view,create,update,delete,restore,force-delete}` each), which shipped with Clients
+([§4](#clients--built)) and Tender Types ([§4](#tender-types--built)). Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
 §6.2](../ARCHITECTURE.md#62-routes-and-permissions)). Each is added to `RolePermissionSeeder::CATALOGUE`
 and `PermissionDescriptions` when its screen is built.
 
 | Permission | Allows |
 | --- | --- |
 | `projects.clients.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's clients |
+| `projects.tender-types.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the tender types every company shares |
 | `projects.projects.{view,create,update,delete}` | Manage projects and their contract terms |
 | `projects.projects.reopen` | Move a project out of Completed or Cancelled ([§4](#project-stages)) |
 | `projects.milestones.{view,create,update,delete}` | Manage milestones |

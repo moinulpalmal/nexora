@@ -17,6 +17,7 @@ use App\Models\Hrm\Department;
 use App\Models\Hrm\Designation;
 use App\Models\Hrm\Employee;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\TenderType;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
 use App\Services\Training\TrainingRegistry;
@@ -285,6 +286,21 @@ test('projects.clients', function () {
     captureTrainingShot($page, $key, 'form');
 });
 
+test('projects.tender-types', function () {
+    $key = 'projects.tender-types';
+    trainingActor();
+
+    foreach ([['OTM', 'Open Tendering Method'], ['LTM', 'Limited Tendering Method'], ['RFQ', 'Request for Quotation'], ['DPM', 'Direct Procurement Method'], ['TSTM', 'Two-Stage Tendering Method']] as [$code, $name]) {
+        TenderType::factory()->create(['code' => $code, 'name' => $name]);
+    }
+
+    $page = visitForTraining(route('projects.tender-types.index', absolute: false))->assertSee('Request for Quotation');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-tender-type"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
 test('hrm.designations', function () {
     $key = 'hrm.designations';
     trainingActor();
@@ -369,7 +385,7 @@ test('hrm.employees', function () {
 test('admin.permissions', function () {
     trainingActor();
 
-    $page = visitForTraining(route('admin.permissions.index', absolute: false))->assertSee('admin.roles.view');
+    $page = visitForTraining(route('admin.permissions.index', absolute: false))->assertSee('admin.permissions.view');
     captureTrainingShot($page, 'admin.permissions', 'overview');
 });
 
