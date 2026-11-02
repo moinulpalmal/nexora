@@ -324,7 +324,7 @@ Types with a required category as Suppliers have.
 
 | Column | Rule |
 | --- | --- |
-| `certification_category_id` | Required; an **active** category to be chosen, though a certification keeps a category that was deactivated later. `restrictOnDelete()`. |
+| `certification_category_id` | Required ("The category field is required." — the request names the field *category*); an **active** category to be chosen, though a certification keeps a category that was deactivated later. `restrictOnDelete()`. |
 | `code` | Required, up to 30, letters and digits joined by single `-`/`_`, stored in capitals (`ISO9001-2015`). Unique **across the whole table**, ignoring case, deleted certifications included. |
 | `name` | Required, up to 150, trimmed and inner spaces collapsed. Unique **per version**, ignoring case, deleted certifications included: ISO 9001 2008 and 2015 are two rows. A blank version counts as one edition, so two unversioned rows of one name clash (the request enforces this; the `(name, version)` unique index cannot, since NULLs differ). |
 | `issuing_body` | Optional, up to 150, free text (ISO, amfori, BSTI). |

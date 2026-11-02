@@ -201,6 +201,11 @@ export default function CertificationsGuide() {
                     bn="মুছে ফেলা একটি সার্টিফিকেশনের ওই সংস্করণে এখনো এই নামটি আছে। দ্বিতীয়টি না বানিয়ে সেটিকেই ফিরিয়ে আনুন।"
                 />
                 <Message
+                    text="The category field is required."
+                    en="No category was picked. Open the Category list and click one; typing a name only narrows the list."
+                    bn="কোনো শ্রেণি বেছে নেওয়া হয়নি। Category তালিকা খুলে একটিতে ক্লিক করুন; নাম লিখলে শুধু তালিকাটি ছোট হয়।"
+                />
+                <Message
                     text="Choose an active certification category."
                     en="The category picked is inactive or deleted. Choose another, or make that category Active first."
                     bn="বেছে নেওয়া শ্রেণিটি নিষ্ক্রিয় বা মুছে ফেলা। অন্যটি বেছে নিন, অথবা আগে শ্রেণিটি Active করুন।"

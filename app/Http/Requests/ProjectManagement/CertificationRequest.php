@@ -109,6 +109,16 @@ class CertificationRequest extends FormRequest
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'certification_category_id' => __('category'),
+        ];
+    }
+
+    /**
      * The validated values, an empty optional field saved as null rather than
      * as an empty string.
      *

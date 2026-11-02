@@ -169,7 +169,7 @@ test('an empty issuing body, version and description are saved as null', functio
 test('category, code, name and status are required', function () {
     $this->actingAs(userWithPermissions('projects.certifications.create'))
         ->post(route('projects.certifications.store'), ['certification_category_id' => '', 'code' => '', 'name' => '', 'status' => ''])
-        ->assertSessionHasErrors(['certification_category_id', 'code', 'name', 'status']);
+        ->assertSessionHasErrors(['certification_category_id' => 'The category field is required.', 'code', 'name', 'status']);
 });
 
 test('a code with spaces or symbols is refused', function () {
