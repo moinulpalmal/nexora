@@ -26,6 +26,7 @@ use App\Services\Training\TrainingRegistry;
 use Database\Seeders\Admin\CountrySeeder;
 use Database\Seeders\Admin\DemoUserSeeder;
 use Database\Seeders\Admin\RolePermissionSeeder;
+use Database\Seeders\ProjectManagement\UnitSeeder;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
 use Pest\Browser\Support\Screenshot;
@@ -347,6 +348,18 @@ test('projects.tender-types', function () {
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-tender-type"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
+test('projects.units', function () {
+    $key = 'projects.units';
+    trainingActor();
+    (new UnitSeeder)->run();
+
+    $page = visitForTraining(route('projects.units.index', absolute: false))->assertSee('Kilogram');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-unit"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 

@@ -24,7 +24,7 @@ sent mail). Business modules are added on top of it, one module per folder in ev
 ([§4](#4-the-organizing-rule)).
 
 The first business modules are **Project Management**, **Accounts** and **HRM**. Each is a 🧪 POC,
-two with their first slices built (Projects → Clients, Suppliers, Supplier Categories, Tender Types; HRM → Departments, Designations, Employees);
+two with their first slices built (Projects → Clients, Suppliers, Supplier Categories, Tender Types, Units of Measure; HRM → Departments, Designations, Employees);
 their agreed scope is in [§5](#5-module-registry) and in their module docs.
 
 Accounts are **created by administrators only** — there is no public registration — and sign in with
@@ -72,7 +72,7 @@ app/
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5);
-                              ProjectManagement/ also Client, Supplier, SupplierCategory, TenderType;
+                              ProjectManagement/ also Client, Supplier, SupplierCategory, TenderType, Unit;
                               Hrm/ also Department, DepartmentImport, Designation, DesignationImport,
                               Employee, EmployeeImport
   Http/Middleware/            EnsureUserIsActive, EnsurePasswordIsChanged, HandleAppearance, HandleInertiaRequests
@@ -88,7 +88,7 @@ app/
                               BrandingSetting, SentMail
   Models/Hrm/                 Department, Employee (company-scoped, §9.10), Designation (group-wide, §9.10)
   Models/ProjectManagement/   Client, Supplier (company-scoped, §9.10 — the ERP's one customer
-                              and one supplier list), SupplierCategory, TenderType (group-wide, §9.10)
+                              and one supplier list), SupplierCategory, TenderType, Unit (group-wide, §9.10)
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
   Providers/                  AppServiceProvider, FortifyServiceProvider
@@ -99,7 +99,8 @@ app/
   Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer),
                               DesignationService, DesignationImportBlueprint, EmployeeService,
                               EmployeeImportBlueprint
-  Services/ProjectManagement/ ClientService, SupplierService, SupplierCategoryService, TenderTypeService
+  Services/ProjectManagement/ ClientService, SupplierService, SupplierCategoryService, TenderTypeService,
+                              UnitService
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
   Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
                               ImportBlueprint, ImportRegistry, the DTOs ImportLimits/Outcome/Preview
@@ -108,6 +109,7 @@ config/                       audit.php, permission.php, reverb.php, broadcastin
 database/
   migrations/                 flat — the migrator does not recurse
   seeders/Admin/              RolePermissionSeeder, SuperAdminSeeder, DemoUserSeeder, CountrySeeder
+  seeders/ProjectManagement/  UnitSeeder (the standard units of measure, §9.14)
 public/
   images/training/            guide screenshots, {key}/{shot}.png, committed. Never public/training/:
                               Apache would serve that folder instead of the /training route
@@ -125,12 +127,12 @@ resources/
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
     components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview;
-                              projects/ also the client, supplier, supplier category and tender
-                              type form dialogs;
+                              projects/ also the client, supplier, supplier category, tender
+                              type and unit form dialogs;
                               hrm/ also the department, designation and employee form dialogs
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
                               table of contents; guides/{general,admin,settings,projects,hrm,shared}/
-                              (§5) — projects/ holds clients, suppliers, supplier categories, tender types;
+                              (§5) — projects/ holds clients, suppliers, supplier categories, tender types, units;
                               hrm/ departments, designations, employees
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
     hooks/                    use-can, use-list-filters, use-form-dialog, use-appearance, …
@@ -145,7 +147,7 @@ routes/
   settings.php                the user's own account settings
   training.php                the in-app manual (ungated)
   projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each; projects.php
-                              also clients, suppliers, supplier categories, tender types; hrm.php also departments, designations, employees and
+                              also clients, suppliers, supplier categories, tender types, units; hrm.php also departments, designations, employees and
                               their imports)
   channels.php                private broadcast channels
 tests/
@@ -258,7 +260,11 @@ keeps it as it keeps clients, and Accounting's bills will point at the same rows
 restorable in the Clients shape, plus TIN/BIN, trade licence and one bank account, each classified by
 a required **Supplier Category** (`projects/supplier-categories`), group-wide (the third ERP exception
 to §9.10) and guarded against deletion while suppliers use it — the `Employee` → `Designation`
-pairing. Neither has an import.
+pairing. Neither has an import. **Units of Measure** (`projects/units`, model `Unit`; owner,
+2026-11-02) — what a quantity is counted in, with a printed symbol and the decimal places a quantity
+in it takes — are group-wide, the fourth ERP exception to §9.10, in the Tender Types shape without
+import, and **seeded** with a standard set (`UnitSeeder`, §9.14) because no BOQ or bill line can be
+written without them. Nothing references a unit yet.
 The module stays 🧪 while its overview still shows sample data; the sidebar group is already a
 list of links, each behind its own `useCan`. Reference:
 [`documentation/projects.md`](documentation/projects.md).
@@ -483,7 +489,8 @@ A confirmation raised from inside another dialog closes its parent through `onSu
   permissions back from one role after its rules match: `hr-officer` gets no
   `hrm.designations.{delete,restore,force-delete}`, because a designation is shared by every company
   and an officer works for one (owner, 2026-10-29); `project-manager` likewise gets no
-  `projects.tender-types.{delete,restore,force-delete}` (owner, 2026-11-02).
+  `projects.tender-types.{delete,restore,force-delete}` or
+  `projects.units.{delete,restore,force-delete}` (owner, 2026-11-02).
 - **`super-admin` passes every check** through `Gate::before` in `AppServiceProvider`. Routes and the
   UI check **permissions, never role names**.
 - **Authorization = route `permission:` middleware + service `*Blocker()` guards. No Policy classes**
@@ -614,9 +621,9 @@ them (owner, 2026-10-26). The buttons submit the real login form.
 *(owner, 2026-10-28; built 2026-10-29)* One installation serves one organization's companies — one or several.
 **Every Projects, Accounting and HRM record carries its company**, and each company has its own
 ledger, fiscal years and payroll. **The exceptions are HRM → Designations** (owner, 2026-10-29), **Projects
-→ Tender Types and Projects → Supplier Categories** (owner, 2026-11-02): group-wide lists with no
-`company_id` — the same job titles, the same procurement methods, the same supplier classes, for every
-company — in the master-crud *global* shape
+→ Tender Types, Projects → Supplier Categories and Projects → Units of Measure** (owner, 2026-11-02):
+group-wide lists with no `company_id` — the same job titles, the same procurement methods, the same
+supplier classes, the same units, for every company — in the master-crud *global* shape
 (restorable, unique across the table, no `BelongsToCompany`, no no-company panel). Add another
 group-wide table only on the owner's word, and name it here. The company dimension is set up before the first ERP table so that
 no table needs a later migration to add it. Reference:
@@ -738,11 +745,13 @@ nothing references yet ships **without** a blocker, and says so in its service's
 that can only return `null` reads as a guard while guarding nothing. Blockers live in the service,
 never a policy ([§9.1](#91-rbac-roles--permissions)).
 
-**Master tables ship empty** — rows arrive by import or by hand — **except Admin → Countries**
-(owner, 2026-11-02): a standard list every installation needs, so `CountrySeeder` (called from
-`DatabaseSeeder`) inserts the ISO 3166-1 countries. It is idempotent and only *adds*: a country whose
-ISO codes or name are already taken, a deleted row included, is skipped, so an admin's edits are never
-overwritten; a country deleted *permanently* comes back on the next seed. Countries are group-wide like
+**Master tables ship empty** — rows arrive by import or by hand — **except Admin → Countries and
+Projects → Units of Measure** (owner, 2026-11-02): standard lists every installation needs, so
+`CountrySeeder` inserts the ISO 3166-1 countries and `ProjectManagement\UnitSeeder` 27 common units
+(pieces, kilograms, square metres, hours…), both called from `DatabaseSeeder` and both built the same
+way. Each is idempotent and only *adds*: a row whose codes or name are already taken, a deleted row
+included, is skipped, so an admin's edits are never overwritten; a row deleted *permanently* comes back
+on the next seed. Countries are group-wide like
 HRM → Designations, but they are Admin's, not an ERP record, so they are not among §9.10's ERP
 exceptions. Add another seeded master only on the owner's word, and name it here.
 

@@ -177,13 +177,15 @@ test('countries are the administrator\'s, and the viewer may only read them', fu
     }
 });
 
-test('a project manager may add and correct tender types but not remove them, and the viewer may only read them', function () {
+test('a project manager may add and correct tender types and units but not remove them, and the viewer may only read them', function () {
     $this->seed(RolePermissionSeeder::class);
 
-    foreach (['view', 'create', 'update', 'delete', 'restore', 'force-delete'] as $action) {
-        expect(Role::findByName('project-manager')->hasPermissionTo("projects.tender-types.{$action}"))->toBe(in_array($action, ['view', 'create', 'update'], true))
-            ->and(Role::findByName('viewer')->hasPermissionTo("projects.tender-types.{$action}"))->toBe($action === 'view')
-            ->and(Role::findByName('admin')->hasPermissionTo("projects.tender-types.{$action}"))->toBeFalse();
+    foreach (['tender-types', 'units'] as $resource) {
+        foreach (['view', 'create', 'update', 'delete', 'restore', 'force-delete'] as $action) {
+            expect(Role::findByName('project-manager')->hasPermissionTo("projects.{$resource}.{$action}"))->toBe(in_array($action, ['view', 'create', 'update'], true))
+                ->and(Role::findByName('viewer')->hasPermissionTo("projects.{$resource}.{$action}"))->toBe($action === 'view')
+                ->and(Role::findByName('admin')->hasPermissionTo("projects.{$resource}.{$action}"))->toBeFalse();
+        }
     }
 
     expect(Role::findByName('project-manager')->hasPermissionTo('projects.clients.delete'))->toBeTrue();

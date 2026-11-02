@@ -15,6 +15,7 @@ import {
     LayoutGrid,
     ListTree,
     Mail,
+    Ruler,
     ShieldCheck,
     SlidersHorizontal,
     Tags,
@@ -56,6 +57,7 @@ import { index as clientsIndex } from '@/routes/projects/clients';
 import { index as supplierCategoriesIndex } from '@/routes/projects/supplier-categories';
 import { index as suppliersIndex } from '@/routes/projects/suppliers';
 import { index as tenderTypesIndex } from '@/routes/projects/tender-types';
+import { index as unitsIndex } from '@/routes/projects/units';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
 
@@ -101,6 +103,7 @@ export function AppSidebar() {
     );
     const canViewSuppliers = useCan('projects.suppliers.view');
     const canViewTenderTypes = useCan('projects.tender-types.view');
+    const canViewUnits = useCan('projects.units.view');
     const canViewAccounting = useCan('accounting.dashboard.view');
     const canViewHrm = useCan('hrm.dashboard.view');
     const canViewDepartments = useCan('hrm.departments.view');
@@ -200,6 +203,12 @@ export function AppSidebar() {
             href: tenderTypesIndex(),
             icon: Gavel,
             visible: canViewTenderTypes,
+        },
+        {
+            title: 'Units of Measure',
+            href: unitsIndex(),
+            icon: Ruler,
+            visible: canViewUnits,
         },
     ];
 

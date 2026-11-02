@@ -54,6 +54,27 @@ export type SupplierCategoryFilters = ListFilters & {
     view: 'active' | 'trashed';
 };
 
+/** One row of the units of measure list, as `UnitController::index()` projects it. */
+export type UnitListItem = {
+    id: number;
+    code: string;
+    name: string;
+    /** The printed form, case kept — `kg`, `m²`. */
+    symbol: string | null;
+    /** How many decimals a quantity in this unit takes, 0–6. */
+    decimal_places: number;
+    description: string | null;
+    /** `App\Enums\RecordStatus` — `'A'` or `'I'`. Not a deletion. */
+    status: string;
+    created_at: string | null;
+    deleted_at: string | null;
+};
+
+export type UnitFilters = ListFilters & {
+    /** Which record set is listed — a tab, not a column filter. */
+    view: 'active' | 'trashed';
+};
+
 /** A supplier category in the suppliers form and filter, as `SupplierController::categoryOptions()` builds it. */
 export type SupplierCategoryOption = {
     value: number;

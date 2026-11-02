@@ -80,6 +80,7 @@ test('the model type filter is the morph map, never hand-listed', function () {
             ['value' => 'supplier', 'label' => 'Supplier'],
             ['value' => 'supplier-category', 'label' => 'Supplier category'],
             ['value' => 'tender-type', 'label' => 'Tender type'],
+            ['value' => 'unit', 'label' => 'Unit'],
             ['value' => 'user', 'label' => 'User'],
         ]));
 });

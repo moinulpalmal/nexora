@@ -148,6 +148,11 @@ return [
             'title_en' => 'Tender types', 'title_bn' => 'দরপত্রের ধরন', 'status' => 'written',
             'shots' => ['overview' => 'The tender types every company shares', 'form' => 'The New tender type dialog'],
         ],
+        'projects.units' => [
+            'route' => 'projects.units.index', 'guide' => 'projects/units', 'section' => 'projects', 'sort' => 40,
+            'title_en' => 'Units of measure', 'title_bn' => 'পরিমাপের একক', 'status' => 'written',
+            'shots' => ['overview' => 'The standard units every company shares', 'form' => 'The New unit dialog'],
+        ],
         'accounting.dashboard' => [
             'route' => 'accounting.dashboard', 'guide' => 'accounting/dashboard', 'section' => 'accounting', 'sort' => 10,
             'title_en' => 'Accounts overview', 'title_bn' => 'হিসাবের সারসংক্ষেপ', 'status' => 'pending',

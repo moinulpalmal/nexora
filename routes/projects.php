@@ -5,6 +5,7 @@ use App\Http\Controllers\ProjectManagement\DashboardController;
 use App\Http\Controllers\ProjectManagement\SupplierCategoryController;
 use App\Http\Controllers\ProjectManagement\SupplierController;
 use App\Http\Controllers\ProjectManagement\TenderTypeController;
+use App\Http\Controllers\ProjectManagement\UnitController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -136,4 +137,31 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:projects.tender-types.force-delete')
             ->name('tender-types.force-delete');
+
+        // Group-wide, not the selected company's (owner, 2026-11-02): a
+        // kilogram is the same for every company (§9.10).
+        Route::delete('units/bulk', [UnitController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.units.delete')
+            ->name('units.bulk-destroy');
+
+        Route::delete('units/bulk/force', [UnitController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.units.force-delete')
+            ->name('units.bulk-force-delete');
+
+        Route::resource('units', UnitController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.units.view')
+            ->middlewareFor(['store'], 'permission:projects.units.create')
+            ->middlewareFor(['update'], 'permission:projects.units.update')
+            ->middlewareFor(['destroy'], 'permission:projects.units.delete');
+
+        Route::put('units/{unit}/restore', [UnitController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.units.restore')
+            ->name('units.restore');
+
+        Route::delete('units/{unit}/force', [UnitController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.units.force-delete')
+            ->name('units.force-delete');
     });

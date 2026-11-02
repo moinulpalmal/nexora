@@ -115,8 +115,9 @@ overrides.
    so, and say in your summary that the table then has no bulk-load path.
 8. **Seed data** — none by default: master tables ship empty; rows arrive by import or by hand.
    The exception is a standard reference list every installation needs, on the owner's word —
-   Admin → Countries (`database/seeders/Admin/CountrySeeder.php`, ARCHITECTURE.md §9.14) is the
-   sibling: idempotent, additive only, called from `DatabaseSeeder`.
+   Admin → Countries (`database/seeders/Admin/CountrySeeder.php`, ARCHITECTURE.md §9.14) and
+   Projects → Units of Measure (`database/seeders/ProjectManagement/UnitSeeder.php`) are the
+   siblings: idempotent, additive only, called from `DatabaseSeeder`.
 
 ---
 

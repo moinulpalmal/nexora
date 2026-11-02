@@ -63,6 +63,8 @@ class RolePermissionSeeder extends Seeder
         'projects.suppliers' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Group-wide (§9.10): one list of procurement methods every company shares (owner, 2026-11-02).
         'projects.tender-types' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        // Group-wide (§9.10): one list of units of measure every company shares, seeded (owner, 2026-11-02).
+        'projects.units' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         'accounting.dashboard' => ['view'],
         'hrm.dashboard' => ['view'],
         'hrm.departments' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],
@@ -78,8 +80,9 @@ class RolePermissionSeeder extends Seeder
      *
      * Designations are shared by every company, so an HR officer — who works
      * for one — may add and correct them but not remove one from all of them
-     * (owner, 2026-10-29). Tender types are shared the same way, so a project
-     * manager is held to the same rule (owner, 2026-11-02). Applied after
+     * (owner, 2026-10-29). Tender types and units of measure are shared the same
+     * way, so a project manager is held to the same rule (owner, 2026-11-02).
+     * Applied after
      * {@see self::ROLES}; an administrator can still grant one to a role by hand.
      *
      * @var array<string, list<string>>
@@ -94,6 +97,9 @@ class RolePermissionSeeder extends Seeder
             'projects.tender-types.delete',
             'projects.tender-types.restore',
             'projects.tender-types.force-delete',
+            'projects.units.delete',
+            'projects.units.restore',
+            'projects.units.force-delete',
         ],
     ];
 
