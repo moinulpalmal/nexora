@@ -1,6 +1,7 @@
 # Projects Module — Reference
 
-> **📋 Planned — only the project stage enum is built** ([§4](#project-stages)). This is the agreed scope for the Project Management module (owner,
+> **📋 Planned — built so far: the project stage enum ([§4](#project-stages)) and Clients
+> ([§4](#clients--built)).** This is the agreed scope for the Project Management module (owner,
 > 2026-10-28). It describes *what* the module will do and *why*; where things will live and what they
 > are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is built, this
 > file becomes its reference and the planned parts shrink as they ship.
@@ -15,7 +16,7 @@
 
 Project Management runs **client projects from contract to invoice**: what was agreed with the
 customer, who works on it, the tasks and milestones, the hours logged, and what is ready to bill.
-It does not issue invoices itself. It raises **billing requests**, and Accounting turns them into
+It keeps the **client list** the whole ERP bills. It does not issue invoices itself. It raises **billing requests**, and Accounting turns them into
 invoices ([§7](#7-links-to-other-modules)).
 
 | | |
@@ -34,7 +35,7 @@ A user works in one selected company at a time and sees only that company's proj
 
 **In scope**
 
-- Projects for a customer, with contract terms: **milestone billing** (a fixed amount per milestone)
+- Projects for a client, with contract terms: **milestone billing** (a fixed amount per milestone)
   or **time-and-materials** (hours × billing rate).
 - Milestones, tasks (list and board views), and the project team.
 - Timesheets: hours per employee per task per day, approved before they can be billed.
@@ -56,14 +57,14 @@ modules:
 
 | Phase | Delivers |
 | --- | --- |
-| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)) — **built**. **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)) — **built** 2026-10-29; employees carry the monthly salary the cost rate will come from. **Accounting → Customers** ([`accounting.md`](accounting.md#3-phases)) — not yet built. |
+| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)) — **built**. **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)) — **built** 2026-10-29; employees carry the monthly salary the cost rate will come from. **Projects → Clients** ([§4](#clients--built)) — **built** 2026-11-02, in place of the planned Accounting → Customers. |
 | **1 — delivery** | Projects with contract terms, milestones, tasks (list + board), project members with billing rates, timesheets with approval. |
 | **2 — billing** | Billing requests from approved milestones and hours. They wait as **ready to invoice** until Accounting's invoices exist, then become invoices. |
 | **3 — profitability** | Budget against actual per project and per milestone, using the employee cost rate. |
 
 ## 4. Main entities
 
-- **Project**: belongs to a company and a **customer** (Accounting's master). It has a project
+- **Project**: belongs to a company and a **client** ([below](#clients--built)). It has a project
   manager (an employee), a billing method (milestone or time-and-materials), a currency, start and
   end dates, a budget, a **stage** ([below](#project-stages)) and the usual Active/Inactive status.
 - **Milestone**: a dated deliverable of one project. Under milestone billing it carries the amount
@@ -77,6 +78,49 @@ modules:
 - **Billing request**: a project, a source (a milestone, or a set of timesheet entries), an amount
   in the project currency, and a status (ready to invoice, invoiced, cancelled). Once invoiced it
   links to the Accounting invoice.
+
+### Clients — built
+
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Clients** (`projects/clients`,
+`projects.clients.index`) is the organizations the company runs projects for — and **the ERP's one
+customer list**. It was planned as Accounting → Customers; the owner moved it here because Projects
+needs a client for every project before Accounting exists. Accounting's invoices will point at the
+same rows and add their billing fields (currency, credit terms, receivable account) when Accounting
+is built ([`accounting.md`](accounting.md)).
+
+| Column | Rule |
+| --- | --- |
+| `company_id` | The selected company, stamped on create; never a form field ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)). |
+| `code` | Required, up to 20, letters and digits joined by single `-`/`_`, stored in capitals. Unique **within the company**, ignoring case, deleted clients included. |
+| `name` | Required, up to 150, trimmed and inner spaces collapsed. Unique like the code. |
+| `contact_person` | Optional, up to 150, tidied like the name. |
+| `phone` | Optional, up to 30: digits, spaces and `+ ( ) -`. No national format — a client may be abroad. |
+| `email` | Optional, a valid address, stored lowercase. **Not unique**: two clients may share a group or billing address. |
+| `address` | Optional, up to 500. |
+| `description` | Optional free text. Shown in the form, not the list. |
+| `status` | `A` / `I` ([§9.3.1](../ARCHITECTURE.md#931-activeinactive-status)). An inactive client stays on record but will not be offered for new projects. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. Every change is in the audit trail (record type *Client*). |
+
+- **Company-scoped**, shaped as HRM → Departments: another company's client is a 404; with no
+  company selected the page shows the no-company panel and hides **New client**. The same code or
+  name in another company is fine.
+- **Active / Deleted tabs.** Delete moves a client to Deleted, where it can be restored or deleted
+  for good; a deleted client keeps its code and name reserved, and creating a duplicate says to
+  restore it instead.
+- **Bulk delete** on both tabs ([ARCHITECTURE §8.6](../ARCHITECTURE.md#86-every-list-is-paginated-sortable-and-filtered-per-column)).
+- **The list** filters by code (starts with), name, contact person and email (contains), phone
+  (starts with) and status; it sorts by code and name.
+- **No deletion guard yet**: nothing points at a client until projects are built. The projects
+  table adds `client_id` with `restrictOnDelete()` and a `ClientService::deletionBlocker()` clause
+  ([ARCHITECTURE §9.14](../ARCHITECTURE.md#914-master-data-and-deletion-guards)).
+- **Outward guard:** a company that still has clients, deleted ones included, cannot be deleted
+  ([`admin.md` §10.1](admin.md#101-the-company-master--admin--companies)).
+- **No spreadsheet import** (owner, 2026-11-02): clients are entered by hand, so there is no
+  bulk-load path.
+- **Roles:** `project-manager` holds every `projects.clients.*` by rule, `viewer` the `.view`; the
+  `admin` role holds none (it takes no module prefix).
+
+Tests: `tests/Feature/ProjectManagement/ClientTest.php`. Guide: Projects → Clients.
 
 ### Project stages
 
@@ -136,12 +180,14 @@ that stops anyone approving their own record.
 
 ## 6. Draft permission catalogue
 
-*Draft — not seeded.* Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
+*Draft — not seeded*, except `projects.clients.{view,create,update,delete,restore,force-delete}`, which
+shipped with Clients ([§4](#clients--built)). Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
 §6.2](../ARCHITECTURE.md#62-routes-and-permissions)). Each is added to `RolePermissionSeeder::CATALOGUE`
 and `PermissionDescriptions` when its screen is built.
 
 | Permission | Allows |
 | --- | --- |
+| `projects.clients.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's clients |
 | `projects.projects.{view,create,update,delete}` | Manage projects and their contract terms |
 | `projects.projects.reopen` | Move a project out of Completed or Cancelled ([§4](#project-stages)) |
 | `projects.milestones.{view,create,update,delete}` | Manage milestones |
@@ -159,7 +205,7 @@ and `PermissionDescriptions` when its screen is built.
 | --- | --- | --- |
 | Admin | Companies, user↔company access | — |
 | HRM | Employees (members, project managers), the employee **cost rate** | — |
-| Accounting | Customers, currencies | Billing requests → invoices. Later, project cost as a draft voucher ([ARCHITECTURE §9.12](../ARCHITECTURE.md#912-posting-to-the-ledger-planned)) |
+| Accounting | Currencies | **Clients** (the one customer list), billing requests → invoices. Later, project cost as a draft voucher ([ARCHITECTURE §9.12](../ARCHITECTURE.md#912-posting-to-the-ledger-planned)) |
 
 ## 8. Open decisions
 

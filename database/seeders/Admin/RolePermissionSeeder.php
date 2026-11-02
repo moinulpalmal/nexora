@@ -54,6 +54,8 @@ class RolePermissionSeeder extends Seeder
 
         // One overview per ERP module; each opens the module's dashboard.
         'projects.dashboard' => ['view'],
+        // The ERP's one customer list, kept per company (owner, 2026-11-02).
+        'projects.clients' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         'accounting.dashboard' => ['view'],
         'hrm.dashboard' => ['view'],
         'hrm.departments' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],

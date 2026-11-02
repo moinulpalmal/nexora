@@ -1,6 +1,6 @@
 ---
 name: master-crud
-description: Build or complete a master-data CRUD surface in one of Nexora's ERP modules (Projects, Accounting, HRM, or Admin's Company master) — migration, model, requests, service with its deletion guards, controller, routes and permissions, Inertia list page with form dialogs, sidebar entry, training entry, factory, tests, the optional spreadsheet import, and every satellite registration. Covers the global, restorable, company-scoped and parent-plus-child (ladder) shapes. Invoke explicitly with /master-crud when adding a new reference/lookup table (departments, designations, customers, chart of accounts, companies…) or finishing a half-built one. For Admin system surfaces (users, roles and the like) use /admin-crud instead.
+description: Build or complete a master-data CRUD surface in one of Nexora's ERP modules (Projects, Accounting, HRM, or Admin's Company master) — migration, model, requests, service with its deletion guards, controller, routes and permissions, Inertia list page with form dialogs, sidebar entry, training entry, factory, tests, the optional spreadsheet import, and every satellite registration. Covers the global, restorable, company-scoped and parent-plus-child (ladder) shapes. Invoke explicitly with /master-crud when adding a new reference/lookup table (departments, designations, clients, chart of accounts, companies…) or finishing a half-built one. For Admin system surfaces (users, roles and the like) use /admin-crud instead.
 disable-model-invocation: true
 ---
 
@@ -43,7 +43,7 @@ Read, in this order:
 ## Step 1 — Owner and shape
 
 **Who owns it?** Master data belongs to the module that owns its subject (§9.14) — there is no shared
-"master data" or Settings module: departments and designations are HRM, customers are Accounting,
+"master data" or Settings module: departments and designations are HRM, clients (the one customer list) are Projects,
 companies are Admin (§9.10). `Settings` in this codebase is the user's *own account*, never reference
 data. If the subject straddles two modules, ask.
 

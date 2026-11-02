@@ -123,6 +123,11 @@ return [
             'title_en' => 'Projects overview', 'title_bn' => 'প্রকল্পের সারসংক্ষেপ', 'status' => 'pending',
             'shots' => [],
         ],
+        'projects.clients' => [
+            'route' => 'projects.clients.index', 'guide' => 'projects/clients', 'section' => 'projects', 'sort' => 20,
+            'title_en' => 'Clients', 'title_bn' => 'ক্লায়েন্ট', 'status' => 'written',
+            'shots' => ['overview' => 'The clients of an invented company', 'form' => 'The New client dialog'],
+        ],
         'accounting.dashboard' => [
             'route' => 'accounting.dashboard', 'guide' => 'accounting/dashboard', 'section' => 'accounting', 'sort' => 10,
             'title_en' => 'Accounts overview', 'title_bn' => 'হিসাবের সারসংক্ষেপ', 'status' => 'pending',

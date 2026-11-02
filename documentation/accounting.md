@@ -14,8 +14,10 @@
 ## 1. Overview
 
 Accounting keeps the **books of each company**: a double-entry general ledger, the vouchers that
-feed it, and the statements read from it. It also owns **customers and sales invoices**, because
-Projects bills clients and the ERP must have **one customer list**.
+feed it, and the statements read from it. It also owns **sales invoices**. It does **not** own the
+customer list: the ERP's one customer list is **Projects → Clients**, kept per company (owner,
+2026-11-02, moving it from here — Projects needs a client for every project before Accounting
+exists). Invoices will point at those clients ([`projects.md` §4](projects.md#clients--built)).
 
 | | |
 | --- | --- |
@@ -44,7 +46,7 @@ and ledger ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
   recorded exchange rate.
 - Vouchers: **payment, receipt, journal, contra**, with approval.
 - Ledgers, the trial balance, profit and loss, and the balance sheet.
-- **Minimal receivables (AR)**: customers, sales invoices, and receipts against invoices.
+- **Minimal receivables (AR)**: sales invoices to Projects' clients, and receipts against invoices.
 - Draft vouchers that arrive from other modules ([§5](#5-workflows-and-approvals)).
 
 **Later**
@@ -63,7 +65,6 @@ Build order across the ERP is **Company (Admin) → Projects → Accounting → 
 
 | Phase | Delivers |
 | --- | --- |
-| **Early slice** (ships with Projects) | **Customers**: `accounting/customers`, `accounting.customers.*`. Projects needs a customer for every project before the rest of Accounting exists. |
 | **1 — ledger** | Chart of accounts, fiscal years, currencies and rates, vouchers with approval, ledgers, trial balance, P&L, balance sheet. |
 | **1b — receivables** | Sales invoices (manual, or from Projects' billing requests), receipts against invoices, customer ledger and ageing. |
 | **2 — payables and banking** | Suppliers, bills, payments, bank reconciliation. |
@@ -82,9 +83,10 @@ Build order across the ERP is **Company (Admin) → Projects → Accounting → 
   currency and rate, and a status. It has **voucher lines** (an account and a debit or credit),
   which must balance. When it came from another module it carries a **source link** (a billing
   request, a payroll run).
-- **Customer**: name, contact details, billing currency, credit terms, and the receivable account it
-  posts to.
-- **Sales invoice**: a customer, a date, a currency, and lines. It may come from a Projects billing
+- **Client billing details**: the billing currency, credit terms and receivable account an invoice
+  needs, added to Projects' clients when receivables are built (whether as columns on `clients` or a
+  table of Accounting's own is open, [§8](#8-open-decisions)).
+- **Sales invoice**: a client, a date, a currency, and lines. It may come from a Projects billing
   request. Approving it posts a voucher.
 - **Receipt allocation**: matches a receipt voucher to one or more invoices.
 
@@ -111,7 +113,6 @@ that stops anyone approving their own voucher.
 
 | Permission | Allows |
 | --- | --- |
-| `accounting.customers.{view,create,update,delete}` | Manage customers (the early slice) |
 | `accounting.accounts.{view,create,update,delete}` | Manage the chart of accounts |
 | `accounting.fiscal-years.{view,create,update,close}` | Manage and close fiscal years |
 | `accounting.currencies.{view,manage}` | Currencies and exchange rates |
@@ -125,7 +126,7 @@ that stops anyone approving their own voucher.
 | Module | Accounting uses | Accounting provides |
 | --- | --- | --- |
 | Admin | Companies, user↔company access | — |
-| Projects | Billing requests | Customers, currencies, invoices |
+| Projects | Billing requests, **clients** (the one customer list) | Currencies, invoices |
 | HRM | Payroll draft vouchers (HRM phase 2) | Ledger accounts that payroll posts to |
 
 ## 8. Open decisions
@@ -133,6 +134,8 @@ that stops anyone approving their own voucher.
 - Voucher and invoice numbering: the format, and whether it is per company, per type or per year.
 - The exchange-rate source: typed in daily, or imported (Bangladesh Bank rates)?
 - How are exchange gains and losses on foreign receipts posted?
+- Where a client's billing details live: columns Accounting adds to `clients`, or a table of its own
+  keyed by client.
 - Is there a standard chart of accounts template seeded for each new company?
 - Do vouchers need more than one approval level (for example, above an amount)? This would mean
   revisiting the "no generic engine" decision.

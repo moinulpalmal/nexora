@@ -46,10 +46,12 @@
 | `pending-import-banner` | reopens or cancels the uploader's staged import |
 | `import-result-panel` / `import-reject-list` | a partial import's rejected rows, with the download |
 | `preview-banner` / `preview-widgets` | the 🧪 POC overviews' "Preview" banner and sample-data cards — throwaway with those pages ([`ARCHITECTURE.md` §5](../ARCHITECTURE.md#5-module-registry)) |
+| `no-company-panel` | drawn by every company-scoped ERP list in place of its table when no company is selected ([`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company)); promoted from `hrm/` when Projects → Clients became its second module's user |
 
-Module components that are not shared yet: `components/hrm/no-company-panel.tsx` (drawn by every ERP
-list when no company is selected; promoted here when a second module uses it) and the form dialogs —
-`components/hrm/{department,designation,employee}-form-dialog.tsx`. The employee dialog is the
+Module components that are not shared yet: the form dialogs —
+`components/hrm/{department,designation,employee}-form-dialog.tsx` and
+`components/projects/client-form-dialog.tsx` (the first with free-text `textarea` fields, which take
+the whole row with `field-wide`). The employee dialog is the
 reference for a dialog with a **conditional block** (the sign-in account and its temporary password)
 whose state resets with `formKey`.
 

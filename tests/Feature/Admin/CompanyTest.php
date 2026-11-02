@@ -4,6 +4,7 @@ use App\Enums\RecordStatus;
 use App\Models\Admin\AuditLog;
 use App\Models\Admin\Company;
 use App\Models\Hrm\Department;
+use App\Models\ProjectManagement\Client;
 use App\Models\User;
 
 /*
@@ -181,6 +182,18 @@ test('a company with departments cannot be deleted, deleted departments included
     $this->actingAs(userWithPermissions('admin.companies.delete'));
 
     assertToast($this->delete(route('admin.companies.destroy', $company)), 'warning');
+
+    expect($company->refresh()->trashed())->toBeFalse();
+});
+
+test('a company with clients cannot be deleted, deleted clients included, and the toast names them', function () {
+    $company = Company::factory()->create();
+    Client::factory()->for($company)->count(2)->create()->each->delete();
+
+    $this->actingAs(userWithPermissions('admin.companies.delete'));
+
+    assertToast($this->delete(route('admin.companies.destroy', $company)), 'warning')
+        ->assertSessionHas('inertia.flash_data.toast.message', '2 clients belong to this company. Deactivate the company instead, or delete them for good first.');
 
     expect($company->refresh()->trashed())->toBeFalse();
 });

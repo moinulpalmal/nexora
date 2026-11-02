@@ -67,6 +67,12 @@ class PermissionDescriptions
         'admin.sent-mails.view' => ['summary' => 'See every mail the application sent, with its status and a preview.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Sent Mails'],
 
         'projects.dashboard.view' => ['summary' => 'Open the Projects overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Projects → Overview'],
+        'projects.clients.view' => ['summary' => "Open the selected company's Clients list (active and deleted tabs) and search it.", 'where' => 'Projects → Clients'],
+        'projects.clients.create' => ['summary' => 'Add a client to the selected company.', 'where' => 'Projects → Clients'],
+        'projects.clients.update' => ['summary' => "Change a client's details, and activate or deactivate it.", 'where' => 'Projects → Clients'],
+        'projects.clients.delete' => ['summary' => 'Move clients into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Clients'],
+        'projects.clients.restore' => ['summary' => 'Bring a client back from Deleted.', 'where' => 'Projects → Clients → Deleted'],
+        'projects.clients.force-delete' => ['summary' => 'Permanently delete clients from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Clients → Deleted'],
         'accounting.dashboard.view' => ['summary' => 'Open the Accounts overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Accounts → Overview'],
         'hrm.dashboard.view' => ['summary' => 'Open the HRM overview.', 'note' => 'A preview with sample data for now.', 'where' => 'HRM → Overview'],
         'hrm.departments.view' => ['summary' => "Open the selected company's Departments list (active and deleted tabs) and search it.", 'where' => 'HRM → Departments'],

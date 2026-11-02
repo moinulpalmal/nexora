@@ -5,6 +5,7 @@ import {
     FolderKanban,
     Network,
     GraduationCap,
+    Handshake,
     History,
     IdCard,
     KeyRound,
@@ -46,6 +47,7 @@ import { index as departmentsIndex } from '@/routes/hrm/departments';
 import { index as designationsIndex } from '@/routes/hrm/designations';
 import { index as employeesIndex } from '@/routes/hrm/employees';
 import { dashboard as projectsDashboard } from '@/routes/projects';
+import { index as clientsIndex } from '@/routes/projects/clients';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
 
@@ -84,6 +86,7 @@ export function AppSidebar() {
     const canViewQuickLogin = useCan('admin.quick-login.view');
 
     const canViewProjects = useCan('projects.dashboard.view');
+    const canViewClients = useCan('projects.clients.view');
     const canViewAccounting = useCan('accounting.dashboard.view');
     const canViewHrm = useCan('hrm.dashboard.view');
     const canViewDepartments = useCan('hrm.departments.view');
@@ -145,6 +148,27 @@ export function AppSidebar() {
         .filter((link) => link.visible)
         .map(({ title, href, icon }) => ({ title, href, icon }));
 
+    // Clients, the first real screen, turned the group into a list of links,
+    // each behind its own permission, as HRM's.
+    const projectsNavLinks: (NavItem & { visible: boolean })[] = [
+        {
+            title: 'Overview',
+            href: projectsDashboard(),
+            icon: FolderKanban,
+            visible: canViewProjects,
+        },
+        {
+            title: 'Clients',
+            href: clientsIndex(),
+            icon: Handshake,
+            visible: canViewClients,
+        },
+    ];
+
+    const projectsNavItems: NavItem[] = projectsNavLinks
+        .filter((link) => link.visible)
+        .map(({ title, href, icon }) => ({ title, href, icon }));
+
     // HRM's first real screen turned its group into a list of links, each
     // behind its own permission, like Admin's.
     const hrmNavLinks: (NavItem & { visible: boolean })[] = [
@@ -184,18 +208,7 @@ export function AppSidebar() {
     const navGroups: NavGroup[] = [
         { label: 'Platform', items: mainNavItems },
         { label: 'Admin', items: adminNavItems },
-        {
-            label: 'Projects',
-            items: canViewProjects
-                ? [
-                      {
-                          title: 'Overview',
-                          href: projectsDashboard(),
-                          icon: FolderKanban,
-                      },
-                  ]
-                : [],
-        },
+        { label: 'Projects', items: projectsNavItems },
         {
             label: 'Accounts',
             items: canViewAccounting

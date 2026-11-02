@@ -12,12 +12,12 @@ import DepartmentController from '@/actions/App/Http/Controllers/Hrm/DepartmentC
 import DepartmentImportController from '@/actions/App/Http/Controllers/Hrm/DepartmentImportController';
 import Heading from '@/components/heading';
 import DepartmentFormDialog from '@/components/hrm/department-form-dialog';
-import NoCompanyPanel from '@/components/hrm/no-company-panel';
 import BulkActionBar from '@/components/shared/bulk-action-bar';
 import ColumnFilterRow from '@/components/shared/column-filter-row';
 import ConfirmActionDialog from '@/components/shared/confirm-action-dialog';
 import ImportResultPanel from '@/components/shared/import-result-panel';
 import ListToolbar from '@/components/shared/list-toolbar';
+import NoCompanyPanel from '@/components/shared/no-company-panel';
 import Pagination from '@/components/shared/pagination';
 import PendingImportBanner from '@/components/shared/pending-import-banner';
 import SheetImportDialog from '@/components/shared/sheet-import-dialog';

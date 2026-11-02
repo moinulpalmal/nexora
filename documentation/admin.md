@@ -184,7 +184,7 @@ and — for an enum people pick from on screen — its label. Like the permissio
 
 - Every create/update/delete/restore of `User`, `Role`, `Permission`, `Company`, `MailSetting`,
   `QuickLoginSetting`, `BrandingSetting`, `ImportLimit`, the HRM `Department`, `Designation` and
-  `Employee`, and `SheetImport` (staged, confirmed, cancelled — not the rows it wrote) is recorded with
+  `Employee`, the Projects `Client`, and `SheetImport` (staged, confirmed, cancelled — not the rows it wrote) is recorded with
   old and new values; secrets (`password`, `remember_token`, the SMTP password) never are. The
   record-type filter is the morph map (`AppServiceProvider::MORPH_MAP`).
 - Also recorded: role, permission and company grants (`companies-changed`), administrator password resets, force deletes, mails
@@ -294,7 +294,7 @@ assertions turn auditing on with `config(['audit.console' => true])` after the f
 > [`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company).
 
 Nexora serves **one or several companies of an organization in one installation**. Every HRM, Accounting and
-Projects record belongs to a company, and each company keeps its own ledger and payroll. Admin owns
+Projects record (a Projects client included) belongs to a company, and each company keeps its own ledger and payroll. Admin owns
 the company list because it is master data every module needs and no one business module owns.
 
 ### 10.1 The Company master — Admin → Companies
@@ -314,8 +314,9 @@ the company list because it is master data every module needs and no one busines
   `admin.companies.force-delete`. A company something belongs to cannot be ticked; the server re-checks
   each and names any it kept in a `warning` toast.
 - **Deletion guard:** `CompanyService::deletionBlocker()` refuses delete and permanent delete while
-  any department or employee belongs to the company, deleted ones included (the counts drop the
-  company scope) — departments are checked first, then employees, and the sentence names which. The button is disabled with the reason on hover; the server answers a `warning` toast.
+  any department, employee or Projects client belongs to the company, deleted ones included (the
+  counts drop the company scope) — departments are checked first, then employees, then clients, and
+  the sentence names which. The button is disabled with the reason on hover; the server answers a `warning` toast.
   Deactivating is the normal way to retire a company.
 - No spreadsheet import — a handful of rows, entered by hand.
 - Permissions: `admin.companies.{view,create,update,delete,restore,force-delete}` — the `admin` role

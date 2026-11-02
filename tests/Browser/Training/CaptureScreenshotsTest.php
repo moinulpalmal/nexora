@@ -15,6 +15,7 @@ use App\Models\Admin\SentMail;
 use App\Models\Hrm\Department;
 use App\Models\Hrm\Designation;
 use App\Models\Hrm\Employee;
+use App\Models\ProjectManagement\Client;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
 use App\Services\Training\TrainingRegistry;
@@ -238,6 +239,32 @@ test('hrm.departments', function () {
         ->click('[data-test="import-departments"]')
         ->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'import');
+});
+
+test('projects.clients', function () {
+    $key = 'projects.clients';
+    $actor = trainingActor();
+    $companies = trainingCompanies();
+    $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
+
+    $clients = [
+        ['NRT', 'Northwind Retail Ltd.', 'Sadia Islam', '+880 1711 223344', 'projects@northwind.example.com'],
+        ['BLU-01', 'Blue Harbour Shipping', 'Imran Chowdhury', '+880 1819 556677', 'imran@blueharbour.example.com'],
+        ['GRN', 'Greenfield Foods Ltd.', 'Rumana Ahmed', '+880 1912 334455', 'contact@greenfield.example.com'],
+        ['ORB', 'Orbit Software GmbH', 'Lena Vogel', '+49 30 1234567', 'lena.vogel@orbit.example.com'],
+    ];
+
+    foreach ($clients as [$code, $name, $contact, $phone, $email]) {
+        Client::factory()->for($companies['atl'])->create([
+            'code' => $code, 'name' => $name, 'contact_person' => $contact, 'phone' => $phone, 'email' => $email,
+        ]);
+    }
+
+    $page = visitForTraining(route('projects.clients.index', absolute: false))->assertSee('Northwind Retail Ltd.');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-client"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
 });
 
 test('hrm.designations', function () {
