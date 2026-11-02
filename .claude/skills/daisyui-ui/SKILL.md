@@ -28,7 +28,8 @@ components.
 5. **Feedback comes from the server** as a flash toast (`success` / `warning` / `error` / `info`);
    the client does not invent its own success messages (§8.8).
 6. **Every list is paginated, sortable and filtered per column** (§8.6) — no unbounded tables, no
-   single global search box.
+   single global search box. The one exception is a short catalogue read from code, not a table
+   (Admin → Enums): cards grouped by module, filtered in the browser (§8.6).
 7. **Merge classes with `cn()`** (`lib/utils.ts`), which understands daisyUI variants — never string
    concatenation.
 8. **Never edit generated files**: `resources/js/actions|routes|wayfinder`, `lib/enums.ts`.

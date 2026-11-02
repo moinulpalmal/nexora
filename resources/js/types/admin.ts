@@ -104,6 +104,16 @@ export type PermissionListItem = {
     help: PermissionHelp;
 };
 
+/** One enum on Admin → Enums — `EnumService::catalogue()`. */
+export type EnumCatalogueItem = {
+    id: string;
+    name: string;
+    module: string;
+    summary: string;
+    labelled: boolean;
+    cases: { case: string; value: string | number; label: string | null }[];
+};
+
 /** One audit row — `AuditLogService::describe()`. */
 export type AuditLogItem = {
     id: number;

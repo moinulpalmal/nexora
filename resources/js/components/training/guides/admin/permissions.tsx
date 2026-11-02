@@ -109,6 +109,11 @@ export default function PermissionsGuide() {
                     en="Giving a permission to a role."
                     bn="কোনো রোলে পারমিশন যোগ করা।"
                 />
+                <RelatedGuide
+                    to="admin.enums"
+                    en="The other catalogue defined in code: enums."
+                    bn="কোডে সংজ্ঞায়িত আরেকটি তালিকা: এনাম।"
+                />
             </GuideSection>
         </Guide>
     );

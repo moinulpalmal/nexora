@@ -95,6 +95,11 @@ const { draft, visit, setFilter, clear, hasActiveFilter, refresh, refreshing } =
 <Pagination page={things} />
 ```
 
+**The one exception** is a short catalogue read from code rather than a table —
+`pages/admin/enums/index.tsx`: one card per item grouped by module, a search box and a module
+`Combobox` filtered in the browser, no pagination ([`ARCHITECTURE.md` §8.6](../ARCHITECTURE.md#86-every-list-is-paginated-sortable-and-filtered-per-column)).
+A database table always uses the list above.
+
 ### 5.2 A form dialog
 
 Reference: `components/admin/user-form-dialog.tsx`.

@@ -328,6 +328,13 @@ test('admin.permissions', function () {
     captureTrainingShot($page, 'admin.permissions', 'overview');
 });
 
+test('admin.enums', function () {
+    trainingActor();
+
+    $page = visitForTraining(route('admin.enums.index', absolute: false))->assertSee('ProjectStage');
+    captureTrainingShot($page, 'admin.enums', 'overview');
+});
+
 test('admin.audit-logs', function () {
     $key = 'admin.audit-logs';
     trainingActor();

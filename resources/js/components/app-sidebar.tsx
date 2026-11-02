@@ -10,6 +10,7 @@ import {
     KeyRound,
     Landmark,
     LayoutGrid,
+    ListTree,
     Mail,
     ShieldCheck,
     SlidersHorizontal,
@@ -35,6 +36,7 @@ import { dashboard as accountingDashboard } from '@/routes/accounting';
 import { edit as applicationSettingsEdit } from '@/routes/admin/application-settings';
 import { index as auditLogsIndex } from '@/routes/admin/audit-logs';
 import { index as companiesIndex } from '@/routes/admin/companies';
+import { index as enumsIndex } from '@/routes/admin/enums';
 import { index as permissionsIndex } from '@/routes/admin/permissions';
 import { index as rolesIndex } from '@/routes/admin/roles';
 import { index as sentMailsIndex } from '@/routes/admin/sent-mails';
@@ -72,6 +74,7 @@ export function AppSidebar() {
     const canViewRoles = useCan('admin.roles.view');
     const canViewCompanies = useCan('admin.companies.view');
     const canViewPermissions = useCan('admin.permissions.view');
+    const canViewEnums = useCan('admin.enums.view');
     const canViewAuditLogs = useCan('admin.audit-logs.view');
     const canViewSentMails = useCan('admin.sent-mails.view');
 
@@ -111,6 +114,12 @@ export function AppSidebar() {
             href: permissionsIndex(),
             icon: KeyRound,
             visible: canViewPermissions,
+        },
+        {
+            title: 'Enums',
+            href: enumsIndex(),
+            icon: ListTree,
+            visible: canViewEnums,
         },
         {
             title: 'Audit Log',

@@ -215,6 +215,26 @@ export const SHEET_FILE_TYPE_LABELS: Record<SheetFileType, string> = {
     xls: 'XLS',
 };
 
+export const PROJECT_STAGE = {
+    Upcoming: 'upcoming',
+    Evaluation: 'evaluation',
+    Running: 'running',
+    OnHold: 'on-hold',
+    Completed: 'completed',
+    Cancelled: 'cancelled',
+} as const;
+
+export type ProjectStage = (typeof PROJECT_STAGE)[keyof typeof PROJECT_STAGE];
+
+export const PROJECT_STAGE_LABELS: Record<ProjectStage, string> = {
+    upcoming: 'Upcoming',
+    evaluation: 'Evaluation',
+    running: 'Running',
+    'on-hold': 'On Hold',
+    completed: 'Completed',
+    cancelled: 'Cancelled',
+};
+
 export const THEME_MODES: Record<Theme, 'light' | 'dark'> = {
     system: 'light',
     light: 'light',

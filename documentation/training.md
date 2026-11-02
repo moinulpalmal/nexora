@@ -196,6 +196,7 @@ change made untrue, in both languages. The gate cannot see stale prose (§5).
 | Port | Dashboard; Admin — Users, Roles, Permissions, Audit Log, Sent Mails, Application Settings; Settings — Profile, Security, Appearance | ✅ written 2026-10-27; **Bangla awaits the owner's read** |
 | Multi-company | Admin — Companies (new), Users (the Companies dialog added); HRM — Departments (new, with its import) | ✅ written 2026-10-29; **Bangla awaits the owner's read** |
 | HRM-lite | HRM — Designations (new, with its import), Employees (new: the sign-in account, the import); Departments, Designations and Companies gained the "used by employees" deletion guards; Users and Security gained the temporary password | ✅ written 2026-10-29; **Bangla awaits the owner's read** |
+| Enum catalogue | Admin — Enums (new, read-only); every screenshot recaptured for the new Admin → Enums sidebar link | ✅ written 2026-11-02; **Bangla awaits the owner's read** |
 | ERP overviews | Projects, Accounts and HRM overviews | `pending` — sample-data previews; written when each overview shows real data |
 
 **There is no backlog, and there is no "next change"** (owner, 2026-10-29): every change that adds or

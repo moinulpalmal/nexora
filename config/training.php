@@ -77,6 +77,11 @@ return [
             'title_en' => 'Permissions', 'title_bn' => 'পারমিশন', 'status' => 'written',
             'shots' => ['overview' => 'The permission catalogue'],
         ],
+        'admin.enums' => [
+            'route' => 'admin.enums.index', 'guide' => 'admin/enums', 'section' => 'admin', 'sort' => 35,
+            'title_en' => 'Enums', 'title_bn' => 'এনাম', 'status' => 'written',
+            'shots' => ['overview' => 'The enum catalogue, grouped by module'],
+        ],
         'admin.audit-logs' => [
             'route' => 'admin.audit-logs.index', 'guide' => 'admin/audit-logs', 'section' => 'admin', 'sort' => 40,
             'title_en' => 'Audit Log', 'title_bn' => 'অডিট লগ', 'status' => 'written',

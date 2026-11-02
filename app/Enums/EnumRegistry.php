@@ -10,6 +10,7 @@ use App\Enums\Admin\MailTransport;
 use App\Enums\Imports\DuplicateAction;
 use App\Enums\Imports\ImportStatus;
 use App\Enums\Imports\SheetFileType;
+use App\Enums\ProjectManagement\ProjectStage;
 use InvalidArgumentException;
 
 /**
@@ -51,6 +52,9 @@ final class EnumRegistry
         DuplicateAction::class,
         ImportStatus::class,
         SheetFileType::class,
+
+        // ProjectManagement
+        ProjectStage::class,
     ];
 
     /**

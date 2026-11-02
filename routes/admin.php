@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\ApplicationSettingController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BrandingSettingController;
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Admin\EnumController;
 use App\Http\Controllers\Admin\ImportLimitController;
 use App\Http\Controllers\Admin\MailSettingController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -100,6 +101,10 @@ Route::middleware(['auth', 'auth.session'])
         Route::get('permissions', [PermissionController::class, 'index'])
             ->middleware('permission:admin.permissions.view')
             ->name('permissions.index');
+
+        Route::get('enums', [EnumController::class, 'index'])
+            ->middleware('permission:admin.enums.view')
+            ->name('enums.index');
 
         Route::get('audit-logs', [AuditLogController::class, 'index'])
             ->middleware('permission:admin.audit-logs.view')

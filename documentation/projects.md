@@ -1,6 +1,6 @@
 # Projects Module — Reference
 
-> **📋 Planned — nothing built.** This is the agreed scope for the Project Management module (owner,
+> **📋 Planned — only the project stage enum is built** ([§4](#project-stages)). This is the agreed scope for the Project Management module (owner,
 > 2026-10-28). It describes *what* the module will do and *why*; where things will live and what they
 > are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is built, this
 > file becomes its reference and the planned parts shrink as they ship.
@@ -65,7 +65,7 @@ modules:
 
 - **Project**: belongs to a company and a **customer** (Accounting's master). It has a project
   manager (an employee), a billing method (milestone or time-and-materials), a currency, start and
-  end dates, a budget, and a status (planned, active, on hold, completed, cancelled).
+  end dates, a budget, a **stage** ([below](#project-stages)) and the usual Active/Inactive status.
 - **Milestone**: a dated deliverable of one project. Under milestone billing it carries the amount
   to bill on completion.
 - **Task**: belongs to a project and optionally a milestone. It has an assignee (a project member),
@@ -77,6 +77,32 @@ modules:
 - **Billing request**: a project, a source (a milestone, or a set of timesheet entries), an amount
   in the project currency, and a status (ready to invoice, invoiced, cancelled). Once invoiced it
   links to the Accounting invoice.
+
+### Project stages
+
+*Built 2026-11-02 as `App\Enums\ProjectManagement\ProjectStage` (id `project-stage`). The projects
+table that will use it is not built yet.* The organizations using Nexora deliver projects for client
+companies, and every project passes through these stages (owner, 2026-11-02):
+
+| Stage | Stored | Means |
+| --- | --- | --- |
+| Upcoming | `upcoming` | A lead has been noted. **Every project starts here.** |
+| Evaluation | `evaluation` | Being assessed or quoted before a contract, waiting for the client's decision. |
+| Running | `running` | Contracted and in delivery. |
+| On Hold | `on-hold` | Paused, by the client or the organization. |
+| Completed | `completed` | Delivered. *Closed.* |
+| Cancelled | `cancelled` | The bid was lost or the project was abandoned. *Closed.* |
+
+- **One stage at a time.** A project is always in exactly one stage. The usual path is
+  Upcoming → Evaluation → Running → Completed, but a project may move from any stage to any other,
+  forward or back.
+- **Reopening is a separate permission.** Moving a project *out* of a closed stage (Completed or
+  Cancelled) needs `projects.projects.reopen` ([§6](#6-draft-permission-catalogue)). The guard will
+  live in the project service; the enum only answers `isClosed()`.
+- **Stage is not the Active/Inactive status.** A project also carries the standard status flag
+  ([ARCHITECTURE §9.3.1](../ARCHITECTURE.md#931-activeinactive-status)). Inactive *archives* a
+  project at any stage: it is kept and still reported on, but no longer offered when logging hours,
+  assigning tasks or raising billing. Cancelled is the business outcome. The two are independent.
 
 ### Billing rate and cost rate
 
@@ -117,6 +143,7 @@ and `PermissionDescriptions` when its screen is built.
 | Permission | Allows |
 | --- | --- |
 | `projects.projects.{view,create,update,delete}` | Manage projects and their contract terms |
+| `projects.projects.reopen` | Move a project out of Completed or Cancelled ([§4](#project-stages)) |
 | `projects.milestones.{view,create,update,delete}` | Manage milestones |
 | `projects.tasks.{view,create,update,delete}` | Manage tasks |
 | `projects.members.{view,manage}` | Staff a project and set billing rates |
@@ -136,6 +163,9 @@ and `PermissionDescriptions` when its screen is built.
 
 ## 8. Open decisions
 
+- Is moving a project between stages part of `projects.projects.update`, or its own permission?
+- Is a dated history of stage changes kept, or is the audit trail enough?
+- The badge colour of each stage on the list and board.
 - Can a member see tasks across the whole project, or only their own?
 - Who can see the cost rate and the profitability report? This is salary-derived data, so the
   likely answer is a separate permission.

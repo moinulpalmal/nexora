@@ -52,6 +52,7 @@ class PermissionDescriptions
         'admin.companies.force-delete' => ['summary' => 'Permanently delete companies from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Admin → Companies → Deleted'],
 
         'admin.permissions.view' => ['summary' => 'See every permission, what it allows and which roles hold it.', 'where' => 'Admin → Permissions'],
+        'admin.enums.view' => ['summary' => 'See every fixed list of values the application uses — its choices, and what is stored for each.', 'where' => 'Admin → Enums'],
 
         'admin.audit-logs.view' => ['summary' => 'Read the audit trail: who changed what, when, with the old and new values.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Audit Log'],
 

@@ -21,6 +21,7 @@
 | g. Sent Mails | `Admin\SentMailController` | `pages/admin/sent-mails/index.tsx` | `admin.sent-mails.view` ★ |
 | h. Application Settings → Branding | `Admin\BrandingSettingController`, `Admin\BrandingService` | `pages/admin/application-settings.tsx` | `admin.branding.{view,update}` |
 | i. Application Settings → Import Limits | `Admin\ImportLimitController`, `Admin\ImportLimitService` | same page | `admin.import-limits.{view,update}` ★ |
+| k. Enum catalogue ([§3.4](#34-the-enum-catalogue)) | `Admin\EnumController`, `Admin\EnumService` | `pages/admin/enums/index.tsx` | `admin.enums.view` |
 | j. Companies ([§10](#10-companies)) | `Admin\CompanyController`, `Admin\CompanyService`, `Admin\SelectedCompany` | `pages/admin/companies/index.tsx` | `admin.companies.*`, `admin.users.assign-companies` |
 
 ★ `SUPER_ADMIN_ONLY` — no role receives it by rule; an administrator can still grant it by hand.
@@ -129,6 +130,7 @@ its sentence, and the code that checks it — `PermissionDescriptionsTest` fails
 | `admin.companies.view` / `create` / `update` / `delete` / `restore` / `force-delete` | the Company master ([§10.1](#101-the-company-master--admin--companies)) |
 | `admin.roles.view` / `create` / `update` / `delete` | roles |
 | `admin.permissions.view` | the catalogue |
+| `admin.enums.view` | the enum catalogue ([§3.4](#34-the-enum-catalogue)) |
 | `admin.audit-logs.view` ★ | the audit trail |
 | `admin.mail-settings.view` / `update` ★ | Mail Server tab, test mail |
 | `admin.quick-login.view` / `update` ★ | Quick Login tab |
@@ -158,6 +160,25 @@ Create and edit in a dialog: a kebab-case name and the grouped permission picker
 for what it allows). A role still held by users cannot be deleted (`warning` — unassign it first); the
 super-admin role cannot be edited or deleted (`error`). Every grant change is audited by name
 (`permissions-changed`), and a user whose roles change is notified.
+
+### 3.4 The enum catalogue
+
+**Admin → Enums** (`admin/enums`, `admin.enums.view`; owner, 2026-11-02) shows every enum the
+application ships: each fixed list of choices, what it is for, its cases, the value stored for each
+and — for an enum people pick from on screen — its label. Like the permission catalogue it is
+**read-only, because enums are code**: a case is added or renamed in its PHP enum, never here.
+
+- **Source.** `Admin\EnumService::catalogue()` reads `EnumRegistry::toArray()` (ARCHITECTURE §9.8),
+  so an enum appears the moment it is registered. The module is the enum's namespace folder
+  (`General` for the root of `app/Enums/`, `Project Management` for `ProjectManagement/`), and the
+  one-line purpose is the first paragraph of the enum's class docblock, with `{@see …}` references
+  reduced to plain names. **That docblock paragraph is therefore user-visible copy** — write it as a
+  sentence a person can read.
+- **Layout.** One card per enum, grouped by module, with a search box (enum name, id, purpose, case,
+  stored value or label) and a module filter, both applied in the browser. It is **not paginated**:
+  a short catalogue from code is the one exception to the list standard (ARCHITECTURE §8.6).
+- **Who.** `admin.enums.view` reaches `admin` (the `admin.` prefix) and `viewer` (every `.view`) by
+  rule; enum values are not secret.
 
 ## 4. The audit trail
 

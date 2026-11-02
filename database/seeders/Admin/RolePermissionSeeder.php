@@ -37,6 +37,8 @@ class RolePermissionSeeder extends Seeder
         'admin.companies' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // `view` alone: the catalogue is defined in code, never edited in the UI.
         'admin.permissions' => ['view'],
+        // `view` alone: enums are code, like the permission catalogue.
+        'admin.enums' => ['view'],
         // `view` alone: the audit trail is read, never written or corrected.
         'admin.audit-logs' => ['view'],
         /*

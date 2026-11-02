@@ -61,11 +61,12 @@ app/
   Enums/                      FilterType, RecordStatus, Theme, EnumRegistry (module-less)
   Enums/Admin/                AuditEvent, MailEncryption, MailTransport
   Enums/Imports/              DuplicateAction, ImportStatus, SheetFileType (§9.13)
+  Enums/ProjectManagement/    ProjectStage (the project lifecycle; documentation/projects.md §4)
   Exceptions/Admin/           MailNotConfiguredException
   Exceptions/Imports/         SheetImportException
   Http/Controllers/           HomeController, NotificationController (module-less)
   Http/Controllers/Admin/     User, Role, Company, Permission, AuditLog, ApplicationSetting,
-                              MailSetting, QuickLoginSetting, BrandingSetting, SentMail
+                              MailSetting, QuickLoginSetting, BrandingSetting, SentMail, Enum
   Http/Controllers/Settings/  Profile, Security, Appearance, CompanySelection (the user's own account)
   Http/Controllers/Imports/   SheetImportController — the abstract base every importer extends
   Http/Controllers/Training/  TrainingController (index, show, panel)
@@ -88,7 +89,7 @@ app/
   Observers/                  ActorObserver
   Providers/                  AppServiceProvider, FortifyServiceProvider
   Services/Admin/             UserService, RoleService, CompanyService, SelectedCompany (§9.10),
-                              PermissionService, PermissionDescriptions, AuditRecorder,
+                              PermissionService, PermissionDescriptions, EnumService, AuditRecorder,
                               AuditLogService, MailSettingService, QuickLoginService,
                               BrandingService, UserCredentialMailer
   Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer),
@@ -203,7 +204,8 @@ follow [§11](#11-adding-a-new-module) for the rest and switch the status to ✅
 
 **Admin** owns: users (create, edit, deactivate, soft delete, restore, force delete, set password,
 assign roles, grant companies, avatar), roles (with the permission picker), the Company master
-([§9.10](#910-multi-company)), the read-only permission catalogue, the
+([§9.10](#910-multi-company)), the read-only permission catalogue, the read-only enum catalogue
+([§9.8](#98-the-enum-registry)), the
 audit log viewer, the Application Settings hub (Mail Server, Quick Login, Branding, Import Limits tabs)
 and Sent Mails. Full
 reference: [`documentation/admin.md`](documentation/admin.md).
@@ -231,7 +233,9 @@ captured from invented data by `composer training:screens`. **Every GET screen m
 **Projects** runs client projects from contract to billing request: projects for a customer,
 milestones, tasks, members (Employees, each with a per-contract billing rate), approved timesheets,
 and budget against actual. It raises billing requests; it never issues invoices. Namespace
-`ProjectManagement`, prefix `projects.` so permission names stay short. Reference:
+`ProjectManagement`, prefix `projects.` so permission names stay short. **Built so far: the
+`ProjectStage` enum** (Upcoming, Evaluation, Running, On Hold, Completed, Cancelled — one stage at a
+time, free moves, reopening a closed one behind its own permission; owner, 2026-11-02). Reference:
 [`documentation/projects.md`](documentation/projects.md).
 
 **Accounting** keeps each company's double-entry ledger: chart of accounts, fiscal years (default
@@ -384,6 +388,10 @@ Values are compared as strings.
 - **Frontend:** `hooks/use-list-filters.ts` (400 ms debounce, reset to page 1, refresh on focus) with
   `components/shared/{list-toolbar,column-filter-row,sortable-header,pagination}.tsx`. The reference
   page is `pages/admin/users/index.tsx`.
+- **The one exception is Admin → Enums** (owner, 2026-11-02): a short catalogue read from code
+  (`EnumRegistry`), not a table, drawn as one card per enum grouped by module, with a search box and
+  a module filter applied in the browser and no pagination. Another code-defined catalogue may take
+  the same shape; a database table never does.
 - A list that reads newest first overrides `ListRequest::defaultDirection()`; core keys (`sort`,
   `direction`, `per_page`, `filter`) always win over a surface's extra `filterValues()`.
 - **Bulk actions** *(owner, 2026-10-29; first on Companies and Departments)*: a tick-box column, a
@@ -564,7 +572,9 @@ when there is none, and `app.blade.php` links the uploaded favicon (falling back
 
 `App\Enums\EnumRegistry::CLASSES` lists every enum (hand-maintained); `EnumRegistryTest` scans
 `app/Enums/` and fails on a missing one and on a stale `lib/enums.ts`. Run `php artisan enums:sync`
-after changing an enum.
+after changing an enum. **Admin → Enums** shows the registry to people (`documentation/admin.md`
+§3.4), and takes each enum's purpose from the first paragraph of its class docblock — so that
+paragraph is user-visible copy.
 
 ### 9.9 Development quick login
 
