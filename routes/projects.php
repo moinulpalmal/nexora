@@ -10,6 +10,7 @@ use App\Http\Controllers\ProjectManagement\SupplierCategoryController;
 use App\Http\Controllers\ProjectManagement\SupplierController;
 use App\Http\Controllers\ProjectManagement\TenderTypeController;
 use App\Http\Controllers\ProjectManagement\UnitController;
+use App\Http\Controllers\ProjectManagement\VerificationItemController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -276,4 +277,31 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:projects.certifications.force-delete')
             ->name('certifications.force-delete');
+
+        // Kept per company (owner, 2026-11-03); what will use an item is still
+        // to be named.
+        Route::delete('verification-items/bulk', [VerificationItemController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.verification-items.delete')
+            ->name('verification-items.bulk-destroy');
+
+        Route::delete('verification-items/bulk/force', [VerificationItemController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.verification-items.force-delete')
+            ->name('verification-items.bulk-force-delete');
+
+        Route::resource('verification-items', VerificationItemController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.verification-items.view')
+            ->middlewareFor(['store'], 'permission:projects.verification-items.create')
+            ->middlewareFor(['update'], 'permission:projects.verification-items.update')
+            ->middlewareFor(['destroy'], 'permission:projects.verification-items.delete');
+
+        Route::put('verification-items/{verification_item}/restore', [VerificationItemController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.verification-items.restore')
+            ->name('verification-items.restore');
+
+        Route::delete('verification-items/{verification_item}/force', [VerificationItemController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.verification-items.force-delete')
+            ->name('verification-items.force-delete');
     });

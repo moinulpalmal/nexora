@@ -10,6 +10,7 @@ use App\Models\ProjectManagement\Client;
 use App\Models\ProjectManagement\Product;
 use App\Models\ProjectManagement\ProductCategory;
 use App\Models\ProjectManagement\Supplier;
+use App\Models\ProjectManagement\VerificationItem;
 use App\Services\ProjectManagement\ProductCategoryService;
 use Illuminate\Support\Facades\DB;
 
@@ -141,8 +142,8 @@ class CompanyService
     */
 
     /**
-     * Refused while any department, employee, client, supplier, product or
-     * product category belongs to the company.
+     * Refused while any department, employee, client, supplier, product,
+     * product category or verification item belongs to the company.
      *
      * Counted with the company scope removed and deleted rows included
      * (§9.14): whether a row is in use is a question about the database, not
@@ -218,6 +219,17 @@ class CompanyService
                 .'|[2,*] :count product categories belong to this company. Deactivate the company instead, or delete them for good first.',
                 $productCategories,
                 ['count' => $productCategories],
+            );
+        }
+
+        $verificationItems = VerificationItem::withoutGlobalScopes()->where('company_id', $company->id)->count();
+
+        if ($verificationItems > 0) {
+            return trans_choice(
+                '{1} One verification item belongs to this company. Deactivate the company instead, or delete that verification item for good first.'
+                .'|[2,*] :count verification items belong to this company. Deactivate the company instead, or delete them for good first.',
+                $verificationItems,
+                ['count' => $verificationItems],
             );
         }
 

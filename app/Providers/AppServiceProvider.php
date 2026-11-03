@@ -22,6 +22,7 @@ use App\Models\ProjectManagement\Supplier;
 use App\Models\ProjectManagement\SupplierCategory;
 use App\Models\ProjectManagement\TenderType;
 use App\Models\ProjectManagement\Unit;
+use App\Models\ProjectManagement\VerificationItem;
 use App\Models\SheetImport;
 use App\Models\User;
 use App\Services\Admin\MailSettingService;
@@ -60,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
         'client' => Client::class,
         'product-category' => ProductCategory::class,
         'product' => Product::class,
+        'verification-item' => VerificationItem::class,
         'tender-type' => TenderType::class,
         'supplier-category' => SupplierCategory::class,
         'unit' => Unit::class,

@@ -111,8 +111,8 @@ export default function CompaniesGuide() {
                         bn="কোনো কোম্পানিকে অবসরে পাঠাতে এটি সম্পাদনা করে অবস্থা Inactive করুন। তখন আর কেউ এটি বেছে নিতে পারবেন না, তবে এর রেকর্ডগুলো থেকে যাবে।"
                     />
                     <Step
-                        en="To delete several at once, tick their rows — the box in the heading ticks every row on the page — and press Delete in the bar that appears. A company that departments, employees, clients, suppliers, products or product categories belong to cannot be ticked."
-                        bn="একসাথে কয়েকটি মুছতে সারিগুলোতে টিক দিন — শিরোনামের বক্সটি পেজের সব সারিতে টিক দেয় — তারপর যে বারটি দেখা যায় তাতে Delete চাপুন। যে কোম্পানির অধীনে বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী, পণ্য বা পণ্যের শ্রেণি আছে সেটিতে টিক দেওয়া যায় না।"
+                        en="To delete several at once, tick their rows — the box in the heading ticks every row on the page — and press Delete in the bar that appears. A company that departments, employees, clients, suppliers, products, product categories or verification items belong to cannot be ticked."
+                        bn="একসাথে কয়েকটি মুছতে সারিগুলোতে টিক দিন — শিরোনামের বক্সটি পেজের সব সারিতে টিক দেয় — তারপর যে বারটি দেখা যায় তাতে Delete চাপুন। যে কোম্পানির অধীনে বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী, পণ্য, পণ্যের শ্রেণি বা যাচাইয়ের বিষয় আছে সেটিতে টিক দেওয়া যায় না।"
                     />
                     <Step
                         en="A deleted company waits on the Deleted tab, where it can be restored or deleted for good — one at a time, or ticked together and removed with Delete permanently."
@@ -160,8 +160,8 @@ export default function CompaniesGuide() {
                 />
                 <Bullets>
                     <Bullet
-                        en="The delete button is disabled while any department, employee, client, supplier, product or product category belongs to the company; point at it to read why."
-                        bn="কোম্পানির অধীনে কোনো বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী, পণ্য বা পণ্যের শ্রেণি থাকলে মোছার বোতাম বন্ধ থাকে; কারণ জানতে এর ওপর মাউস রাখুন।"
+                        en="The delete button is disabled while any department, employee, client, supplier, product, product category or verification item belongs to the company; point at it to read why."
+                        bn="কোম্পানির অধীনে কোনো বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী, পণ্য, পণ্যের শ্রেণি বা যাচাইয়ের বিষয় থাকলে মোছার বোতাম বন্ধ থাকে; কারণ জানতে এর ওপর মাউস রাখুন।"
                     />
                 </Bullets>
                 <ListBasics deletedTab />
@@ -210,8 +210,13 @@ export default function CompaniesGuide() {
                 />
                 <Message
                     text="13 product categories belong to this company. Deactivate the company instead, or delete them for good first."
-                    en="The same rule for Projects product categories, checked last. Every company made on this screen starts with 13, so a company is deleted only after they are deleted for good on Projects → Product Categories."
-                    bn="Projects-এর পণ্যের শ্রেণির জন্যও একই নিয়ম, সবশেষে যাচাই হয়। এই স্ক্রিনে বানানো প্রতিটি কোম্পানি ১৩টি শ্রেণি নিয়ে শুরু হয়, তাই Projects → Product Categories থেকে সেগুলো চিরতরে মোছার পরেই কোম্পানিটি মোছা যায়।"
+                    en="The same rule for Projects product categories, checked after products. Every company made on this screen starts with 13, so a company is deleted only after they are deleted for good on Projects → Product Categories."
+                    bn="Projects-এর পণ্যের শ্রেণির জন্যও একই নিয়ম, পণ্যের পরে যাচাই হয়। এই স্ক্রিনে বানানো প্রতিটি কোম্পানি ১৩টি শ্রেণি নিয়ে শুরু হয়, তাই Projects → Product Categories থেকে সেগুলো চিরতরে মোছার পরেই কোম্পানিটি মোছা যায়।"
+                />
+                <Message
+                    text="2 verification items belong to this company. Deactivate the company instead, or delete them for good first."
+                    en="The same rule for Projects verification items, checked last. Delete them for good on Projects → Verification Items."
+                    bn="Projects-এর যাচাইয়ের বিষয়ের জন্যও একই নিয়ম, সবশেষে যাচাই হয়। Projects → Verification Items থেকে এগুলো চিরতরে মুছুন।"
                 />
             </GuideSection>
 

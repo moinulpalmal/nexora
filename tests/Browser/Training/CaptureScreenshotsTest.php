@@ -22,6 +22,7 @@ use App\Models\ProjectManagement\ProductCategory;
 use App\Models\ProjectManagement\Supplier;
 use App\Models\ProjectManagement\SupplierCategory;
 use App\Models\ProjectManagement\TenderType;
+use App\Models\ProjectManagement\VerificationItem;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
 use App\Services\ProjectManagement\ProductCategoryService;
@@ -306,6 +307,23 @@ test('projects.product-categories', function () {
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-product-category"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
+test('projects.verification-items', function () {
+    $key = 'projects.verification-items';
+    $actor = trainingActor();
+    $companies = trainingCompanies();
+    $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
+
+    foreach (['Trade licence checked', 'Tax certificate checked', 'Bank guarantee received', 'Site visited'] as $name) {
+        VerificationItem::factory()->for($companies['atl'])->create(['name' => $name]);
+    }
+
+    $page = visitForTraining(route('projects.verification-items.index', absolute: false))->assertSee('Trade licence checked');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-verification-item"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 

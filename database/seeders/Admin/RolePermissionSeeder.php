@@ -60,6 +60,8 @@ class RolePermissionSeeder extends Seeder
         // Kept per company, each starting with a starter set (owner, 2026-11-03).
         'projects.product-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         'projects.products' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        // Kept per company; what will use an item is still to be named (owner, 2026-11-03).
+        'projects.verification-items' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Group-wide (§9.10): one list every company's suppliers are classified by (owner, 2026-11-02).
         'projects.supplier-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // The ERP's one supplier list, kept per company (owner, 2026-11-02).

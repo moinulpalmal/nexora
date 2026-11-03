@@ -24,7 +24,7 @@ sent mail). Business modules are added on top of it, one module per folder in ev
 ([§4](#4-the-organizing-rule)).
 
 The first business modules are **Project Management**, **Accounts** and **HRM**. Each is a 🧪 POC,
-two with their first slices built (Projects → Clients, Product Categories, Products, Suppliers, Supplier Categories, Tender Types, Units of Measure, Certification Categories, Certifications; HRM → Departments, Designations, Employees);
+two with their first slices built (Projects → Clients, Product Categories, Products, Suppliers, Supplier Categories, Tender Types, Units of Measure, Certification Categories, Certifications, Verification Items; HRM → Departments, Designations, Employees);
 their agreed scope is in [§5](#5-module-registry) and in their module docs.
 
 Accounts are **created by administrators only** — there is no public registration — and sign in with
@@ -73,7 +73,7 @@ app/
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5);
                               ProjectManagement/ also Client, ProductCategory, Product, Supplier, SupplierCategory,
-                              TenderType, Unit, CertificationCategory, Certification;
+                              TenderType, Unit, CertificationCategory, Certification, VerificationItem;
                               Hrm/ also Department, DepartmentImport, Designation, DesignationImport,
                               Employee, EmployeeImport
   Http/Middleware/            EnsureUserIsActive, EnsurePasswordIsChanged, HandleAppearance, HandleInertiaRequests
@@ -92,7 +92,8 @@ app/
                               and one supplier list), ProductCategory (company-scoped, seeded per
                               company — §9.14), Product (company-scoped, in its company's
                               ProductCategory), SupplierCategory, TenderType, Unit,
-                              CertificationCategory, Certification (group-wide, §9.10)
+                              CertificationCategory, Certification (group-wide, §9.10),
+                              VerificationItem (company-scoped, no code)
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
   Providers/                  AppServiceProvider, FortifyServiceProvider
@@ -104,7 +105,8 @@ app/
                               DesignationService, DesignationImportBlueprint, EmployeeService,
                               EmployeeImportBlueprint
   Services/ProjectManagement/ ClientService, ProductCategoryService (+ its STARTER set), ProductService, SupplierService, SupplierCategoryService, TenderTypeService,
-                              UnitService, CertificationCategoryService, CertificationService
+                              UnitService, CertificationCategoryService, CertificationService,
+                              VerificationItemService
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
   Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
                               ImportBlueprint, ImportRegistry, the DTOs ImportLimits/Outcome/Preview
@@ -134,13 +136,13 @@ resources/
     components/notifications/ the bell
     components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview;
                               projects/ also the client, product category, product, supplier, supplier
-                              category, tender type, unit, certification category and
-                              certification form dialogs;
+                              category, tender type, unit, certification category,
+                              certification and verification item form dialogs;
                               hrm/ also the department, designation and employee form dialogs
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
                               table of contents; guides/{general,admin,settings,projects,hrm,shared}/
                               (§5) — projects/ holds clients, product categories, products, suppliers, supplier categories, tender types, units,
-                              certification categories, certifications;
+                              certification categories, certifications, verification items;
                               hrm/ departments, designations, employees
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
     hooks/                    use-can, use-list-filters, use-form-dialog, use-appearance, …
@@ -156,7 +158,7 @@ routes/
   training.php                the in-app manual (ungated)
   projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each; projects.php
                               also clients, product categories, products, suppliers, supplier categories, tender types, units, certification categories,
-                              certifications; hrm.php also departments, designations, employees and
+                              certifications, verification items; hrm.php also departments, designations, employees and
                               their imports)
   channels.php                private broadcast channels
 tests/
@@ -287,6 +289,10 @@ group-wide (the fifth and sixth ERP exceptions to §9.10), restorable, without i
 (`CertificationCategorySeeder`, `CertificationSeeder`, §9.14). A certification's code is unique; its
 name is unique per version. Nothing references a certification yet; the owner will name the screens
 that do.
+**Verification Items** (`projects/verification-items`; owner, 2026-11-03) are company-scoped and
+restorable in the Product Categories shape, **with no code** (name, description, status only), no
+import and no starter set; what will use an item is still the owner's to name, so it has no
+deletion guard yet.
 The module stays 🧪 while its overview still shows sample data; the sidebar group is already a
 list of links, each behind its own `useCan`. Reference:
 [`documentation/projects.md`](documentation/projects.md).

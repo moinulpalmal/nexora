@@ -38,6 +38,22 @@ export type ProductCategoryFilters = ListFilters & {
     view: 'active' | 'trashed';
 };
 
+/** One row of the verification items list, as `VerificationItemController::index()` projects it. */
+export type VerificationItemListItem = {
+    id: number;
+    name: string;
+    description: string | null;
+    /** `App\Enums\RecordStatus` — `'A'` or `'I'`. Not a deletion. */
+    status: string;
+    created_at: string | null;
+    deleted_at: string | null;
+};
+
+export type VerificationItemFilters = ListFilters & {
+    /** Which record set is listed — a tab, not a column filter. */
+    view: 'active' | 'trashed';
+};
+
 /** A product category in the products form and filter, as `ProductController::categoryOptions()` builds it. */
 export type ProductCategoryOption = {
     value: number;

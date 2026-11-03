@@ -173,6 +173,11 @@ return [
             'title_en' => 'Certifications', 'title_bn' => 'সার্টিফিকেশন', 'status' => 'written',
             'shots' => ['overview' => 'The standard certifications every company shares', 'form' => 'The New certification dialog'],
         ],
+        'projects.verification-items' => [
+            'route' => 'projects.verification-items.index', 'guide' => 'projects/verification-items', 'section' => 'projects', 'sort' => 60,
+            'title_en' => 'Verification items', 'title_bn' => 'যাচাইয়ের বিষয়', 'status' => 'written',
+            'shots' => ['overview' => 'The verification items of an invented company', 'form' => 'The New verification item dialog'],
+        ],
         'accounting.dashboard' => [
             'route' => 'accounting.dashboard', 'guide' => 'accounting/dashboard', 'section' => 'accounting', 'sort' => 10,
             'title_en' => 'Accounts overview', 'title_bn' => 'হিসাবের সারসংক্ষেপ', 'status' => 'pending',

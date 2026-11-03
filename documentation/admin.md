@@ -295,7 +295,7 @@ assertions turn auditing on with `config(['audit.console' => true])` after the f
 > [`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company).
 
 Nexora serves **one or several companies of an organization in one installation**. Every HRM, Accounting and
-Projects record (a Projects client, product and product category included) belongs to a company, and each company keeps its own ledger and payroll. Admin owns
+Projects record (a Projects client, product, product category and verification item included) belongs to a company, and each company keeps its own ledger and payroll. Admin owns
 the company list because it is master data every module needs and no one business module owns.
 
 ### 10.1 The Company master — Admin → Companies
@@ -318,11 +318,11 @@ the company list because it is master data every module needs and no one busines
   `CompanyService::create()` adds the 13 categories of `ProductCategoryService::STARTER` in the same
   transaction, each an audited create ([`projects.md` §4](projects.md#product-categories--built)).
 - **Deletion guard:** `CompanyService::deletionBlocker()` refuses delete and permanent delete while
-  any department, employee, Projects client, Projects supplier, Projects product or Projects product
-  category belongs to the company, deleted ones included (the counts drop the company scope) —
-  departments are checked first, then employees, then clients, then suppliers, then products (a
-  product holds its category, so products must go first), then product categories, and
-  the sentence names which. The button is disabled with the reason on hover; the server answers a `warning` toast.
+  any department, employee, Projects client, Projects supplier, Projects product, Projects product
+  category or Projects verification item belongs to the company, deleted ones included (the counts
+  drop the company scope) — departments are checked first, then employees, then clients, then
+  suppliers, then products (a product holds its category, so products must go first), then product
+  categories, then verification items, and the sentence names which. The button is disabled with the reason on hover; the server answers a `warning` toast.
   Deactivating is the normal way to retire a company. **Because every company made on this screen has
   its starter product categories, deleting one means permanently deleting those categories first**
   (owner, 2026-11-03, choosing that over removing them with the company).

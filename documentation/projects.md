@@ -4,7 +4,8 @@
 > ([§4](#clients--built)), Product Categories ([§4](#product-categories--built)), Products ([§4](#products--built)), Supplier Categories ([§4](#supplier-categories--built)), Suppliers
 > ([§4](#suppliers--built)), Tender Types ([§4](#tender-types--built)), Units of Measure
 > ([§4](#units-of-measure--built)), Certification Categories
-> ([§4](#certification-categories--built)) and Certifications ([§4](#certifications--built)).** This is the agreed scope for the Project Management module (owner,
+> ([§4](#certification-categories--built)), Certifications ([§4](#certifications--built)) and
+> Verification Items ([§4](#verification-items--built)).** This is the agreed scope for the Project Management module (owner,
 > 2026-10-28). It describes *what* the module will do and *why*; where things will live and what they
 > are called is [`ARCHITECTURE.md`](../ARCHITECTURE.md)'s job. When the first slice is built, this
 > file becomes its reference and the planned parts shrink as they ship.
@@ -444,6 +445,43 @@ Types with a required category as Suppliers have.
 
 Tests: `tests/Feature/ProjectManagement/CertificationTest.php`. Guide: Projects → Certifications.
 
+### Verification items — built
+
+*Built 2026-11-03 (owner's decisions of that day).* **Projects → Verification Items**
+(`projects/verification-items`, `projects.verification-items.index`, model `VerificationItem`) is a
+company's reusable list of things it checks. **What will use an item is still the owner's to
+name**; for now it is a plain master. **Company-scoped**, shaped as Product Categories but **with no
+code** (the owner asked for a name, description and status only): each company keeps its own list,
+and the same name in another company is fine.
+
+| Column | Rule |
+| --- | --- |
+| `company_id` | The selected company, stamped on create; never a form field ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)). `restrictOnDelete()`. |
+| `name` | Required, up to 100, trimmed and inner spaces collapsed. Unique **within the company**, ignoring case, deleted items included — the item's only key. |
+| `description` | Optional free text, up to 5000. Shown in the form, not the list. |
+| `status` | `A` / `I` ([§9.3.1](../ARCHITECTURE.md#931-activeinactive-status)). An inactive item stays on record but will not be offered for new entries. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. Every change is in the audit trail (record type *Verification item*). |
+
+- **Company-scoped**: another company's item is a 404; with no company selected the page shows the
+  no-company panel and hides **New verification item**.
+- **Active / Deleted tabs**, **bulk delete** on both; a deleted item keeps its name reserved, and
+  creating a duplicate says to restore it instead.
+- **The list** shows name and status. It filters by name (contains) and status; it sorts by name,
+  status and created date.
+- **No starter set** — the list starts empty.
+- **No deletion guard yet**: nothing points at an item. The first table with a
+  `verification_item_id` adds `restrictOnDelete()` and a `VerificationItemService::deletionBlocker()`
+  clause ([ARCHITECTURE §9.14](../ARCHITECTURE.md#914-master-data-and-deletion-guards)).
+- **Outward guard:** a company that still has verification items, deleted ones included, cannot be
+  deleted ([`admin.md` §10.1](admin.md#101-the-company-master--admin--companies)).
+- **No spreadsheet import** (owner, 2026-11-03): items are entered by hand, so there is no bulk-load
+  path.
+- **Roles:** `project-manager` holds every `projects.verification-items.*` by rule — per-company
+  data, so no `ROLE_EXCLUSIONS` entry — `viewer` the `.view`; the `admin` role holds none.
+
+Tests: `tests/Feature/ProjectManagement/VerificationItemTest.php` (and the company-side rule in
+`tests/Feature/Admin/CompanyTest.php`). Guide: Projects → Verification items.
+
 ### Project stages
 
 *Built 2026-11-02 as `App\Enums\ProjectManagement\ProjectStage` (id `project-stage`). The projects
@@ -520,6 +558,7 @@ and `PermissionDescriptions` when its screen is built.
 | `projects.units.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the units of measure every company shares |
 | `projects.certification-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the certification categories every company shares |
 | `projects.certifications.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the catalogue of certifications every company shares |
+| `projects.verification-items.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's verification items |
 | `projects.projects.{view,create,update,delete}` | Manage projects and their contract terms |
 | `projects.projects.reopen` | Move a project out of Completed or Cancelled ([§4](#project-stages)) |
 | `projects.milestones.{view,create,update,delete}` | Manage milestones |

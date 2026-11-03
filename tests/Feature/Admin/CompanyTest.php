@@ -8,6 +8,7 @@ use App\Models\ProjectManagement\Client;
 use App\Models\ProjectManagement\Product;
 use App\Models\ProjectManagement\ProductCategory;
 use App\Models\ProjectManagement\Supplier;
+use App\Models\ProjectManagement\VerificationItem;
 use App\Models\User;
 use App\Services\ProjectManagement\ProductCategoryService;
 
@@ -234,6 +235,18 @@ test('a company with product categories cannot be deleted, deleted ones included
 
     assertToast($this->delete(route('admin.companies.destroy', $company)), 'warning')
         ->assertSessionHas('inertia.flash_data.toast.message', '2 product categories belong to this company. Deactivate the company instead, or delete them for good first.');
+
+    expect($company->refresh()->trashed())->toBeFalse();
+});
+
+test('a company with verification items cannot be deleted, deleted ones included, and the toast names them', function () {
+    $company = Company::factory()->create();
+    VerificationItem::factory()->for($company)->count(2)->create()->each->delete();
+
+    $this->actingAs(userWithPermissions('admin.companies.delete'));
+
+    assertToast($this->delete(route('admin.companies.destroy', $company)), 'warning')
+        ->assertSessionHas('inertia.flash_data.toast.message', '2 verification items belong to this company. Deactivate the company instead, or delete them for good first.');
 
     expect($company->refresh()->trashed())->toBeFalse();
 });

@@ -15,6 +15,7 @@ import {
     KeyRound,
     Landmark,
     LayoutGrid,
+    ListChecks,
     ListTree,
     Mail,
     Package,
@@ -65,6 +66,7 @@ import { index as supplierCategoriesIndex } from '@/routes/projects/supplier-cat
 import { index as suppliersIndex } from '@/routes/projects/suppliers';
 import { index as tenderTypesIndex } from '@/routes/projects/tender-types';
 import { index as unitsIndex } from '@/routes/projects/units';
+import { index as verificationItemsIndex } from '@/routes/projects/verification-items';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
 
@@ -117,6 +119,7 @@ export function AppSidebar() {
         'projects.certification-categories.view',
     );
     const canViewCertifications = useCan('projects.certifications.view');
+    const canViewVerificationItems = useCan('projects.verification-items.view');
     const canViewAccounting = useCan('accounting.dashboard.view');
     const canViewHrm = useCan('hrm.dashboard.view');
     const canViewDepartments = useCan('hrm.departments.view');
@@ -246,6 +249,12 @@ export function AppSidebar() {
             href: certificationsIndex(),
             icon: Award,
             visible: canViewCertifications,
+        },
+        {
+            title: 'Verification Items',
+            href: verificationItemsIndex(),
+            icon: ListChecks,
+            visible: canViewVerificationItems,
         },
     ];
 
