@@ -16,6 +16,7 @@ import {
     LayoutGrid,
     ListTree,
     Mail,
+    Package,
     Ruler,
     ShieldCheck,
     SlidersHorizontal,
@@ -57,6 +58,7 @@ import { dashboard as projectsDashboard } from '@/routes/projects';
 import { index as certificationCategoriesIndex } from '@/routes/projects/certification-categories';
 import { index as certificationsIndex } from '@/routes/projects/certifications';
 import { index as clientsIndex } from '@/routes/projects/clients';
+import { index as productCategoriesIndex } from '@/routes/projects/product-categories';
 import { index as supplierCategoriesIndex } from '@/routes/projects/supplier-categories';
 import { index as suppliersIndex } from '@/routes/projects/suppliers';
 import { index as tenderTypesIndex } from '@/routes/projects/tender-types';
@@ -101,6 +103,7 @@ export function AppSidebar() {
 
     const canViewProjects = useCan('projects.dashboard.view');
     const canViewClients = useCan('projects.clients.view');
+    const canViewProductCategories = useCan('projects.product-categories.view');
     const canViewSupplierCategories = useCan(
         'projects.supplier-categories.view',
     );
@@ -192,6 +195,12 @@ export function AppSidebar() {
             href: clientsIndex(),
             icon: Handshake,
             visible: canViewClients,
+        },
+        {
+            title: 'Product Categories',
+            href: productCategoriesIndex(),
+            icon: Package,
+            visible: canViewProductCategories,
         },
         {
             title: 'Supplier Categories',

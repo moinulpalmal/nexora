@@ -8,6 +8,7 @@ use Database\Seeders\Admin\RolePermissionSeeder;
 use Database\Seeders\Admin\SuperAdminSeeder;
 use Database\Seeders\ProjectManagement\CertificationCategorySeeder;
 use Database\Seeders\ProjectManagement\CertificationSeeder;
+use Database\Seeders\ProjectManagement\ProductCategorySeeder;
 use Database\Seeders\ProjectManagement\UnitSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -30,6 +31,7 @@ class DatabaseSeeder extends Seeder
             UnitSeeder::class,
             CertificationCategorySeeder::class,
             CertificationSeeder::class,
+            ProductCategorySeeder::class,
         ]);
 
         if (! app()->isProduction()) {

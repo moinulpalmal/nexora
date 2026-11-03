@@ -24,7 +24,7 @@ sent mail). Business modules are added on top of it, one module per folder in ev
 ([§4](#4-the-organizing-rule)).
 
 The first business modules are **Project Management**, **Accounts** and **HRM**. Each is a 🧪 POC,
-two with their first slices built (Projects → Clients, Suppliers, Supplier Categories, Tender Types, Units of Measure, Certification Categories, Certifications; HRM → Departments, Designations, Employees);
+two with their first slices built (Projects → Clients, Product Categories, Suppliers, Supplier Categories, Tender Types, Units of Measure, Certification Categories, Certifications; HRM → Departments, Designations, Employees);
 their agreed scope is in [§5](#5-module-registry) and in their module docs.
 
 Accounts are **created by administrators only** — there is no public registration — and sign in with
@@ -72,8 +72,8 @@ app/
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5);
-                              ProjectManagement/ also Client, Supplier, SupplierCategory, TenderType, Unit,
-                              CertificationCategory, Certification;
+                              ProjectManagement/ also Client, ProductCategory, Supplier, SupplierCategory,
+                              TenderType, Unit, CertificationCategory, Certification;
                               Hrm/ also Department, DepartmentImport, Designation, DesignationImport,
                               Employee, EmployeeImport
   Http/Middleware/            EnsureUserIsActive, EnsurePasswordIsChanged, HandleAppearance, HandleInertiaRequests
@@ -89,7 +89,8 @@ app/
                               BrandingSetting, SentMail
   Models/Hrm/                 Department, Employee (company-scoped, §9.10), Designation (group-wide, §9.10)
   Models/ProjectManagement/   Client, Supplier (company-scoped, §9.10 — the ERP's one customer
-                              and one supplier list), SupplierCategory, TenderType, Unit,
+                              and one supplier list), ProductCategory (company-scoped, seeded per
+                              company — §9.14), SupplierCategory, TenderType, Unit,
                               CertificationCategory, Certification (group-wide, §9.10)
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
@@ -101,7 +102,7 @@ app/
   Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer),
                               DesignationService, DesignationImportBlueprint, EmployeeService,
                               EmployeeImportBlueprint
-  Services/ProjectManagement/ ClientService, SupplierService, SupplierCategoryService, TenderTypeService,
+  Services/ProjectManagement/ ClientService, ProductCategoryService (+ its STARTER set), SupplierService, SupplierCategoryService, TenderTypeService,
                               UnitService, CertificationCategoryService, CertificationService
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
   Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
@@ -112,7 +113,8 @@ database/
   migrations/                 flat — the migrator does not recurse
   seeders/Admin/              RolePermissionSeeder, SuperAdminSeeder, DemoUserSeeder, CountrySeeder
   seeders/ProjectManagement/  UnitSeeder (the standard units of measure), CertificationCategorySeeder,
-                              CertificationSeeder (the standard certifications) — §9.14
+                              CertificationSeeder (the standard certifications), ProductCategorySeeder
+                              (back-fills each company's starter set) — §9.14
 public/
   images/training/            guide screenshots, {key}/{shot}.png, committed. Never public/training/:
                               Apache would serve that folder instead of the /training route
@@ -130,12 +132,13 @@ resources/
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
     components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview;
-                              projects/ also the client, supplier, supplier category, tender
-                              type, unit, certification category and certification form dialogs;
+                              projects/ also the client, product category, supplier, supplier
+                              category, tender type, unit, certification category and
+                              certification form dialogs;
                               hrm/ also the department, designation and employee form dialogs
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
                               table of contents; guides/{general,admin,settings,projects,hrm,shared}/
-                              (§5) — projects/ holds clients, suppliers, supplier categories, tender types, units,
+                              (§5) — projects/ holds clients, product categories, suppliers, supplier categories, tender types, units,
                               certification categories, certifications;
                               hrm/ departments, designations, employees
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
@@ -151,7 +154,7 @@ routes/
   settings.php                the user's own account settings
   training.php                the in-app manual (ungated)
   projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each; projects.php
-                              also clients, suppliers, supplier categories, tender types, units, certification categories,
+                              also clients, product categories, suppliers, supplier categories, tender types, units, certification categories,
                               certifications; hrm.php also departments, designations, employees and
                               their imports)
   channels.php                private broadcast channels
@@ -258,7 +261,10 @@ time, free moves, reopening a closed one behind its own permission; owner, 2026-
 (`projects/clients`; owner, 2026-11-02) — **the ERP's one customer list**, company-scoped and
 restorable in the `hrm/departments` shape, with bulk delete and no import. Projects owns it because
 every project needs a client before Accounting exists; Accounting's invoices will point at the same
-rows. **Tender Types** (`projects/tender-types`; owner, 2026-11-02) — how a project was procured —
+rows. **Product Categories** (`projects/product-categories`; owner, 2026-11-03) are company-scoped and
+restorable in the Clients shape, without import, and **every company starts with a 13-row starter
+set** (§9.14); what will point at a category is still the owner's to name.
+**Tender Types** (`projects/tender-types`; owner, 2026-11-02) — how a project was procured —
 are group-wide, the second ERP exception to §9.10, in the `hrm/designations` shape without import.
 **Suppliers** (`projects/suppliers`; owner, 2026-11-02) are **the ERP's one supplier list** — Projects
 keeps it as it keeps clients, and Accounting's bills will point at the same rows — company-scoped and
@@ -770,7 +776,17 @@ garment, electrical, steel, pipe, machinery, radar and BSTI standards — all ca
 included, is skipped, so an admin's edits are never overwritten; a row deleted *permanently* comes back
 on the next seed. Countries are group-wide like
 HRM → Designations, but they are Admin's, not an ERP record, so they are not among §9.10's ERP
-exceptions. Add another seeded master only on the owner's word, and name it here.
+exceptions.
+
+**Projects → Product Categories is the one seeded master kept per company** (owner, 2026-11-03). A
+seeder cannot know a company that does not exist yet, so the starter set (`ProductCategoryService::
+STARTER`) is written **when a company is created** — `CompanyService::create()`, in the same
+transaction, audited as the creator's — and `ProductCategorySeeder` only back-fills companies that
+already exist. Both go through `ProductCategoryService::addStarterSet()`, additive and idempotent per
+company as above. The categories then block the company's deletion like any company-scoped row, so a
+company made on screen is deleted only after its categories are permanently deleted — the owner's
+choice over removing them with it. Add another seeded master only on the owner's word, and name it
+here.
 
 ## 10. Adding a feature to an existing module
 

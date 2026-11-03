@@ -1,7 +1,7 @@
 # Projects Module — Reference
 
 > **📋 Planned — built so far: the project stage enum ([§4](#project-stages)), Clients
-> ([§4](#clients--built)), Supplier Categories ([§4](#supplier-categories--built)), Suppliers
+> ([§4](#clients--built)), Product Categories ([§4](#product-categories--built)), Supplier Categories ([§4](#supplier-categories--built)), Suppliers
 > ([§4](#suppliers--built)), Tender Types ([§4](#tender-types--built)), Units of Measure
 > ([§4](#units-of-measure--built)), Certification Categories
 > ([§4](#certification-categories--built)) and Certifications ([§4](#certifications--built)).** This is the agreed scope for the Project Management module (owner,
@@ -126,6 +126,57 @@ is built ([`accounting.md`](accounting.md)).
   `admin` role holds none (it takes no module prefix).
 
 Tests: `tests/Feature/ProjectManagement/ClientTest.php`. Guide: Projects → Clients.
+
+### Product categories — built
+
+*Built 2026-11-03 (owner's decisions of that day).* **Projects → Product Categories**
+(`projects/product-categories`, `projects.product-categories.index`, model `ProductCategory`) is the
+groups a company's products and items are sorted into. **What will point at a category is not yet
+decided** — the owner will name it; until then the wording stays general. **Company-scoped**, shaped
+as Clients: each company keeps its own list, and the same code or name in another company is fine.
+
+| Column | Rule |
+| --- | --- |
+| `company_id` | The selected company, stamped on create; never a form field ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)). `restrictOnDelete()`. |
+| `code` | Required, up to 20, letters and digits joined by single `-`/`_`, stored in capitals. Unique **within the company**, ignoring case, deleted categories included. |
+| `name` | Required, up to 100, trimmed and inner spaces collapsed. Unique like the code. |
+| `description` | Optional free text, up to 5000. Shown in the form, not the list. |
+| `status` | `A` / `I` ([§9.3.1](../ARCHITECTURE.md#931-activeinactive-status)). An inactive category stays on record but will not be offered for new entries. |
+| `inserted_by`, `last_updated_by`, timestamps, `deleted_at` | The usual actor stamps; restorable. Every change is in the audit trail (record type *Product category*). |
+
+- **Company-scoped**: another company's category is a 404; with no company selected the page shows
+  the no-company panel and hides **New product category**.
+- **Active / Deleted tabs**, **bulk delete** on both; a deleted category keeps its code and name
+  reserved, and creating a duplicate says to restore it instead.
+- **The list** shows code, name and status. It filters by code (starts with), name (contains) and
+  status; it sorts by code, name, status and created date.
+- **Every company starts with a starter set** (owner, 2026-11-03) — the first seeded master kept per
+  company ([ARCHITECTURE §9.14](../ARCHITECTURE.md#914-master-data-and-deletion-guards)). The 13
+  categories live in `ProductCategoryService::STARTER`: RAW Raw Materials, CONS Consumables, SPARE
+  Spare Parts, EQUIP Equipment & Machinery, TOOL Tools, ELEC Electrical, IT IT & Electronics, FURN
+  Furniture & Fixtures, STAT Stationery & Office Supplies, PACK Packaging, FIN Finished Goods, SERV
+  Services, OTHER Other.
+  - `CompanyService::create()` adds them to **every new company**, in the same transaction, each an
+    audited create by the person who made the company.
+  - `ProductCategorySeeder` (called from `DatabaseSeeder`) **back-fills existing companies**; on a
+    fresh install, where no company exists yet, it adds nothing.
+  - Both go through `ProductCategoryService::addStarterSet()`, which only **adds**: a starter row
+    whose code or name is already taken in the company — a deleted one included, ignoring case — is
+    skipped, so re-running never overwrites an edit. Deleted companies are not back-filled.
+- **No deletion guard yet**: nothing points at a product category. The first table with a
+  `product_category_id` adds `restrictOnDelete()` and a `ProductCategoryService::deletionBlocker()`
+  clause.
+- **Outward guard:** a company that still has product categories, deleted ones included, cannot be
+  deleted ([`admin.md` §10.1](admin.md#101-the-company-master--admin--companies)). Because every
+  company made on screen starts with the starter set, **a company is deleted only after its product
+  categories are permanently deleted** — the owner's choice (2026-11-03) over removing them with the
+  company; deactivating remains the normal way to retire a company.
+- **No spreadsheet import** (owner, 2026-11-03): categories beyond the starter set are entered by hand.
+- **Roles:** `project-manager` holds every `projects.product-categories.*` by rule — per-company
+  data, so no `ROLE_EXCLUSIONS` entry — `viewer` the `.view`; the `admin` role holds none.
+
+Tests: `tests/Feature/ProjectManagement/ProductCategoryTest.php` (and the company-side rules in
+`tests/Feature/Admin/CompanyTest.php`). Guide: Projects → Product categories.
 
 ### Supplier categories — built
 
@@ -411,7 +462,7 @@ that stops anyone approving their own record.
 
 ## 6. Draft permission catalogue
 
-*Draft — not seeded*, except `projects.clients.*`, `projects.supplier-categories.*`,
+*Draft — not seeded*, except `projects.clients.*`, `projects.product-categories.*`, `projects.supplier-categories.*`,
 `projects.suppliers.*`, `projects.tender-types.*`, `projects.units.*`,
 `projects.certification-categories.*` and `projects.certifications.*`
 (`{view,create,update,delete,restore,force-delete}` each), which shipped with their screens ([§4](#4-main-entities)). Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
@@ -421,6 +472,7 @@ and `PermissionDescriptions` when its screen is built.
 | Permission | Allows |
 | --- | --- |
 | `projects.clients.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's clients |
+| `projects.product-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's product categories |
 | `projects.supplier-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the supplier categories every company shares |
 | `projects.suppliers.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's suppliers |
 | `projects.tender-types.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the tender types every company shares |
@@ -455,6 +507,8 @@ and `PermissionDescriptions` when its screen is built.
 - Who can see the cost rate and the profitability report? This is salary-derived data, so the
   likely answer is a separate permission.
 - Project codes and billing-request numbering: the format, and whether it is per company.
+- What points at a product category (an item catalogue, BOQ or purchase lines, projects?) — which
+  decides where its deletion guard goes.
 - Is there a weekly timesheet lock, and how late can hours be logged?
 - Does a project in a foreign currency convert its budget into BDT for reporting? This depends on
   Accounting's exchange-rate source.

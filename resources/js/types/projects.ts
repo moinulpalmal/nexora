@@ -21,6 +21,23 @@ export type ClientFilters = ListFilters & {
     view: 'active' | 'trashed';
 };
 
+/** One row of the product categories list, as `ProductCategoryController::index()` projects it. */
+export type ProductCategoryListItem = {
+    id: number;
+    code: string;
+    name: string;
+    description: string | null;
+    /** `App\Enums\RecordStatus` — `'A'` or `'I'`. Not a deletion. */
+    status: string;
+    created_at: string | null;
+    deleted_at: string | null;
+};
+
+export type ProductCategoryFilters = ListFilters & {
+    /** Which record set is listed — a tab, not a column filter. */
+    view: 'active' | 'trashed';
+};
+
 /** One row of the tender types list, as `TenderTypeController::index()` projects it. */
 export type TenderTypeListItem = {
     id: number;

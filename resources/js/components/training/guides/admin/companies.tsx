@@ -83,14 +83,20 @@ export default function CompaniesGuide() {
                             <>
                                 Press <Ui>New company</Ui>, enter the name and a
                                 short code such as <Ui>ATL</Ui>, and save with{' '}
-                                <Ui>Save &amp; close</Ui>.
+                                <Ui>Save &amp; close</Ui>. The new company
+                                starts with 13 standard product categories
+                                (Projects → Product Categories), which its
+                                people can rename or retire.
                             </>
                         }
                         bn={
                             <>
                                 <Ui>New company</Ui> চাপুন, নাম ও একটি সংক্ষিপ্ত
                                 কোড দিন, যেমন <Ui>ATL</Ui>, তারপর{' '}
-                                <Ui>Save &amp; close</Ui> দিয়ে সেভ করুন।
+                                <Ui>Save &amp; close</Ui> দিয়ে সেভ করুন। নতুন
+                                কোম্পানিটি ১৩টি সাধারণ পণ্যের শ্রেণি (Projects →
+                                Product Categories) নিয়ে শুরু হয়, যেগুলোর নাম
+                                বদলানো বা বাদ দেওয়া যায়।
                             </>
                         }
                     >
@@ -105,8 +111,8 @@ export default function CompaniesGuide() {
                         bn="কোনো কোম্পানিকে অবসরে পাঠাতে এটি সম্পাদনা করে অবস্থা Inactive করুন। তখন আর কেউ এটি বেছে নিতে পারবেন না, তবে এর রেকর্ডগুলো থেকে যাবে।"
                     />
                     <Step
-                        en="To delete several at once, tick their rows — the box in the heading ticks every row on the page — and press Delete in the bar that appears. A company that departments, employees, clients or suppliers belong to cannot be ticked."
-                        bn="একসাথে কয়েকটি মুছতে সারিগুলোতে টিক দিন — শিরোনামের বক্সটি পেজের সব সারিতে টিক দেয় — তারপর যে বারটি দেখা যায় তাতে Delete চাপুন। যে কোম্পানির অধীনে বিভাগ, কর্মচারী, ক্লায়েন্ট বা সরবরাহকারী আছে সেটিতে টিক দেওয়া যায় না।"
+                        en="To delete several at once, tick their rows — the box in the heading ticks every row on the page — and press Delete in the bar that appears. A company that departments, employees, clients, suppliers or product categories belong to cannot be ticked."
+                        bn="একসাথে কয়েকটি মুছতে সারিগুলোতে টিক দিন — শিরোনামের বক্সটি পেজের সব সারিতে টিক দেয় — তারপর যে বারটি দেখা যায় তাতে Delete চাপুন। যে কোম্পানির অধীনে বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী বা পণ্যের শ্রেণি আছে সেটিতে টিক দেওয়া যায় না।"
                     />
                     <Step
                         en="A deleted company waits on the Deleted tab, where it can be restored or deleted for good — one at a time, or ticked together and removed with Delete permanently."
@@ -154,8 +160,8 @@ export default function CompaniesGuide() {
                 />
                 <Bullets>
                     <Bullet
-                        en="The delete button is disabled while any department, employee or client belongs to the company; point at it to read why."
-                        bn="কোম্পানির অধীনে কোনো বিভাগ, কর্মচারী বা ক্লায়েন্ট থাকলে মোছার বোতাম বন্ধ থাকে; কারণ জানতে এর ওপর মাউস রাখুন।"
+                        en="The delete button is disabled while any department, employee, client, supplier or product category belongs to the company; point at it to read why."
+                        bn="কোম্পানির অধীনে কোনো বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী বা পণ্যের শ্রেণি থাকলে মোছার বোতাম বন্ধ থাকে; কারণ জানতে এর ওপর মাউস রাখুন।"
                     />
                 </Bullets>
                 <ListBasics deletedTab />
@@ -197,6 +203,11 @@ export default function CompaniesGuide() {
                     en="The same rule for Projects suppliers, checked once the company has no departments, employees or clients left."
                     bn="Projects-এর সরবরাহকারীদের জন্যও একই নিয়ম, কোম্পানির আর কোনো বিভাগ, কর্মচারী বা ক্লায়েন্ট না থাকলে এটি যাচাই হয়।"
                 />
+                <Message
+                    text="13 product categories belong to this company. Deactivate the company instead, or delete them for good first."
+                    en="The same rule for Projects product categories, checked last. Every company made on this screen starts with 13, so a company is deleted only after they are deleted for good on Projects → Product Categories."
+                    bn="Projects-এর পণ্যের শ্রেণির জন্যও একই নিয়ম, সবশেষে যাচাই হয়। এই স্ক্রিনে বানানো প্রতিটি কোম্পানি ১৩টি শ্রেণি নিয়ে শুরু হয়, তাই Projects → Product Categories থেকে সেগুলো চিরতরে মোছার পরেই কোম্পানিটি মোছা যায়।"
+                />
             </GuideSection>
 
             <GuideSection kind="mistakes">
@@ -204,6 +215,11 @@ export default function CompaniesGuide() {
                     tone="danger"
                     en="Renaming a company or changing its short code changes it everywhere at once — on every record, in every switcher. Correct a typo, but do not reuse a company for a different business."
                     bn="কোম্পানির নাম বা সংক্ষিপ্ত কোড বদলালে তা সব জায়গায় একসাথে বদলে যায় — প্রতিটি রেকর্ডে, প্রতিটি সুইচারে। বানান ভুল ঠিক করুন, কিন্তু কোনো কোম্পানিকে অন্য ব্যবসার জন্য আবার ব্যবহার করবেন না।"
+                />
+                <Callout
+                    tone="warn"
+                    en="A company added by mistake cannot simply be deleted: it already has its product categories. Make it Inactive, or delete its product categories for good first."
+                    bn="ভুল করে যোগ করা কোম্পানি সরাসরি মোছা যায় না: এর মধ্যেই এর পণ্যের শ্রেণিগুলো তৈরি হয়ে গেছে। এটিকে Inactive করুন, অথবা আগে এর পণ্যের শ্রেণিগুলো চিরতরে মুছুন।"
                 />
             </GuideSection>
 
@@ -227,6 +243,11 @@ export default function CompaniesGuide() {
                     to="projects.suppliers"
                     en="The suppliers that belong to each company."
                     bn="প্রতিটি কোম্পানির অধীনের সরবরাহকারীরা।"
+                />
+                <RelatedGuide
+                    to="projects.product-categories"
+                    en="The product categories each company starts with."
+                    bn="প্রতিটি কোম্পানি যেসব পণ্যের শ্রেণি নিয়ে শুরু হয়।"
                 />
             </GuideSection>
         </Guide>

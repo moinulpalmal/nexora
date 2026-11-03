@@ -133,6 +133,11 @@ return [
             'title_en' => 'Clients', 'title_bn' => 'ক্লায়েন্ট', 'status' => 'written',
             'shots' => ['overview' => 'The clients of an invented company', 'form' => 'The New client dialog'],
         ],
+        'projects.product-categories' => [
+            'route' => 'projects.product-categories.index', 'guide' => 'projects/product-categories', 'section' => 'projects', 'sort' => 22,
+            'title_en' => 'Product categories', 'title_bn' => 'পণ্যের শ্রেণি', 'status' => 'written',
+            'shots' => ['overview' => 'The product categories of an invented company', 'form' => 'The New product category dialog'],
+        ],
         'projects.supplier-categories' => [
             'route' => 'projects.supplier-categories.index', 'guide' => 'projects/supplier-categories', 'section' => 'projects', 'sort' => 24,
             'title_en' => 'Supplier categories', 'title_bn' => 'সরবরাহকারীর শ্রেণি', 'status' => 'written',

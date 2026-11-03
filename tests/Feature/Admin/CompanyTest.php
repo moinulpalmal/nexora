@@ -5,8 +5,10 @@ use App\Models\Admin\AuditLog;
 use App\Models\Admin\Company;
 use App\Models\Hrm\Department;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\ProductCategory;
 use App\Models\ProjectManagement\Supplier;
 use App\Models\User;
+use App\Services\ProjectManagement\ProductCategoryService;
 
 /*
 |--------------------------------------------------------------------------
@@ -209,6 +211,31 @@ test('a company with suppliers cannot be deleted, deleted suppliers included, an
         ->assertSessionHas('inertia.flash_data.toast.message', '2 suppliers belong to this company. Deactivate the company instead, or delete them for good first.');
 
     expect($company->refresh()->trashed())->toBeFalse();
+});
+
+test('a company with product categories cannot be deleted, deleted ones included, and the toast names them', function () {
+    $company = Company::factory()->create();
+    ProductCategory::factory()->for($company)->count(2)->create()->each->delete();
+
+    $this->actingAs(userWithPermissions('admin.companies.delete'));
+
+    assertToast($this->delete(route('admin.companies.destroy', $company)), 'warning')
+        ->assertSessionHas('inertia.flash_data.toast.message', '2 product categories belong to this company. Deactivate the company instead, or delete them for good first.');
+
+    expect($company->refresh()->trashed())->toBeFalse();
+});
+
+test('a new company starts with the product-category starter set, each audited', function () {
+    $this->actingAs(userWithPermissions('admin.companies.create'));
+    config(['audit.console' => true]);
+
+    assertToast($this->post(route('admin.companies.store'), companyPayload()), 'success');
+
+    $company = Company::query()->sole();
+    $categories = ProductCategory::withoutGlobalScopes()->where('company_id', $company->id)->pluck('code')->all();
+
+    expect($categories)->toEqualCanonicalizing(array_column(ProductCategoryService::STARTER, 0))
+        ->and(AuditLog::where('event', 'created')->where('auditable_type', 'product-category')->count())->toBe(count(ProductCategoryService::STARTER));
 });
 
 test('a deleted company with departments cannot be permanently deleted', function () {

@@ -185,7 +185,7 @@ and — for an enum people pick from on screen — its label. Like the permissio
 
 - Every create/update/delete/restore of `User`, `Role`, `Permission`, `Company`, `MailSetting`,
   `QuickLoginSetting`, `BrandingSetting`, `ImportLimit`, the HRM `Department`, `Designation` and
-  `Employee`, the Projects `Client`, `Supplier`, `SupplierCategory`, `TenderType`, `Unit`, `CertificationCategory` and `Certification`, and `SheetImport` (staged, confirmed, cancelled — not the rows it wrote) is recorded with
+  `Employee`, the Projects `Client`, `ProductCategory`, `Supplier`, `SupplierCategory`, `TenderType`, `Unit`, `CertificationCategory` and `Certification`, and `SheetImport` (staged, confirmed, cancelled — not the rows it wrote) is recorded with
   old and new values; secrets (`password`, `remember_token`, the SMTP password) never are. The
   record-type filter is the morph map (`AppServiceProvider::MORPH_MAP`).
 - Also recorded: role, permission and company grants (`companies-changed`), administrator password resets, force deletes, mails
@@ -295,7 +295,7 @@ assertions turn auditing on with `config(['audit.console' => true])` after the f
 > [`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company).
 
 Nexora serves **one or several companies of an organization in one installation**. Every HRM, Accounting and
-Projects record (a Projects client included) belongs to a company, and each company keeps its own ledger and payroll. Admin owns
+Projects record (a Projects client and product category included) belongs to a company, and each company keeps its own ledger and payroll. Admin owns
 the company list because it is master data every module needs and no one business module owns.
 
 ### 10.1 The Company master — Admin → Companies
@@ -314,12 +314,17 @@ the company list because it is master data every module needs and no one busines
   delete them (Active) or delete them for good (Deleted), behind `admin.companies.delete` /
   `admin.companies.force-delete`. A company something belongs to cannot be ticked; the server re-checks
   each and names any it kept in a `warning` toast.
+- **A new company starts with the Projects product-category starter set** (owner, 2026-11-03):
+  `CompanyService::create()` adds the 13 categories of `ProductCategoryService::STARTER` in the same
+  transaction, each an audited create ([`projects.md` §4](projects.md#product-categories--built)).
 - **Deletion guard:** `CompanyService::deletionBlocker()` refuses delete and permanent delete while
-  any department, employee, Projects client or Projects supplier belongs to the company, deleted ones
-  included (the counts drop the company scope) — departments are checked first, then employees, then
-  clients, then suppliers, and
+  any department, employee, Projects client, Projects supplier or Projects product category belongs
+  to the company, deleted ones included (the counts drop the company scope) — departments are checked
+  first, then employees, then clients, then suppliers, then product categories, and
   the sentence names which. The button is disabled with the reason on hover; the server answers a `warning` toast.
-  Deactivating is the normal way to retire a company.
+  Deactivating is the normal way to retire a company. **Because every company made on this screen has
+  its starter product categories, deleting one means permanently deleting those categories first**
+  (owner, 2026-11-03, choosing that over removing them with the company).
 - No spreadsheet import — a handful of rows, entered by hand.
 - Permissions: `admin.companies.{view,create,update,delete,restore,force-delete}` — the `admin` role
   receives them by rule, `viewer` the `.view`.
@@ -360,7 +365,8 @@ shares, no `company_id` — shaped as HRM → Designations: restorable, Active /
 on both tabs, every action a dialog. It **ships filled** (ARCHITECTURE §9.14) — with Projects → Units of
 Measure ([`projects.md` §4](projects.md#units-of-measure--built)) and Projects → Certifications with
 their categories ([`projects.md` §4](projects.md#certifications--built)), one of the seeded master
-tables.
+tables (Projects → Product Categories is seeded too, but per company —
+[`projects.md` §4](projects.md#product-categories--built)).
 
 | Column | Rule |
 | --- | --- |

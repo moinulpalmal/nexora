@@ -7,7 +7,10 @@ use App\Models\Admin\Company;
 use App\Models\Hrm\Department;
 use App\Models\Hrm\Employee;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\ProductCategory;
 use App\Models\ProjectManagement\Supplier;
+use App\Services\ProjectManagement\ProductCategoryService;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Every write to the Company master, and the guard that may refuse a delete
@@ -20,14 +23,27 @@ use App\Models\ProjectManagement\Supplier;
  */
 class CompanyService
 {
-    public function __construct(private readonly AuditRecorder $audits) {}
+    public function __construct(
+        private readonly AuditRecorder $audits,
+        private readonly ProductCategoryService $productCategories,
+    ) {}
 
     /**
+     * Create the company with the Projects product-category starter set in it
+     * (owner, 2026-11-03), in one transaction: a company never exists without
+     * the set. Each category is an ordinary, audited create.
+     *
      * @param  array{name: string, short_code: string, status: string}  $attributes
      */
     public function create(array $attributes): Company
     {
-        return Company::query()->create($attributes);
+        return DB::transaction(function () use ($attributes): Company {
+            $company = Company::query()->create($attributes);
+
+            $this->productCategories->addStarterSet($company);
+
+            return $company;
+        });
     }
 
     /**
@@ -124,8 +140,8 @@ class CompanyService
     */
 
     /**
-     * Refused while any department, employee, client or supplier belongs to the
-     * company.
+     * Refused while any department, employee, client, supplier or product
+     * category belongs to the company.
      *
      * Counted with the company scope removed and deleted rows included
      * (§9.14): whether a row is in use is a question about the database, not
@@ -175,6 +191,19 @@ class CompanyService
                 .'|[2,*] :count suppliers belong to this company. Deactivate the company instead, or delete them for good first.',
                 $suppliers,
                 ['count' => $suppliers],
+            );
+        }
+
+        // The starter set counts too (owner, 2026-11-03): every company made on
+        // screen has it, so its categories must be deleted for good first.
+        $productCategories = ProductCategory::withoutGlobalScopes()->where('company_id', $company->id)->count();
+
+        if ($productCategories > 0) {
+            return trans_choice(
+                '{1} One product category belongs to this company. Deactivate the company instead, or delete that product category for good first.'
+                .'|[2,*] :count product categories belong to this company. Deactivate the company instead, or delete them for good first.',
+                $productCategories,
+                ['count' => $productCategories],
             );
         }
 

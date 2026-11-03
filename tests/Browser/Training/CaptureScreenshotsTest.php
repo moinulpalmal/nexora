@@ -22,6 +22,7 @@ use App\Models\ProjectManagement\SupplierCategory;
 use App\Models\ProjectManagement\TenderType;
 use App\Models\User;
 use App\Notifications\Admin\AccountChanged;
+use App\Services\ProjectManagement\ProductCategoryService;
 use App\Services\Training\TrainingRegistry;
 use Database\Seeders\Admin\CountrySeeder;
 use Database\Seeders\Admin\DemoUserSeeder;
@@ -288,6 +289,21 @@ test('projects.clients', function () {
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-client"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
+test('projects.product-categories', function () {
+    $key = 'projects.product-categories';
+    $actor = trainingActor();
+    $companies = trainingCompanies();
+    $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
+
+    app(ProductCategoryService::class)->addStarterSet($companies['atl']);
+
+    $page = visitForTraining(route('projects.product-categories.index', absolute: false))->assertSee('Raw Materials');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-product-category"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 

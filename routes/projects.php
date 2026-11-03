@@ -4,6 +4,7 @@ use App\Http\Controllers\ProjectManagement\CertificationCategoryController;
 use App\Http\Controllers\ProjectManagement\CertificationController;
 use App\Http\Controllers\ProjectManagement\ClientController;
 use App\Http\Controllers\ProjectManagement\DashboardController;
+use App\Http\Controllers\ProjectManagement\ProductCategoryController;
 use App\Http\Controllers\ProjectManagement\SupplierCategoryController;
 use App\Http\Controllers\ProjectManagement\SupplierController;
 use App\Http\Controllers\ProjectManagement\TenderTypeController;
@@ -59,6 +60,33 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:projects.clients.force-delete')
             ->name('clients.force-delete');
+
+        // Kept per company (owner, 2026-11-03); every company starts with a
+        // starter set.
+        Route::delete('product-categories/bulk', [ProductCategoryController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.product-categories.delete')
+            ->name('product-categories.bulk-destroy');
+
+        Route::delete('product-categories/bulk/force', [ProductCategoryController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.product-categories.force-delete')
+            ->name('product-categories.bulk-force-delete');
+
+        Route::resource('product-categories', ProductCategoryController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.product-categories.view')
+            ->middlewareFor(['store'], 'permission:projects.product-categories.create')
+            ->middlewareFor(['update'], 'permission:projects.product-categories.update')
+            ->middlewareFor(['destroy'], 'permission:projects.product-categories.delete');
+
+        Route::put('product-categories/{product_category}/restore', [ProductCategoryController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.product-categories.restore')
+            ->name('product-categories.restore');
+
+        Route::delete('product-categories/{product_category}/force', [ProductCategoryController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.product-categories.force-delete')
+            ->name('product-categories.force-delete');
 
         // Group-wide (owner, 2026-11-02): every company's suppliers are
         // classified by one list (§9.10).
