@@ -38,6 +38,35 @@ export type ProductCategoryFilters = ListFilters & {
     view: 'active' | 'trashed';
 };
 
+/** A product category in the products form and filter, as `ProductController::categoryOptions()` builds it. */
+export type ProductCategoryOption = {
+    value: number;
+    label: string;
+    /** The code, shown after the name. */
+    hint: string;
+    /** `App\Enums\RecordStatus`. */
+    status: string;
+};
+
+/** One row of the products list, as `ProductController::index()` projects it. */
+export type ProductListItem = {
+    id: number;
+    product_category_id: number;
+    category_name: string;
+    code: string;
+    name: string;
+    description: string | null;
+    /** `App\Enums\RecordStatus` — `'A'` or `'I'`. Not a deletion. */
+    status: string;
+    created_at: string | null;
+    deleted_at: string | null;
+};
+
+export type ProductFilters = ListFilters & {
+    /** Which record set is listed — a tab, not a column filter. */
+    view: 'active' | 'trashed';
+};
+
 /** One row of the tender types list, as `TenderTypeController::index()` projects it. */
 export type TenderTypeListItem = {
     id: number;

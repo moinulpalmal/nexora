@@ -17,6 +17,8 @@ use App\Models\Hrm\Department;
 use App\Models\Hrm\Designation;
 use App\Models\Hrm\Employee;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\Product;
+use App\Models\ProjectManagement\ProductCategory;
 use App\Models\ProjectManagement\Supplier;
 use App\Models\ProjectManagement\SupplierCategory;
 use App\Models\ProjectManagement\TenderType;
@@ -304,6 +306,37 @@ test('projects.product-categories', function () {
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-product-category"]')->assertVisible('dialog[open]');
+    captureTrainingShot($page, $key, 'form');
+});
+
+test('projects.products', function () {
+    $key = 'projects.products';
+    $actor = trainingActor();
+    $companies = trainingCompanies();
+    $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
+
+    $categories = [
+        'RAW' => ProductCategory::factory()->for($companies['atl'])->create(['code' => 'RAW', 'name' => 'Raw Materials']),
+        'ELEC' => ProductCategory::factory()->for($companies['atl'])->create(['code' => 'ELEC', 'name' => 'Electrical']),
+        'CONS' => ProductCategory::factory()->for($companies['atl'])->create(['code' => 'CONS', 'name' => 'Consumables']),
+    ];
+
+    $products = [
+        ['CEM-50KG', 'Portland Cement 50 kg', 'RAW'],
+        ['ROD-12MM', 'Deformed Steel Bar 12 mm', 'RAW'],
+        ['CBL-2.5', 'Copper Cable 2.5 sq mm', 'ELEC'],
+        ['MCB-32A', 'Circuit Breaker 32 A', 'ELEC'],
+        ['GLV-01', 'Safety Gloves', 'CONS'],
+    ];
+
+    foreach ($products as [$code, $name, $category]) {
+        Product::factory()->for($companies['atl'])->for($categories[$category], 'category')->create(['code' => $code, 'name' => $name]);
+    }
+
+    $page = visitForTraining(route('projects.products.index', absolute: false))->assertSee('Portland Cement 50 kg');
+    captureTrainingShot($page, $key, 'overview');
+
+    $page->click('[data-test="new-product"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 

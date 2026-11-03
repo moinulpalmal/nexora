@@ -24,7 +24,7 @@ sent mail). Business modules are added on top of it, one module per folder in ev
 ([§4](#4-the-organizing-rule)).
 
 The first business modules are **Project Management**, **Accounts** and **HRM**. Each is a 🧪 POC,
-two with their first slices built (Projects → Clients, Product Categories, Suppliers, Supplier Categories, Tender Types, Units of Measure, Certification Categories, Certifications; HRM → Departments, Designations, Employees);
+two with their first slices built (Projects → Clients, Product Categories, Products, Suppliers, Supplier Categories, Tender Types, Units of Measure, Certification Categories, Certifications; HRM → Departments, Designations, Employees);
 their agreed scope is in [§5](#5-module-registry) and in their module docs.
 
 Accounts are **created by administrators only** — there is no public registration — and sign in with
@@ -72,7 +72,7 @@ app/
   Http/Controllers/Training/  TrainingController (index, show, panel)
   Http/Controllers/ProjectManagement/, Accounting/, Hrm/
                               DashboardController each — the 🧪 POC overviews (§5);
-                              ProjectManagement/ also Client, ProductCategory, Supplier, SupplierCategory,
+                              ProjectManagement/ also Client, ProductCategory, Product, Supplier, SupplierCategory,
                               TenderType, Unit, CertificationCategory, Certification;
                               Hrm/ also Department, DepartmentImport, Designation, DesignationImport,
                               Employee, EmployeeImport
@@ -90,7 +90,8 @@ app/
   Models/Hrm/                 Department, Employee (company-scoped, §9.10), Designation (group-wide, §9.10)
   Models/ProjectManagement/   Client, Supplier (company-scoped, §9.10 — the ERP's one customer
                               and one supplier list), ProductCategory (company-scoped, seeded per
-                              company — §9.14), SupplierCategory, TenderType, Unit,
+                              company — §9.14), Product (company-scoped, in its company's
+                              ProductCategory), SupplierCategory, TenderType, Unit,
                               CertificationCategory, Certification (group-wide, §9.10)
   Notifications/Admin/        AccountChanged
   Observers/                  ActorObserver
@@ -102,7 +103,7 @@ app/
   Services/Hrm/               DepartmentService, DepartmentImportBlueprint (the first real importer),
                               DesignationService, DesignationImportBlueprint, EmployeeService,
                               EmployeeImportBlueprint
-  Services/ProjectManagement/ ClientService, ProductCategoryService (+ its STARTER set), SupplierService, SupplierCategoryService, TenderTypeService,
+  Services/ProjectManagement/ ClientService, ProductCategoryService (+ its STARTER set), ProductService, SupplierService, SupplierCategoryService, TenderTypeService,
                               UnitService, CertificationCategoryService, CertificationService
   Services/Training/          TrainingRegistry (reads config/training.php), TrainingGapFinder
   Services/Imports/           the mapped-import engine (§9.13): ImportRunner, SheetReader,
@@ -132,13 +133,13 @@ resources/
     components/admin/         Admin-only dialogs and panels
     components/notifications/ the bell
     components/{projects,accounting,hrm}/   sample-data.ts for each 🧪 POC overview;
-                              projects/ also the client, product category, supplier, supplier
+                              projects/ also the client, product category, product, supplier, supplier
                               category, tender type, unit, certification category and
                               certification form dialogs;
                               hrm/ also the department, designation and employee form dialogs
     components/training/      the manual: vocabulary, guide loader, language toggle, the header's ?,
                               table of contents; guides/{general,admin,settings,projects,hrm,shared}/
-                              (§5) — projects/ holds clients, product categories, suppliers, supplier categories, tender types, units,
+                              (§5) — projects/ holds clients, product categories, products, suppliers, supplier categories, tender types, units,
                               certification categories, certifications;
                               hrm/ departments, designations, employees
     components/*.tsx          the app shell (sidebar, header, nav, logo, theme picker, …)
@@ -154,7 +155,7 @@ routes/
   settings.php                the user's own account settings
   training.php                the in-app manual (ungated)
   projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each; projects.php
-                              also clients, product categories, suppliers, supplier categories, tender types, units, certification categories,
+                              also clients, product categories, products, suppliers, supplier categories, tender types, units, certification categories,
                               certifications; hrm.php also departments, designations, employees and
                               their imports)
   channels.php                private broadcast channels
@@ -263,7 +264,9 @@ restorable in the `hrm/departments` shape, with bulk delete and no import. Proje
 every project needs a client before Accounting exists; Accounting's invoices will point at the same
 rows. **Product Categories** (`projects/product-categories`; owner, 2026-11-03) are company-scoped and
 restorable in the Clients shape, without import, and **every company starts with a 13-row starter
-set** (§9.14); what will point at a category is still the owner's to name.
+set** (§9.14). **Products** (`projects/products`; owner, 2026-11-03) are the first thing to point at
+a category: company-scoped and restorable in the Suppliers shape, each in one of its company's
+categories, which `ProductCategoryService::deletionBlocker()` then guards.
 **Tender Types** (`projects/tender-types`; owner, 2026-11-02) — how a project was procured —
 are group-wide, the second ERP exception to §9.10, in the `hrm/designations` shape without import.
 **Suppliers** (`projects/suppliers`; owner, 2026-11-02) are **the ERP's one supplier list** — Projects

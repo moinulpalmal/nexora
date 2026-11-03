@@ -138,6 +138,11 @@ return [
             'title_en' => 'Product categories', 'title_bn' => 'পণ্যের শ্রেণি', 'status' => 'written',
             'shots' => ['overview' => 'The product categories of an invented company', 'form' => 'The New product category dialog'],
         ],
+        'projects.products' => [
+            'route' => 'projects.products.index', 'guide' => 'projects/products', 'section' => 'projects', 'sort' => 23,
+            'title_en' => 'Products', 'title_bn' => 'পণ্য', 'status' => 'written',
+            'shots' => ['overview' => 'The products of an invented company', 'form' => 'The New product dialog'],
+        ],
         'projects.supplier-categories' => [
             'route' => 'projects.supplier-categories.index', 'guide' => 'projects/supplier-categories', 'section' => 'projects', 'sort' => 24,
             'title_en' => 'Supplier categories', 'title_bn' => 'সরবরাহকারীর শ্রেণি', 'status' => 'written',

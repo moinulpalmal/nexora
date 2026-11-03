@@ -3,6 +3,7 @@
 use App\Enums\RecordStatus;
 use App\Models\Admin\AuditLog;
 use App\Models\Admin\Company;
+use App\Models\ProjectManagement\Product;
 use App\Models\ProjectManagement\ProductCategory;
 use App\Models\User;
 use App\Services\ProjectManagement\ProductCategoryService;
@@ -333,6 +334,62 @@ test('bulk permanent delete removes the ticked deleted categories and records ea
 
     expect(ProductCategory::withoutGlobalScopes()->withTrashed()->count())->toBe(0)
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'product-category')->count())->toBe(2);
+});
+
+/*
+| Deletion guard (ARCHITECTURE.md §9.14)
+*/
+
+test('a category any product is in cannot be deleted or permanently deleted', function (bool $trashed) {
+    $company = Company::factory()->create();
+    $category = ProductCategory::factory()->for($company)->create();
+    Product::factory()->for($company)->for($category, 'category')->create()->delete();
+    Product::factory()->for($company)->for($category, 'category')->create();
+
+    if ($trashed) {
+        $category->delete();
+    }
+
+    $this->actingAs(productCategoryActor($company, 'projects.product-categories.delete', 'projects.product-categories.force-delete'));
+
+    $response = $trashed
+        ? $this->delete(route('projects.product-categories.force-delete', $category))
+        : $this->delete(route('projects.product-categories.destroy', $category));
+
+    assertToast($response, 'warning')->assertSessionHas('inertia.flash_data.toast.message', 'Used by 2 products. Move them to another category, or deactivate this one instead.');
+
+    expect(ProductCategory::withoutGlobalScopes()->find($category->id)?->trashed())->toBe($trashed);
+})->with(['delete' => false, 'permanent delete' => true]);
+
+test('a category in use can still be deactivated', function () {
+    $company = Company::factory()->create();
+    $category = ProductCategory::factory()->for($company)->create(['code' => 'RAW', 'name' => 'Raw Materials']);
+    Product::factory()->for($company)->for($category, 'category')->create();
+
+    $this->actingAs(productCategoryActor($company, 'projects.product-categories.update'))
+        ->put(route('projects.product-categories.update', $category), productCategoryPayload(['status' => RecordStatus::Inactive->value]))
+        ->assertSessionHasNoErrors();
+
+    expect($category->refresh()->status)->toBe(RecordStatus::Inactive);
+});
+
+test('bulk delete deletes the free categories and names the ones in use', function () {
+    $company = Company::factory()->create();
+    $free = ProductCategory::factory()->for($company)->create();
+    $used = ProductCategory::factory()->for($company)->create(['code' => 'USED']);
+    Product::factory()->for($company)->for($used, 'category')->create();
+
+    $this->actingAs(productCategoryActor($company, 'projects.product-categories.delete'));
+
+    $response = $this->delete(route('projects.product-categories.bulk-destroy'), ['ids' => [$free->id, $used->id]]);
+
+    assertToast($response, 'warning')->assertSessionHas(
+        'inertia.flash_data.toast.message',
+        '1 product category moved to Deleted. Not deleted — USED: Used by one product. Move it to another category, or deactivate this one instead.',
+    );
+
+    expect($free->refresh()->trashed())->toBeTrue()
+        ->and($used->refresh()->trashed())->toBeFalse();
 });
 
 /*

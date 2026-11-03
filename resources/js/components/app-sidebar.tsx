@@ -1,6 +1,7 @@
 import { Link } from '@inertiajs/react';
 import {
     Award,
+    Boxes,
     Briefcase,
     Building2,
     FolderKanban,
@@ -59,6 +60,7 @@ import { index as certificationCategoriesIndex } from '@/routes/projects/certifi
 import { index as certificationsIndex } from '@/routes/projects/certifications';
 import { index as clientsIndex } from '@/routes/projects/clients';
 import { index as productCategoriesIndex } from '@/routes/projects/product-categories';
+import { index as productsIndex } from '@/routes/projects/products';
 import { index as supplierCategoriesIndex } from '@/routes/projects/supplier-categories';
 import { index as suppliersIndex } from '@/routes/projects/suppliers';
 import { index as tenderTypesIndex } from '@/routes/projects/tender-types';
@@ -104,6 +106,7 @@ export function AppSidebar() {
     const canViewProjects = useCan('projects.dashboard.view');
     const canViewClients = useCan('projects.clients.view');
     const canViewProductCategories = useCan('projects.product-categories.view');
+    const canViewProducts = useCan('projects.products.view');
     const canViewSupplierCategories = useCan(
         'projects.supplier-categories.view',
     );
@@ -201,6 +204,12 @@ export function AppSidebar() {
             href: productCategoriesIndex(),
             icon: Package,
             visible: canViewProductCategories,
+        },
+        {
+            title: 'Products',
+            href: productsIndex(),
+            icon: Boxes,
+            visible: canViewProducts,
         },
         {
             title: 'Supplier Categories',

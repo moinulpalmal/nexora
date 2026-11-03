@@ -101,6 +101,12 @@ class ProductCategoryController extends Controller
 
     public function destroy(ProductCategory $productCategory): RedirectResponse
     {
+        $blocker = $this->categories->deletionBlocker($productCategory);
+
+        if ($blocker !== null) {
+            return $this->refuse($blocker);
+        }
+
         $this->categories->delete($productCategory);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Product category moved to Deleted.')]);
@@ -119,6 +125,12 @@ class ProductCategoryController extends Controller
 
     public function forceDelete(ProductCategory $productCategory): RedirectResponse
     {
+        $blocker = $this->categories->deletionBlocker($productCategory);
+
+        if ($blocker !== null) {
+            return $this->refuse($blocker);
+        }
+
         $this->categories->forceDelete($productCategory);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Product category permanently deleted.')]);
@@ -133,14 +145,9 @@ class ProductCategoryController extends Controller
      */
     public function bulkDestroy(BulkRequest $request): RedirectResponse
     {
-        $done = $this->categories->bulkDelete(ProductCategory::query()->whereKey($request->ids())->get());
+        $result = $this->categories->bulkDelete(ProductCategory::query()->whereKey($request->ids())->get());
 
-        Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => trans_choice(':count product category moved to Deleted.|:count product categories moved to Deleted.', $done, ['count' => $done]),
-        ]);
-
-        return back();
+        return $this->bulkToast($result, ':count product category moved to Deleted.|:count product categories moved to Deleted.');
     }
 
     /**
@@ -148,11 +155,30 @@ class ProductCategoryController extends Controller
      */
     public function bulkForceDelete(BulkRequest $request): RedirectResponse
     {
-        $done = $this->categories->bulkForceDelete(ProductCategory::onlyTrashed()->whereKey($request->ids())->get());
+        $result = $this->categories->bulkForceDelete(ProductCategory::onlyTrashed()->whereKey($request->ids())->get());
+
+        return $this->bulkToast($result, ':count product category permanently deleted.|:count product categories permanently deleted.');
+    }
+
+    /**
+     * `success` when every ticked category went, `warning` naming each one a
+     * guard kept, as `SupplierCategoryController::bulkToast()`.
+     *
+     * @param  array{done: int, refused: list<string>}  $result
+     */
+    protected function bulkToast(array $result, string $doneMessage): RedirectResponse
+    {
+        $message = trans_choice($doneMessage, $result['done'], ['count' => $result['done']]);
+
+        if ($result['refused'] === []) {
+            Inertia::flash('toast', ['type' => 'success', 'message' => $message]);
+
+            return back();
+        }
 
         Inertia::flash('toast', [
-            'type' => 'success',
-            'message' => trans_choice(':count product category permanently deleted.|:count product categories permanently deleted.', $done, ['count' => $done]),
+            'type' => 'warning',
+            'message' => $message.' '.__('Not deleted — :reasons', ['reasons' => implode(' ', $result['refused'])]),
         ]);
 
         return back();

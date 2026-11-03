@@ -5,6 +5,7 @@ namespace App\Services\ProjectManagement;
 use App\Enums\Admin\AuditEvent;
 use App\Enums\RecordStatus;
 use App\Models\Admin\Company;
+use App\Models\ProjectManagement\Product;
 use App\Models\ProjectManagement\ProductCategory;
 use App\Services\Admin\AuditRecorder;
 
@@ -12,11 +13,10 @@ use App\Services\Admin\AuditRecorder;
  * Every write to a product category, as `ClientService`, plus the starter set
  * every company begins with (owner, 2026-11-03).
  *
- * **There is no `deletionBlocker()` yet** (ARCHITECTURE.md §9.14): the owner
- * has not yet named what will point at a product category, and a blocker that
- * can only return `null` would read as a guard while guarding nothing. The
- * first table with a `product_category_id` adds it, with the controller's
- * refusal and the bulk methods' per-row check alongside.
+ * {@see self::deletionBlocker()} refuses while products hold the category
+ * (ARCHITECTURE.md §9.14), for one row and per row in bulk, as
+ * `SupplierCategoryService`. Deactivating a category in use is allowed (owner,
+ * 2026-11-03): its products keep it, and it is no longer offered to new ones.
  */
 class ProductCategoryService
 {
@@ -134,40 +134,75 @@ class ProductCategoryService
     }
 
     /**
-     * Soft delete each category, one at a time so each is audited.
+     * Soft delete each category its guard allows, one at a time so each is
+     * audited; the rest are reported, not deleted.
      *
      * @param  iterable<ProductCategory>  $categories
-     * @return int how many were deleted
+     * @return array{done: int, refused: list<string>}
      */
-    public function bulkDelete(iterable $categories): int
+    public function bulkDelete(iterable $categories): array
     {
-        return $this->each($categories, $this->delete(...));
+        return $this->eachUnblocked($categories, $this->delete(...));
     }
 
     /**
      * Delete each soft-deleted category for good, recording each.
      *
      * @param  iterable<ProductCategory>  $categories
-     * @return int how many were deleted
+     * @return array{done: int, refused: list<string>}
      */
-    public function bulkForceDelete(iterable $categories): int
+    public function bulkForceDelete(iterable $categories): array
     {
-        return $this->each($categories, $this->forceDelete(...));
+        return $this->eachUnblocked($categories, $this->forceDelete(...));
+    }
+
+    /**
+     * Refused while any product holds the category.
+     *
+     * Counted with every scope removed and deleted products included (§9.14):
+     * whether a row is in use is a question about the database, not about what
+     * the actor can see, and a deleted product still points here — the foreign
+     * key would refuse the permanent delete either way.
+     */
+    public function deletionBlocker(ProductCategory $category): ?string
+    {
+        $products = Product::withoutGlobalScopes()->where('product_category_id', $category->id)->count();
+
+        if ($products > 0) {
+            return trans_choice(
+                '{1} Used by one product. Move it to another category, or deactivate this one instead.'
+                .'|[2,*] Used by :count products. Move them to another category, or deactivate this one instead.',
+                $products,
+                ['count' => $products],
+            );
+        }
+
+        return null;
     }
 
     /**
      * @param  iterable<ProductCategory>  $categories
      * @param  callable(ProductCategory): void  $write
+     * @return array{done: int, refused: list<string>}
      */
-    private function each(iterable $categories, callable $write): int
+    private function eachUnblocked(iterable $categories, callable $write): array
     {
         $done = 0;
+        $refused = [];
 
         foreach ($categories as $category) {
+            $blocker = $this->deletionBlocker($category);
+
+            if ($blocker !== null) {
+                $refused[] = "{$category->code}: {$blocker}";
+
+                continue;
+            }
+
             $write($category);
             $done++;
         }
 
-        return $done;
+        return ['done' => $done, 'refused' => $refused];
     }
 }

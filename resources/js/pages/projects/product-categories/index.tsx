@@ -45,8 +45,8 @@ type Props = {
  * bulk delete on both tabs), without a spreadsheet import. Every company starts
  * with a starter set (owner, 2026-11-03).
  *
- * Nothing references a product category yet, so every row can be deleted and
- * ticked.
+ * Every row can be ticked; the server refuses to delete a category any product
+ * is in, and names it in a warning toast (bulk delete deletes the rest).
  */
 export default function ProductCategoriesIndex({
     categories,

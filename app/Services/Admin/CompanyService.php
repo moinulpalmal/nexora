@@ -7,6 +7,7 @@ use App\Models\Admin\Company;
 use App\Models\Hrm\Department;
 use App\Models\Hrm\Employee;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\Product;
 use App\Models\ProjectManagement\ProductCategory;
 use App\Models\ProjectManagement\Supplier;
 use App\Services\ProjectManagement\ProductCategoryService;
@@ -140,8 +141,8 @@ class CompanyService
     */
 
     /**
-     * Refused while any department, employee, client, supplier or product
-     * category belongs to the company.
+     * Refused while any department, employee, client, supplier, product or
+     * product category belongs to the company.
      *
      * Counted with the company scope removed and deleted rows included
      * (§9.14): whether a row is in use is a question about the database, not
@@ -191,6 +192,19 @@ class CompanyService
                 .'|[2,*] :count suppliers belong to this company. Deactivate the company instead, or delete them for good first.',
                 $suppliers,
                 ['count' => $suppliers],
+            );
+        }
+
+        // Before the categories: a product holds its category, so the
+        // products are what must go first.
+        $products = Product::withoutGlobalScopes()->where('company_id', $company->id)->count();
+
+        if ($products > 0) {
+            return trans_choice(
+                '{1} One product belongs to this company. Deactivate the company instead, or delete that product for good first.'
+                .'|[2,*] :count products belong to this company. Deactivate the company instead, or delete them for good first.',
+                $products,
+                ['count' => $products],
             );
         }
 

@@ -111,8 +111,8 @@ export default function CompaniesGuide() {
                         bn="কোনো কোম্পানিকে অবসরে পাঠাতে এটি সম্পাদনা করে অবস্থা Inactive করুন। তখন আর কেউ এটি বেছে নিতে পারবেন না, তবে এর রেকর্ডগুলো থেকে যাবে।"
                     />
                     <Step
-                        en="To delete several at once, tick their rows — the box in the heading ticks every row on the page — and press Delete in the bar that appears. A company that departments, employees, clients, suppliers or product categories belong to cannot be ticked."
-                        bn="একসাথে কয়েকটি মুছতে সারিগুলোতে টিক দিন — শিরোনামের বক্সটি পেজের সব সারিতে টিক দেয় — তারপর যে বারটি দেখা যায় তাতে Delete চাপুন। যে কোম্পানির অধীনে বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী বা পণ্যের শ্রেণি আছে সেটিতে টিক দেওয়া যায় না।"
+                        en="To delete several at once, tick their rows — the box in the heading ticks every row on the page — and press Delete in the bar that appears. A company that departments, employees, clients, suppliers, products or product categories belong to cannot be ticked."
+                        bn="একসাথে কয়েকটি মুছতে সারিগুলোতে টিক দিন — শিরোনামের বক্সটি পেজের সব সারিতে টিক দেয় — তারপর যে বারটি দেখা যায় তাতে Delete চাপুন। যে কোম্পানির অধীনে বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী, পণ্য বা পণ্যের শ্রেণি আছে সেটিতে টিক দেওয়া যায় না।"
                     />
                     <Step
                         en="A deleted company waits on the Deleted tab, where it can be restored or deleted for good — one at a time, or ticked together and removed with Delete permanently."
@@ -160,8 +160,8 @@ export default function CompaniesGuide() {
                 />
                 <Bullets>
                     <Bullet
-                        en="The delete button is disabled while any department, employee, client, supplier or product category belongs to the company; point at it to read why."
-                        bn="কোম্পানির অধীনে কোনো বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী বা পণ্যের শ্রেণি থাকলে মোছার বোতাম বন্ধ থাকে; কারণ জানতে এর ওপর মাউস রাখুন।"
+                        en="The delete button is disabled while any department, employee, client, supplier, product or product category belongs to the company; point at it to read why."
+                        bn="কোম্পানির অধীনে কোনো বিভাগ, কর্মচারী, ক্লায়েন্ট, সরবরাহকারী, পণ্য বা পণ্যের শ্রেণি থাকলে মোছার বোতাম বন্ধ থাকে; কারণ জানতে এর ওপর মাউস রাখুন।"
                     />
                 </Bullets>
                 <ListBasics deletedTab />
@@ -202,6 +202,11 @@ export default function CompaniesGuide() {
                     text="2 suppliers belong to this company. Deactivate the company instead, or delete them for good first."
                     en="The same rule for Projects suppliers, checked once the company has no departments, employees or clients left."
                     bn="Projects-এর সরবরাহকারীদের জন্যও একই নিয়ম, কোম্পানির আর কোনো বিভাগ, কর্মচারী বা ক্লায়েন্ট না থাকলে এটি যাচাই হয়।"
+                />
+                <Message
+                    text="4 products belong to this company. Deactivate the company instead, or delete them for good first."
+                    en="The same rule for Projects products, checked after suppliers. Delete them for good on Projects → Products before their categories."
+                    bn="Projects-এর পণ্যের জন্যও একই নিয়ম, সরবরাহকারীর পরে যাচাই হয়। এদের শ্রেণির আগে Projects → Products থেকে এগুলো চিরতরে মুছুন।"
                 />
                 <Message
                     text="13 product categories belong to this company. Deactivate the company instead, or delete them for good first."

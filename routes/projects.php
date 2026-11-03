@@ -5,6 +5,7 @@ use App\Http\Controllers\ProjectManagement\CertificationController;
 use App\Http\Controllers\ProjectManagement\ClientController;
 use App\Http\Controllers\ProjectManagement\DashboardController;
 use App\Http\Controllers\ProjectManagement\ProductCategoryController;
+use App\Http\Controllers\ProjectManagement\ProductController;
 use App\Http\Controllers\ProjectManagement\SupplierCategoryController;
 use App\Http\Controllers\ProjectManagement\SupplierController;
 use App\Http\Controllers\ProjectManagement\TenderTypeController;
@@ -87,6 +88,33 @@ Route::middleware(['auth', 'auth.session'])
             ->withTrashed()
             ->middleware('permission:projects.product-categories.force-delete')
             ->name('product-categories.force-delete');
+
+        // Kept per company, each in one of the company's product categories
+        // (owner, 2026-11-03).
+        Route::delete('products/bulk', [ProductController::class, 'bulkDestroy'])
+            ->middleware('permission:projects.products.delete')
+            ->name('products.bulk-destroy');
+
+        Route::delete('products/bulk/force', [ProductController::class, 'bulkForceDelete'])
+            ->middleware('permission:projects.products.force-delete')
+            ->name('products.bulk-force-delete');
+
+        Route::resource('products', ProductController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middlewareFor(['index'], 'permission:projects.products.view')
+            ->middlewareFor(['store'], 'permission:projects.products.create')
+            ->middlewareFor(['update'], 'permission:projects.products.update')
+            ->middlewareFor(['destroy'], 'permission:projects.products.delete');
+
+        Route::put('products/{product}/restore', [ProductController::class, 'restore'])
+            ->withTrashed()
+            ->middleware('permission:projects.products.restore')
+            ->name('products.restore');
+
+        Route::delete('products/{product}/force', [ProductController::class, 'forceDelete'])
+            ->withTrashed()
+            ->middleware('permission:projects.products.force-delete')
+            ->name('products.force-delete');
 
         // Group-wide (owner, 2026-11-02): every company's suppliers are
         // classified by one list (§9.10).

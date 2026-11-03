@@ -28,8 +28,8 @@ export default function ProductCategoriesGuide() {
         <Guide>
             <GuideSection kind="purpose">
                 <Para
-                    en="The product categories of the company you are working in — the groups the company's products and items will be sorted into. Each company keeps its own list, and every new company starts with 13 standard ones (Raw Materials, Consumables, Spare Parts, Services and the like) that you can rename, deactivate or delete."
-                    bn="আপনি যে কোম্পানিতে কাজ করছেন তার পণ্যের শ্রেণিগুলো — কোম্পানির পণ্য ও আইটেমগুলো যেসব দলে ভাগ করা হবে। প্রতিটি কোম্পানির নিজস্ব তালিকা থাকে, এবং প্রতিটি নতুন কোম্পানি ১৩টি সাধারণ শ্রেণি (Raw Materials, Consumables, Spare Parts, Services ইত্যাদি) নিয়ে শুরু হয়, যেগুলোর নাম বদলানো, নিষ্ক্রিয় করা বা মোছা যায়।"
+                    en="The product categories of the company you are working in — the groups the company's products (Projects → Products) are sorted into. Each company keeps its own list, and every new company starts with 13 standard ones (Raw Materials, Consumables, Spare Parts, Services and the like) that you can rename, deactivate or delete."
+                    bn="আপনি যে কোম্পানিতে কাজ করছেন তার পণ্যের শ্রেণিগুলো — কোম্পানির পণ্যগুলো (Projects → Products) যেসব দলে ভাগ করা হয়। প্রতিটি কোম্পানির নিজস্ব তালিকা থাকে, এবং প্রতিটি নতুন কোম্পানি ১৩টি সাধারণ শ্রেণি (Raw Materials, Consumables, Spare Parts, Services ইত্যাদি) নিয়ে শুরু হয়, যেগুলোর নাম বদলানো, নিষ্ক্রিয় করা বা মোছা যায়।"
                 />
             </GuideSection>
 
@@ -186,6 +186,11 @@ export default function ProductCategoriesGuide() {
                     bn="মুছে ফেলা একটি শ্রেণির এখনো এই নামটি আছে। দ্বিতীয়টি না বানিয়ে সেটিকেই ফিরিয়ে আনুন।"
                 />
                 <Message
+                    text="Used by 3 products. Move them to another category, or deactivate this one instead."
+                    en="Products are in this category, deleted products included, so it cannot be deleted — neither moved to Deleted nor deleted for good. Edit those products onto another category, or make this one Inactive: its products keep it, and new products cannot choose it. Bulk delete deletes the free categories and names the kept ones."
+                    bn="এই শ্রেণিতে পণ্য আছে, মুছে ফেলা পণ্যসহ, তাই এটি মোছা যায় না — Deleted-এ পাঠানোও না, চিরতরে মোছাও না। ওই পণ্যগুলো সম্পাদনা করে অন্য শ্রেণিতে নিন, অথবা এটিকে Inactive করুন: এর পণ্যগুলো শ্রেণিটি রেখে দেবে, নতুন পণ্য এটি বেছে নিতে পারবে না। একসাথে মোছার সময় খালি শ্রেণিগুলো মোছা হয় এবং যেগুলো রাখা হলো সেগুলোর নাম জানানো হয়।"
+                />
+                <Message
                     text="Select a company in the header before adding a product category."
                     en="No company is selected. Choose one from the switcher and try again."
                     bn="কোনো কোম্পানি বেছে নেওয়া হয়নি। সুইচার থেকে একটি বেছে নিয়ে আবার চেষ্টা করুন।"
@@ -206,6 +211,11 @@ export default function ProductCategoriesGuide() {
             </GuideSection>
 
             <GuideSection kind="related">
+                <RelatedGuide
+                    to="projects.products"
+                    en="The products sorted into these categories."
+                    bn="যেসব পণ্য এই শ্রেণিগুলোতে ভাগ করা হয়।"
+                />
                 <RelatedGuide
                     to="admin.companies"
                     en="The companies product categories belong to."

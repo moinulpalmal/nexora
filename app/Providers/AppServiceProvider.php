@@ -16,6 +16,7 @@ use App\Models\ImportLimit;
 use App\Models\ProjectManagement\Certification;
 use App\Models\ProjectManagement\CertificationCategory;
 use App\Models\ProjectManagement\Client;
+use App\Models\ProjectManagement\Product;
 use App\Models\ProjectManagement\ProductCategory;
 use App\Models\ProjectManagement\Supplier;
 use App\Models\ProjectManagement\SupplierCategory;
@@ -58,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
         'employee' => Employee::class,
         'client' => Client::class,
         'product-category' => ProductCategory::class,
+        'product' => Product::class,
         'tender-type' => TenderType::class,
         'supplier-category' => SupplierCategory::class,
         'unit' => Unit::class,
