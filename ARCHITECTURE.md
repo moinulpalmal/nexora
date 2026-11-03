@@ -170,8 +170,11 @@ tests/
                               test and the screenshot recipes
   Pest.php, TestCase.php      safety guards and helpers
 documentation/                module reference docs (§14)
-.claude/                      settings.json (hooks), hooks/ (architecture-sync, docs-sync — §12),
-                              skills/
+.claude/                      settings.json (hooks; enabledPlugins: claude-security, superpowers,
+                              claude-code-setup, caveman — the last from the akramsystems-plugins
+                              marketplace registered there; `/claude-security` scans write a
+                              self-ignored CLAUDE-SECURITY-<timestamp>/), hooks/ (architecture-sync,
+                              docs-sync — §12), skills/
 .serena/                      Serena project config and memories
 ```
 

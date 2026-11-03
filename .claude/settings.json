@@ -1,5 +1,19 @@
 {
     "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "enabledPlugins": {
+        "claude-security@claude-plugins-official": true,
+        "superpowers@claude-plugins-official": true,
+        "claude-code-setup@claude-plugins-official": true,
+        "caveman@akramsystems-plugins": true
+    },
+    "extraKnownMarketplaces": {
+        "akramsystems-plugins": {
+            "source": {
+                "source": "github",
+                "repo": "akramsystems/caveman"
+            }
+        }
+    },
     "hooks": {
         "PostToolUse": [
             {
