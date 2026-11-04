@@ -15,7 +15,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/supplier-categories';
+import { index } from '@/routes/projects/settings/supplier-categories';
 import type {
     Filterable,
     Paginated,
@@ -36,9 +36,9 @@ type Props = {
 };
 
 /**
- * Projects → Supplier Categories — what kind of supplier each one is, one
+ * Projects → Settings → Supplier Categories — what kind of supplier each one is, one
  * list every company shares (ARCHITECTURE.md §9.10). Laid out as
- * `projects/tender-types` (Active/Deleted tabs, every action a dialog, bulk
+ * `projects/settings/tender-types` (Active/Deleted tabs, every action a dialog, bulk
  * delete on both tabs); the page works whether or not a company is selected.
  *
  * Suppliers point here, so the server refuses to delete a category in use
@@ -55,11 +55,13 @@ export default function SupplierCategoriesIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.supplier-categories.create');
-    const canUpdate = useCan('projects.supplier-categories.update');
-    const canDelete = useCan('projects.supplier-categories.delete');
-    const canRestore = useCan('projects.supplier-categories.restore');
-    const canForceDelete = useCan('projects.supplier-categories.force-delete');
+    const canCreate = useCan('projects.settings.supplier-categories.create');
+    const canUpdate = useCan('projects.settings.supplier-categories.update');
+    const canDelete = useCan('projects.settings.supplier-categories.delete');
+    const canRestore = useCan('projects.settings.supplier-categories.restore');
+    const canForceDelete = useCan(
+        'projects.settings.supplier-categories.force-delete',
+    );
 
     const isDeleted = filters.view === 'trashed';
     const canBulkDelete = isDeleted ? canForceDelete : canDelete;

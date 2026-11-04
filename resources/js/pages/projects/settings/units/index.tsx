@@ -15,7 +15,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/units';
+import { index } from '@/routes/projects/settings/units';
 import type {
     Filterable,
     Paginated,
@@ -36,8 +36,8 @@ type Props = {
 };
 
 /**
- * Projects → Units of Measure — what a quantity is counted in, one list every
- * company shares (ARCHITECTURE.md §9.10). Laid out as `projects/tender-types`
+ * Projects → Settings → Units of Measure — what a quantity is counted in, one list every
+ * company shares (ARCHITECTURE.md §9.10). Laid out as `projects/settings/tender-types`
  * (Active/Deleted tabs, every action a dialog, bulk delete on both tabs) plus
  * the symbol and decimal places columns; the description shows in the form
  * only, to keep the list narrow.
@@ -53,11 +53,11 @@ export default function UnitsIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.units.create');
-    const canUpdate = useCan('projects.units.update');
-    const canDelete = useCan('projects.units.delete');
-    const canRestore = useCan('projects.units.restore');
-    const canForceDelete = useCan('projects.units.force-delete');
+    const canCreate = useCan('projects.settings.units.create');
+    const canUpdate = useCan('projects.settings.units.update');
+    const canDelete = useCan('projects.settings.units.delete');
+    const canRestore = useCan('projects.settings.units.restore');
+    const canForceDelete = useCan('projects.settings.units.force-delete');
 
     const isDeleted = filters.view === 'trashed';
     const canBulkDelete = isDeleted ? canForceDelete : canDelete;

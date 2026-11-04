@@ -15,8 +15,8 @@ file. What it established, named after what ships:
 - **`Concerns\MasterDataValidationRules`**: `normaliseName()` / `normaliseCode()` (also the import
   fields' transforms) and `uniqueIgnoringCase()`, which counts deleted rows and says "restore it
   instead" — the owner's duplicate rule for master tables (2026-10-29).
-- `components/shared/no-company-panel.tsx` for rule 5 below (promoted from `hrm/` when Projects →
-  Clients needed it). `projects/clients` is a second company-scoped sibling, without an import.
+- `components/shared/no-company-panel.tsx` for rule 5 below (promoted from `hrm/` when Projects → Settings →
+  Clients needed it). `projects/settings/clients` is a second company-scoped sibling, without an import.
 - The test helper shape: `departmentActor($company, ...$permissions)` in `DepartmentTest.php`.
 
 ---

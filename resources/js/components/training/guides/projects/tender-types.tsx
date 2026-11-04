@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Tender Types (`projects.tender-types.index`), with its New
+ * Projects → Settings → Tender Types (`projects.settings.tender-types.index`), with its New
  * tender type / Edit dialog and the Deleted tab. Source:
  * documentation/projects.md §4 (Tender types).
  */
@@ -37,32 +37,36 @@ export default function TenderTypesGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.tender-types.view</Ui> opens the list;{' '}
-                            <Ui>projects.tender-types.create</Ui>,{' '}
-                            <Ui>projects.tender-types.update</Ui> and{' '}
-                            <Ui>projects.tender-types.delete</Ui> add, edit and
-                            delete; <Ui>projects.tender-types.restore</Ui> and{' '}
-                            <Ui>projects.tender-types.force-delete</Ui> work on
-                            the Deleted tab. The project-manager role may view,
-                            add and edit, but not delete or restore: the list is
-                            shared, so removing a tender type is left to the
-                            super admin. No company needs to be selected.
+                            <Ui>projects.settings.tender-types.view</Ui> opens
+                            the list;{' '}
+                            <Ui>projects.settings.tender-types.create</Ui>,{' '}
+                            <Ui>projects.settings.tender-types.update</Ui> and{' '}
+                            <Ui>projects.settings.tender-types.delete</Ui> add,
+                            edit and delete;{' '}
+                            <Ui>projects.settings.tender-types.restore</Ui> and{' '}
+                            <Ui>projects.settings.tender-types.force-delete</Ui>{' '}
+                            work on the Deleted tab. The project-manager role
+                            may view, add and edit, but not delete or restore:
+                            the list is shared, so removing a tender type is
+                            left to the super admin. No company needs to be
+                            selected.
                         </>
                     }
                     bn={
                         <>
-                            <Ui>projects.tender-types.view</Ui> থাকলে তালিকা
-                            খোলা যায়; <Ui>projects.tender-types.create</Ui>,{' '}
-                            <Ui>projects.tender-types.update</Ui> ও{' '}
-                            <Ui>projects.tender-types.delete</Ui> দিয়ে যোগ,
-                            সম্পাদনা ও মোছা যায়;{' '}
-                            <Ui>projects.tender-types.restore</Ui> ও{' '}
-                            <Ui>projects.tender-types.force-delete</Ui> Deleted
-                            ট্যাবে কাজ করে। project-manager রোল দেখতে, যোগ করতে
-                            ও সম্পাদনা করতে পারে, কিন্তু মুছতে বা ফিরিয়ে আনতে
-                            পারে না: তালিকাটি সবার, তাই দরপত্রের ধরন মোছার কাজ
-                            সুপার অ্যাডমিনের। কোনো কোম্পানি বেছে নেওয়ার দরকার
-                            নেই।
+                            <Ui>projects.settings.tender-types.view</Ui> থাকলে
+                            তালিকা খোলা যায়;{' '}
+                            <Ui>projects.settings.tender-types.create</Ui>,{' '}
+                            <Ui>projects.settings.tender-types.update</Ui> ও{' '}
+                            <Ui>projects.settings.tender-types.delete</Ui> দিয়ে
+                            যোগ, সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>projects.settings.tender-types.restore</Ui> ও{' '}
+                            <Ui>projects.settings.tender-types.force-delete</Ui>{' '}
+                            Deleted ট্যাবে কাজ করে। project-manager রোল দেখতে,
+                            যোগ করতে ও সম্পাদনা করতে পারে, কিন্তু মুছতে বা
+                            ফিরিয়ে আনতে পারে না: তালিকাটি সবার, তাই দরপত্রের
+                            ধরন মোছার কাজ সুপার অ্যাডমিনের। কোনো কোম্পানি বেছে
+                            নেওয়ার দরকার নেই।
                         </>
                     }
                 />
@@ -78,8 +82,8 @@ export default function TenderTypesGuide() {
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Tender Types. Search by code or name in the row under the headings, or pick a status."
-                        bn="Projects → Tender Types খুলুন। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন, অথবা একটি অবস্থা বেছে নিন।"
+                        en="Open Projects → Settings → Tender Types. Search by code or name in the row under the headings, or pick a status."
+                        bn="Projects → Settings → Tender Types খুলুন। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন, অথবা একটি অবস্থা বেছে নিন।"
                     >
                         <Shot
                             id="overview"
@@ -199,7 +203,7 @@ export default function TenderTypesGuide() {
 
             <GuideSection kind="related">
                 <RelatedGuide
-                    to="projects.clients"
+                    to="projects.settings.clients"
                     en="The clients projects are run for."
                     bn="যেসব ক্লায়েন্টের জন্য প্রকল্প চালানো হয়।"
                 />

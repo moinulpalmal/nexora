@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Supplier Categories (`projects.supplier-categories.index`), with
+ * Projects → Settings → Supplier Categories (`projects.settings.supplier-categories.index`), with
  * its New supplier category / Edit dialog and the Deleted tab. Source:
  * documentation/projects.md §4 (Supplier categories).
  */
@@ -37,27 +37,54 @@ export default function SupplierCategoriesGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.supplier-categories.view</Ui> opens the
-                            list; <Ui>projects.supplier-categories.create</Ui>,{' '}
-                            <Ui>projects.supplier-categories.update</Ui> and{' '}
-                            <Ui>projects.supplier-categories.delete</Ui> add,
-                            edit and delete;{' '}
-                            <Ui>projects.supplier-categories.restore</Ui> and{' '}
-                            <Ui>projects.supplier-categories.force-delete</Ui>{' '}
+                            <Ui>projects.settings.supplier-categories.view</Ui>{' '}
+                            opens the list;{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.create
+                            </Ui>
+                            ,{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.update
+                            </Ui>{' '}
+                            and{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.delete
+                            </Ui>{' '}
+                            add, edit and delete;{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.restore
+                            </Ui>{' '}
+                            and{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.force-delete
+                            </Ui>{' '}
                             work on the Deleted tab. The project-manager role
                             holds them all. No company needs to be selected.
                         </>
                     }
                     bn={
                         <>
-                            <Ui>projects.supplier-categories.view</Ui> থাকলে
-                            তালিকা খোলা যায়;{' '}
-                            <Ui>projects.supplier-categories.create</Ui>,{' '}
-                            <Ui>projects.supplier-categories.update</Ui> ও{' '}
-                            <Ui>projects.supplier-categories.delete</Ui> দিয়ে
-                            যোগ, সম্পাদনা ও মোছা যায়;{' '}
-                            <Ui>projects.supplier-categories.restore</Ui> ও{' '}
-                            <Ui>projects.supplier-categories.force-delete</Ui>{' '}
+                            <Ui>projects.settings.supplier-categories.view</Ui>{' '}
+                            থাকলে তালিকা খোলা যায়;{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.create
+                            </Ui>
+                            ,{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.update
+                            </Ui>{' '}
+                            ও{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.delete
+                            </Ui>{' '}
+                            দিয়ে যোগ, সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.restore
+                            </Ui>{' '}
+                            ও{' '}
+                            <Ui>
+                                projects.settings.supplier-categories.force-delete
+                            </Ui>{' '}
                             Deleted ট্যাবে কাজ করে। project-manager রোলের কাছে
                             এর সবগুলোই আছে। কোনো কোম্পানি বেছে নেওয়ার দরকার
                             নেই।
@@ -76,8 +103,8 @@ export default function SupplierCategoriesGuide() {
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Supplier Categories. Search by code or name in the row under the headings."
-                        bn="Projects → Supplier Categories খুলুন। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন।"
+                        en="Open Projects → Settings → Supplier Categories. Search by code or name in the row under the headings."
+                        bn="Projects → Settings → Supplier Categories খুলুন। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন।"
                     >
                         <Shot
                             id="overview"
@@ -202,7 +229,7 @@ export default function SupplierCategoriesGuide() {
 
             <GuideSection kind="related">
                 <RelatedGuide
-                    to="projects.suppliers"
+                    to="projects.settings.suppliers"
                     en="The suppliers each category classifies."
                     bn="যে সরবরাহকারীদের প্রতিটি শ্রেণি ভাগ করে।"
                 />

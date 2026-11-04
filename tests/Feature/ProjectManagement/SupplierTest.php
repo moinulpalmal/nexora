@@ -9,10 +9,10 @@ use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
-| Projects → Suppliers
+| Projects → Settings → Suppliers
 |--------------------------------------------------------------------------
 |
-| The ERP's one supplier list, company-scoped as Projects → Clients
+| The ERP's one supplier list, company-scoped as Projects → Settings → Clients
 | (ARCHITECTURE.md §9.10), each in a group-wide supplier category that must be
 | active to be chosen. The rules shared with clients are proved there; this
 | file proves the scoping once more and what suppliers add.
@@ -64,12 +64,12 @@ function supplierPayload(array $overrides = []): array
 */
 
 test('guests are sent to the login page', function () {
-    $this->get(route('projects.suppliers.index'))->assertRedirect(route('login'));
+    $this->get(route('projects.settings.suppliers.index'))->assertRedirect(route('login'));
 });
 
 test('the list is refused without the view permission', function () {
     $this->actingAs(supplierActor(Company::factory()->create()))
-        ->get(route('projects.suppliers.index'))
+        ->get(route('projects.settings.suppliers.index'))
         ->assertForbidden();
 });
 
@@ -81,19 +81,19 @@ test('each write is refused without its own permission', function (string $metho
         $supplier->delete();
     }
 
-    $this->actingAs(supplierActor($company, 'projects.suppliers.view'))
+    $this->actingAs(supplierActor($company, 'projects.settings.suppliers.view'))
         ->{$method}(route($route, $supplier), supplierPayload())
         ->assertForbidden();
 })->with([
-    'update' => ['put', 'projects.suppliers.update', false],
-    'delete' => ['delete', 'projects.suppliers.destroy', false],
-    'restore' => ['put', 'projects.suppliers.restore', true],
-    'force delete' => ['delete', 'projects.suppliers.force-delete', true],
+    'update' => ['put', 'projects.settings.suppliers.update', false],
+    'delete' => ['delete', 'projects.settings.suppliers.destroy', false],
+    'restore' => ['put', 'projects.settings.suppliers.restore', true],
+    'force delete' => ['delete', 'projects.settings.suppliers.force-delete', true],
 ]);
 
 test('creating is refused without the create permission', function () {
-    $this->actingAs(supplierActor(Company::factory()->create(), 'projects.suppliers.view'))
-        ->post(route('projects.suppliers.store'), supplierPayload())
+    $this->actingAs(supplierActor(Company::factory()->create(), 'projects.settings.suppliers.view'))
+        ->post(route('projects.settings.suppliers.store'), supplierPayload())
         ->assertForbidden();
 });
 
@@ -104,11 +104,11 @@ test('the list shows only the selected company\'s suppliers, with every category
     Supplier::factory()->for($mine)->for($category, 'category')->create(['code' => 'MINE']);
     Supplier::factory()->for($theirs)->create(['code' => 'THEIRS']);
 
-    $this->actingAs(supplierActor($mine, 'projects.suppliers.view'))
-        ->get(route('projects.suppliers.index'))
+    $this->actingAs(supplierActor($mine, 'projects.settings.suppliers.view'))
+        ->get(route('projects.settings.suppliers.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('projects/suppliers/index')
+            ->component('projects/settings/suppliers/index')
             ->where('company.id', $mine->id)
             ->has('suppliers.data', 1)
             ->where('suppliers.data.0.code', 'MINE')
@@ -124,8 +124,8 @@ test('the list filters on the category and the tax numbers', function (string $c
     Supplier::factory()->for($company)->for($hitCategory, 'category')->create(['code' => 'HIT', 'tin' => '111122223333', 'bin' => '000111222-0101']);
     Supplier::factory()->for($company)->create(['code' => 'MISS', 'tin' => '999988887777', 'bin' => '000999888-0101']);
 
-    $this->actingAs(supplierActor($company, 'projects.suppliers.view'))
-        ->get(route('projects.suppliers.index', ['filter' => [$column => $prefix ?? $hitCategory->id]]))
+    $this->actingAs(supplierActor($company, 'projects.settings.suppliers.view'))
+        ->get(route('projects.settings.suppliers.index', ['filter' => [$column => $prefix ?? $hitCategory->id]]))
         ->assertInertia(fn ($page) => $page
             ->has('suppliers.data', 1)
             ->where('suppliers.data.0.code', 'HIT'),
@@ -140,18 +140,18 @@ test('another company\'s supplier is a 404', function () {
     [$mine, $theirs] = Company::factory()->count(2)->create();
     $foreign = Supplier::factory()->for($theirs)->create();
 
-    $this->actingAs(supplierActor($mine, 'projects.suppliers.update'))
-        ->put(route('projects.suppliers.update', $foreign), supplierPayload())
+    $this->actingAs(supplierActor($mine, 'projects.settings.suppliers.update'))
+        ->put(route('projects.settings.suppliers.update', $foreign), supplierPayload())
         ->assertNotFound();
 });
 
 test('with no company selected the page says so and lists nothing', function () {
     Supplier::factory()->create();
-    $user = userWithPermissions('projects.suppliers.view');
+    $user = userWithPermissions('projects.settings.suppliers.view');
     $user->companies()->attach(Company::factory()->count(2)->create());
 
     $this->actingAs($user)
-        ->get(route('projects.suppliers.index'))
+        ->get(route('projects.settings.suppliers.index'))
         ->assertInertia(fn ($page) => $page
             ->where('company', null)
             ->has('suppliers.data', 0)
@@ -160,7 +160,7 @@ test('with no company selected the page says so and lists nothing', function () 
 });
 
 test('creating without a selected company is refused', function () {
-    assertToast($this->actingAs(userWithPermissions('projects.suppliers.create'))->post(route('projects.suppliers.store'), supplierPayload()), 'warning');
+    assertToast($this->actingAs(userWithPermissions('projects.settings.suppliers.create'))->post(route('projects.settings.suppliers.store'), supplierPayload()), 'warning');
 
     expect(Supplier::withoutGlobalScopes()->count())->toBe(0);
 });
@@ -172,9 +172,9 @@ test('creating without a selected company is refused', function () {
 test('a supplier lands in the selected company with its values tidied and empty fields saved as null', function () {
     [$mine, $theirs] = Company::factory()->count(2)->create();
 
-    $this->actingAs(supplierActor($mine, 'projects.suppliers.create'));
+    $this->actingAs(supplierActor($mine, 'projects.settings.suppliers.create'));
 
-    assertToast($this->post(route('projects.suppliers.store'), supplierPayload([
+    assertToast($this->post(route('projects.settings.suppliers.store'), supplierPayload([
         'company_id' => $theirs->id,
         'code' => ' bm-01 ',
         'name' => ' Buildmart   Supplies ',
@@ -198,8 +198,8 @@ test('a supplier lands in the selected company with its values tidied and empty 
 });
 
 test('a malformed field is refused', function (string $field, string $value) {
-    $this->actingAs(supplierActor(Company::factory()->create(), 'projects.suppliers.create'))
-        ->post(route('projects.suppliers.store'), supplierPayload([$field => $value]))
+    $this->actingAs(supplierActor(Company::factory()->create(), 'projects.settings.suppliers.create'))
+        ->post(route('projects.settings.suppliers.store'), supplierPayload([$field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
     'category missing' => ['supplier_category_id', ''],
@@ -212,8 +212,8 @@ test('a malformed field is refused', function (string $field, string $value) {
 ]);
 
 test('an inactive or deleted category cannot be chosen', function (SupplierCategory $category) {
-    $this->actingAs(supplierActor(Company::factory()->create(), 'projects.suppliers.create'))
-        ->post(route('projects.suppliers.store'), supplierPayload(['supplier_category_id' => $category->id]))
+    $this->actingAs(supplierActor(Company::factory()->create(), 'projects.settings.suppliers.create'))
+        ->post(route('projects.settings.suppliers.store'), supplierPayload(['supplier_category_id' => $category->id]))
         ->assertSessionHasErrors(['supplier_category_id' => 'Choose an active supplier category.']);
 })->with([
     'inactive' => fn () => SupplierCategory::factory()->inactive()->create(),
@@ -226,8 +226,8 @@ test('a supplier keeps its category on edit after the category is deactivated', 
     $supplier = Supplier::factory()->for($company)->for($category, 'category')->create(['code' => 'BUILDMART', 'name' => 'Buildmart Supplies Ltd.']);
     $category->update(['status' => RecordStatus::Inactive]);
 
-    $this->actingAs(supplierActor($company, 'projects.suppliers.update'))
-        ->put(route('projects.suppliers.update', $supplier), supplierPayload(['supplier_category_id' => $category->id, 'phone' => '+880 1911 000000']))
+    $this->actingAs(supplierActor($company, 'projects.settings.suppliers.update'))
+        ->put(route('projects.settings.suppliers.update', $supplier), supplierPayload(['supplier_category_id' => $category->id, 'phone' => '+880 1911 000000']))
         ->assertSessionHasNoErrors();
 
     expect($supplier->refresh()->phone)->toBe('+880 1911 000000');
@@ -239,11 +239,11 @@ test('a code or name is unique within the company only, deleted suppliers includ
     Supplier::factory()->for($mine)->create(['code' => 'SISTER', 'tin' => '123456789012', 'bin' => '000123456-0101']);
     Supplier::factory()->for($mine)->create(['code' => 'GONE', 'name' => 'Gone Ltd.'])->delete();
 
-    $this->actingAs(supplierActor($mine, 'projects.suppliers.create'));
+    $this->actingAs(supplierActor($mine, 'projects.settings.suppliers.create'));
 
-    $this->post(route('projects.suppliers.store'), supplierPayload())->assertSessionHasNoErrors();
+    $this->post(route('projects.settings.suppliers.store'), supplierPayload())->assertSessionHasNoErrors();
 
-    $this->post(route('projects.suppliers.store'), supplierPayload(['code' => 'gone', 'name' => 'Gone Ltd.']))
+    $this->post(route('projects.settings.suppliers.store'), supplierPayload(['code' => 'gone', 'name' => 'Gone Ltd.']))
         ->assertSessionHasErrors([
             'code' => 'The code "GONE" belongs to a deleted supplier in this company. Restore it from the Deleted tab instead.',
             'name' => 'A deleted supplier in this company is named "Gone Ltd.". Restore it from the Deleted tab instead.',
@@ -253,23 +253,23 @@ test('a code or name is unique within the company only, deleted suppliers includ
 test('a supplier is soft deleted, restored and permanently deleted, every change audited', function () {
     $company = Company::factory()->create();
 
-    $this->actingAs(supplierActor($company, 'projects.suppliers.create', 'projects.suppliers.delete', 'projects.suppliers.restore', 'projects.suppliers.force-delete'));
+    $this->actingAs(supplierActor($company, 'projects.settings.suppliers.create', 'projects.settings.suppliers.delete', 'projects.settings.suppliers.restore', 'projects.settings.suppliers.force-delete'));
     $payload = supplierPayload();
     config(['audit.console' => true]);
 
-    $this->post(route('projects.suppliers.store'), $payload);
+    $this->post(route('projects.settings.suppliers.store'), $payload);
     $supplier = Supplier::withoutGlobalScopes()->sole();
 
     expect((int) AuditLog::where('event', 'created')->where('auditable_type', 'supplier')->sole()->new_values['company_id'])->toBe($company->id);
 
-    assertToast($this->delete(route('projects.suppliers.destroy', $supplier)), 'success');
+    assertToast($this->delete(route('projects.settings.suppliers.destroy', $supplier)), 'success');
     expect($supplier->refresh()->trashed())->toBeTrue();
 
-    assertToast($this->put(route('projects.suppliers.restore', $supplier)), 'success');
+    assertToast($this->put(route('projects.settings.suppliers.restore', $supplier)), 'success');
     expect($supplier->refresh()->trashed())->toBeFalse();
 
     $supplier->delete();
-    assertToast($this->delete(route('projects.suppliers.force-delete', $supplier)), 'success');
+    assertToast($this->delete(route('projects.settings.suppliers.force-delete', $supplier)), 'success');
 
     expect(Supplier::withoutGlobalScopes()->withTrashed()->find($supplier->id))->toBeNull()
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'supplier')->exists())->toBeTrue();
@@ -284,9 +284,9 @@ test('bulk delete moves the ticked suppliers to Deleted, never another company\'
     [$first, $second] = Supplier::factory()->for($mine)->count(2)->create();
     $foreign = Supplier::factory()->for($theirs)->create();
 
-    $this->actingAs(supplierActor($mine, 'projects.suppliers.delete'));
+    $this->actingAs(supplierActor($mine, 'projects.settings.suppliers.delete'));
 
-    assertToast($this->delete(route('projects.suppliers.bulk-destroy'), ['ids' => [$first->id, $second->id, $foreign->id]]), 'success')
+    assertToast($this->delete(route('projects.settings.suppliers.bulk-destroy'), ['ids' => [$first->id, $second->id, $foreign->id]]), 'success')
         ->assertSessionHas('inertia.flash_data.toast.message', '2 suppliers moved to Deleted.');
 
     expect($first->refresh()->trashed())->toBeTrue()
@@ -298,10 +298,10 @@ test('bulk delete and bulk permanent delete each need their own permission', fun
     $company = Company::factory()->create();
     $supplier = Supplier::factory()->for($company)->create();
 
-    $this->actingAs(supplierActor($company, 'projects.suppliers.view'))
+    $this->actingAs(supplierActor($company, 'projects.settings.suppliers.view'))
         ->delete(route($route), ['ids' => [$supplier->id]])
         ->assertForbidden();
-})->with(['projects.suppliers.bulk-destroy', 'projects.suppliers.bulk-force-delete']);
+})->with(['projects.settings.suppliers.bulk-destroy', 'projects.settings.suppliers.bulk-force-delete']);
 
 test('bulk permanent delete removes the ticked deleted suppliers', function () {
     $company = Company::factory()->create();
@@ -309,9 +309,9 @@ test('bulk permanent delete removes the ticked deleted suppliers', function () {
     $first->delete();
     $second->delete();
 
-    $this->actingAs(supplierActor($company, 'projects.suppliers.force-delete'));
+    $this->actingAs(supplierActor($company, 'projects.settings.suppliers.force-delete'));
 
-    assertToast($this->delete(route('projects.suppliers.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.suppliers.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
 
     expect(Supplier::withoutGlobalScopes()->withTrashed()->count())->toBe(0);
 });

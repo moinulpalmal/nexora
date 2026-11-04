@@ -74,66 +74,66 @@ class PermissionDescriptions
         'admin.sent-mails.view' => ['summary' => 'See every mail the application sent, with its status and a preview.', 'note' => self::SUPER_ADMIN_ONLY, 'where' => 'Admin → Sent Mails'],
 
         'projects.dashboard.view' => ['summary' => 'Open the Projects overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Projects → Overview'],
-        'projects.clients.view' => ['summary' => "Open the selected company's Clients list (active and deleted tabs) and search it.", 'where' => 'Projects → Clients'],
-        'projects.clients.create' => ['summary' => 'Add a client to the selected company.', 'where' => 'Projects → Clients'],
-        'projects.clients.update' => ['summary' => "Change a client's details, and activate or deactivate it.", 'where' => 'Projects → Clients'],
-        'projects.clients.delete' => ['summary' => 'Move clients into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Clients'],
-        'projects.clients.restore' => ['summary' => 'Bring a client back from Deleted.', 'where' => 'Projects → Clients → Deleted'],
-        'projects.clients.force-delete' => ['summary' => 'Permanently delete clients from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Clients → Deleted'],
-        'projects.product-categories.view' => ['summary' => "Open the selected company's Product Categories list (active and deleted tabs) and search it.", 'where' => 'Projects → Product Categories'],
-        'projects.product-categories.create' => ['summary' => 'Add a product category to the selected company.', 'note' => 'Every new company already starts with a standard set.', 'where' => 'Projects → Product Categories'],
-        'projects.product-categories.update' => ['summary' => "Change a product category's code, name or description, and activate or deactivate it.", 'where' => 'Projects → Product Categories'],
-        'projects.product-categories.delete' => ['summary' => 'Move product categories into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved. Refused while any product is in the category.', 'where' => 'Projects → Product Categories'],
-        'projects.product-categories.restore' => ['summary' => 'Bring a product category back from Deleted.', 'where' => 'Projects → Product Categories → Deleted'],
-        'projects.product-categories.force-delete' => ['summary' => 'Permanently delete product categories from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone. A company can be deleted only once all its product categories are gone. Refused while any product is in the category.', 'where' => 'Projects → Product Categories → Deleted'],
-        'projects.products.view' => ['summary' => "Open the selected company's Products list (active and deleted tabs) and search it.", 'where' => 'Projects → Products'],
-        'projects.products.create' => ['summary' => 'Add a product to the selected company, in one of its active product categories.', 'where' => 'Projects → Products'],
-        'projects.products.update' => ['summary' => "Change a product's category, code, name or description, and activate or deactivate it.", 'where' => 'Projects → Products'],
-        'projects.products.delete' => ['summary' => 'Move products into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Products'],
-        'projects.products.restore' => ['summary' => 'Bring a product back from Deleted.', 'where' => 'Projects → Products → Deleted'],
-        'projects.products.force-delete' => ['summary' => 'Permanently delete products from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone. A company can be deleted only once all its products are gone.', 'where' => 'Projects → Products → Deleted'],
-        'projects.verification-items.view' => ['summary' => "Open the selected company's Verification Items list (active and deleted tabs) and search it.", 'where' => 'Projects → Verification Items'],
-        'projects.verification-items.create' => ['summary' => 'Add a verification item to the selected company.', 'where' => 'Projects → Verification Items'],
-        'projects.verification-items.update' => ['summary' => "Change a verification item's name or description, and activate or deactivate it.", 'where' => 'Projects → Verification Items'],
-        'projects.verification-items.delete' => ['summary' => 'Move verification items into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its name stays reserved.', 'where' => 'Projects → Verification Items'],
-        'projects.verification-items.restore' => ['summary' => 'Bring a verification item back from Deleted.', 'where' => 'Projects → Verification Items → Deleted'],
-        'projects.verification-items.force-delete' => ['summary' => 'Permanently delete verification items from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone. A company can be deleted only once all its verification items are gone.', 'where' => 'Projects → Verification Items → Deleted'],
-        'projects.supplier-categories.view' => ['summary' => 'Open the Supplier Categories list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'Projects → Supplier Categories'],
-        'projects.supplier-categories.create' => ['summary' => 'Add a supplier category.', 'note' => 'Every company sees it.', 'where' => 'Projects → Supplier Categories'],
-        'projects.supplier-categories.update' => ['summary' => "Change a supplier category's code, name or description, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Supplier Categories'],
-        'projects.supplier-categories.delete' => ['summary' => 'Move supplier categories into Deleted — one, or several ticked at once.', 'note' => 'Refused while any supplier, in any company, is in the category. Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Supplier Categories'],
-        'projects.supplier-categories.restore' => ['summary' => 'Bring a supplier category back from Deleted.', 'where' => 'Projects → Supplier Categories → Deleted'],
-        'projects.supplier-categories.force-delete' => ['summary' => 'Permanently delete supplier categories from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Supplier Categories → Deleted'],
-        'projects.suppliers.view' => ['summary' => "Open the selected company's Suppliers list (active and deleted tabs) and search it.", 'where' => 'Projects → Suppliers'],
-        'projects.suppliers.create' => ['summary' => 'Add a supplier to the selected company.', 'where' => 'Projects → Suppliers'],
-        'projects.suppliers.update' => ['summary' => "Change a supplier's details — category, contact, tax numbers and bank account — and activate or deactivate it.", 'where' => 'Projects → Suppliers'],
-        'projects.suppliers.delete' => ['summary' => 'Move suppliers into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Suppliers'],
-        'projects.suppliers.restore' => ['summary' => 'Bring a supplier back from Deleted.', 'where' => 'Projects → Suppliers → Deleted'],
-        'projects.suppliers.force-delete' => ['summary' => 'Permanently delete suppliers from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Suppliers → Deleted'],
-        'projects.tender-types.view' => ['summary' => 'Open the Tender Types list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'Projects → Tender Types'],
-        'projects.tender-types.create' => ['summary' => 'Add a tender type.', 'note' => 'Every company sees it.', 'where' => 'Projects → Tender Types'],
-        'projects.tender-types.update' => ['summary' => "Change a tender type's code or name, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Tender Types'],
-        'projects.tender-types.delete' => ['summary' => 'Move tender types into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved. Not granted to project managers by default.', 'where' => 'Projects → Tender Types'],
-        'projects.tender-types.restore' => ['summary' => 'Bring a tender type back from Deleted.', 'where' => 'Projects → Tender Types → Deleted'],
-        'projects.tender-types.force-delete' => ['summary' => 'Permanently delete tender types from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Tender Types → Deleted'],
-        'projects.units.view' => ['summary' => 'Open the Units of Measure list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'Projects → Units of Measure'],
-        'projects.units.create' => ['summary' => 'Add a unit of measure.', 'note' => 'Every company sees it.', 'where' => 'Projects → Units of Measure'],
-        'projects.units.update' => ['summary' => "Change a unit's code, name, symbol, decimal places or description, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Units of Measure'],
-        'projects.units.delete' => ['summary' => 'Move units of measure into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved. Not granted to project managers by default.', 'where' => 'Projects → Units of Measure'],
-        'projects.units.restore' => ['summary' => 'Bring a unit of measure back from Deleted.', 'where' => 'Projects → Units of Measure → Deleted'],
-        'projects.units.force-delete' => ['summary' => 'Permanently delete units of measure from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Units of Measure → Deleted'],
-        'projects.certification-categories.view' => ['summary' => 'Open the Certification Categories list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'Projects → Certification Categories'],
-        'projects.certification-categories.create' => ['summary' => 'Add a certification category.', 'note' => 'Every company sees it.', 'where' => 'Projects → Certification Categories'],
-        'projects.certification-categories.update' => ['summary' => "Change a certification category's code, name or description, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Certification Categories'],
-        'projects.certification-categories.delete' => ['summary' => 'Move certification categories into Deleted — one, or several ticked at once.', 'note' => 'Refused while any certification is in the category. Reversible with restore; its code and name stay reserved. Not granted to project managers by default.', 'where' => 'Projects → Certification Categories'],
-        'projects.certification-categories.restore' => ['summary' => 'Bring a certification category back from Deleted.', 'where' => 'Projects → Certification Categories → Deleted'],
-        'projects.certification-categories.force-delete' => ['summary' => 'Permanently delete certification categories from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Certification Categories → Deleted'],
-        'projects.certifications.view' => ['summary' => 'Open the Certifications list (active and deleted tabs) and search it.', 'note' => 'One catalogue of standards shared by every company.', 'where' => 'Projects → Certifications'],
-        'projects.certifications.create' => ['summary' => 'Add a certification (a standard such as ISO 9001).', 'note' => 'Every company sees it.', 'where' => 'Projects → Certifications'],
-        'projects.certifications.update' => ['summary' => "Change a certification's category, code, name, issuing body, version or description, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Certifications'],
-        'projects.certifications.delete' => ['summary' => 'Move certifications into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code, and its name within its version, stay reserved. Not granted to project managers by default.', 'where' => 'Projects → Certifications'],
-        'projects.certifications.restore' => ['summary' => 'Bring a certification back from Deleted.', 'where' => 'Projects → Certifications → Deleted'],
-        'projects.certifications.force-delete' => ['summary' => 'Permanently delete certifications from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Certifications → Deleted'],
+        'projects.settings.clients.view' => ['summary' => "Open the selected company's Clients list (active and deleted tabs) and search it.", 'where' => 'Projects → Settings → Clients'],
+        'projects.settings.clients.create' => ['summary' => 'Add a client to the selected company.', 'where' => 'Projects → Settings → Clients'],
+        'projects.settings.clients.update' => ['summary' => "Change a client's details, and activate or deactivate it.", 'where' => 'Projects → Settings → Clients'],
+        'projects.settings.clients.delete' => ['summary' => 'Move clients into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Settings → Clients'],
+        'projects.settings.clients.restore' => ['summary' => 'Bring a client back from Deleted.', 'where' => 'Projects → Settings → Clients → Deleted'],
+        'projects.settings.clients.force-delete' => ['summary' => 'Permanently delete clients from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Settings → Clients → Deleted'],
+        'projects.settings.product-categories.view' => ['summary' => "Open the selected company's Product Categories list (active and deleted tabs) and search it.", 'where' => 'Projects → Settings → Product Categories'],
+        'projects.settings.product-categories.create' => ['summary' => 'Add a product category to the selected company.', 'note' => 'Every new company already starts with a standard set.', 'where' => 'Projects → Settings → Product Categories'],
+        'projects.settings.product-categories.update' => ['summary' => "Change a product category's code, name or description, and activate or deactivate it.", 'where' => 'Projects → Settings → Product Categories'],
+        'projects.settings.product-categories.delete' => ['summary' => 'Move product categories into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved. Refused while any product is in the category.', 'where' => 'Projects → Settings → Product Categories'],
+        'projects.settings.product-categories.restore' => ['summary' => 'Bring a product category back from Deleted.', 'where' => 'Projects → Settings → Product Categories → Deleted'],
+        'projects.settings.product-categories.force-delete' => ['summary' => 'Permanently delete product categories from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone. A company can be deleted only once all its product categories are gone. Refused while any product is in the category.', 'where' => 'Projects → Settings → Product Categories → Deleted'],
+        'projects.settings.products.view' => ['summary' => "Open the selected company's Products list (active and deleted tabs) and search it.", 'where' => 'Projects → Settings → Products'],
+        'projects.settings.products.create' => ['summary' => 'Add a product to the selected company, in one of its active product categories.', 'where' => 'Projects → Settings → Products'],
+        'projects.settings.products.update' => ['summary' => "Change a product's category, code, name or description, and activate or deactivate it.", 'where' => 'Projects → Settings → Products'],
+        'projects.settings.products.delete' => ['summary' => 'Move products into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Settings → Products'],
+        'projects.settings.products.restore' => ['summary' => 'Bring a product back from Deleted.', 'where' => 'Projects → Settings → Products → Deleted'],
+        'projects.settings.products.force-delete' => ['summary' => 'Permanently delete products from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone. A company can be deleted only once all its products are gone.', 'where' => 'Projects → Settings → Products → Deleted'],
+        'projects.settings.verification-items.view' => ['summary' => "Open the selected company's Verification Items list (active and deleted tabs) and search it.", 'where' => 'Projects → Settings → Verification Items'],
+        'projects.settings.verification-items.create' => ['summary' => 'Add a verification item to the selected company.', 'where' => 'Projects → Settings → Verification Items'],
+        'projects.settings.verification-items.update' => ['summary' => "Change a verification item's name or description, and activate or deactivate it.", 'where' => 'Projects → Settings → Verification Items'],
+        'projects.settings.verification-items.delete' => ['summary' => 'Move verification items into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its name stays reserved.', 'where' => 'Projects → Settings → Verification Items'],
+        'projects.settings.verification-items.restore' => ['summary' => 'Bring a verification item back from Deleted.', 'where' => 'Projects → Settings → Verification Items → Deleted'],
+        'projects.settings.verification-items.force-delete' => ['summary' => 'Permanently delete verification items from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone. A company can be deleted only once all its verification items are gone.', 'where' => 'Projects → Settings → Verification Items → Deleted'],
+        'projects.settings.supplier-categories.view' => ['summary' => 'Open the Supplier Categories list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'Projects → Settings → Supplier Categories'],
+        'projects.settings.supplier-categories.create' => ['summary' => 'Add a supplier category.', 'note' => 'Every company sees it.', 'where' => 'Projects → Settings → Supplier Categories'],
+        'projects.settings.supplier-categories.update' => ['summary' => "Change a supplier category's code, name or description, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Settings → Supplier Categories'],
+        'projects.settings.supplier-categories.delete' => ['summary' => 'Move supplier categories into Deleted — one, or several ticked at once.', 'note' => 'Refused while any supplier, in any company, is in the category. Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Settings → Supplier Categories'],
+        'projects.settings.supplier-categories.restore' => ['summary' => 'Bring a supplier category back from Deleted.', 'where' => 'Projects → Settings → Supplier Categories → Deleted'],
+        'projects.settings.supplier-categories.force-delete' => ['summary' => 'Permanently delete supplier categories from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Settings → Supplier Categories → Deleted'],
+        'projects.settings.suppliers.view' => ['summary' => "Open the selected company's Suppliers list (active and deleted tabs) and search it.", 'where' => 'Projects → Settings → Suppliers'],
+        'projects.settings.suppliers.create' => ['summary' => 'Add a supplier to the selected company.', 'where' => 'Projects → Settings → Suppliers'],
+        'projects.settings.suppliers.update' => ['summary' => "Change a supplier's details — category, contact, tax numbers and bank account — and activate or deactivate it.", 'where' => 'Projects → Settings → Suppliers'],
+        'projects.settings.suppliers.delete' => ['summary' => 'Move suppliers into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved.', 'where' => 'Projects → Settings → Suppliers'],
+        'projects.settings.suppliers.restore' => ['summary' => 'Bring a supplier back from Deleted.', 'where' => 'Projects → Settings → Suppliers → Deleted'],
+        'projects.settings.suppliers.force-delete' => ['summary' => 'Permanently delete suppliers from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Settings → Suppliers → Deleted'],
+        'projects.settings.tender-types.view' => ['summary' => 'Open the Tender Types list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'Projects → Settings → Tender Types'],
+        'projects.settings.tender-types.create' => ['summary' => 'Add a tender type.', 'note' => 'Every company sees it.', 'where' => 'Projects → Settings → Tender Types'],
+        'projects.settings.tender-types.update' => ['summary' => "Change a tender type's code or name, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Settings → Tender Types'],
+        'projects.settings.tender-types.delete' => ['summary' => 'Move tender types into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved. Not granted to project managers by default.', 'where' => 'Projects → Settings → Tender Types'],
+        'projects.settings.tender-types.restore' => ['summary' => 'Bring a tender type back from Deleted.', 'where' => 'Projects → Settings → Tender Types → Deleted'],
+        'projects.settings.tender-types.force-delete' => ['summary' => 'Permanently delete tender types from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Settings → Tender Types → Deleted'],
+        'projects.settings.units.view' => ['summary' => 'Open the Units of Measure list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'Projects → Settings → Units of Measure'],
+        'projects.settings.units.create' => ['summary' => 'Add a unit of measure.', 'note' => 'Every company sees it.', 'where' => 'Projects → Settings → Units of Measure'],
+        'projects.settings.units.update' => ['summary' => "Change a unit's code, name, symbol, decimal places or description, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Settings → Units of Measure'],
+        'projects.settings.units.delete' => ['summary' => 'Move units of measure into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code and name stay reserved. Not granted to project managers by default.', 'where' => 'Projects → Settings → Units of Measure'],
+        'projects.settings.units.restore' => ['summary' => 'Bring a unit of measure back from Deleted.', 'where' => 'Projects → Settings → Units of Measure → Deleted'],
+        'projects.settings.units.force-delete' => ['summary' => 'Permanently delete units of measure from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Settings → Units of Measure → Deleted'],
+        'projects.settings.certification-categories.view' => ['summary' => 'Open the Certification Categories list (active and deleted tabs) and search it.', 'note' => 'One list shared by every company.', 'where' => 'Projects → Settings → Certification Categories'],
+        'projects.settings.certification-categories.create' => ['summary' => 'Add a certification category.', 'note' => 'Every company sees it.', 'where' => 'Projects → Settings → Certification Categories'],
+        'projects.settings.certification-categories.update' => ['summary' => "Change a certification category's code, name or description, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Settings → Certification Categories'],
+        'projects.settings.certification-categories.delete' => ['summary' => 'Move certification categories into Deleted — one, or several ticked at once.', 'note' => 'Refused while any certification is in the category. Reversible with restore; its code and name stay reserved. Not granted to project managers by default.', 'where' => 'Projects → Settings → Certification Categories'],
+        'projects.settings.certification-categories.restore' => ['summary' => 'Bring a certification category back from Deleted.', 'where' => 'Projects → Settings → Certification Categories → Deleted'],
+        'projects.settings.certification-categories.force-delete' => ['summary' => 'Permanently delete certification categories from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Settings → Certification Categories → Deleted'],
+        'projects.settings.certifications.view' => ['summary' => 'Open the Certifications list (active and deleted tabs) and search it.', 'note' => 'One catalogue of standards shared by every company.', 'where' => 'Projects → Settings → Certifications'],
+        'projects.settings.certifications.create' => ['summary' => 'Add a certification (a standard such as ISO 9001).', 'note' => 'Every company sees it.', 'where' => 'Projects → Settings → Certifications'],
+        'projects.settings.certifications.update' => ['summary' => "Change a certification's category, code, name, issuing body, version or description, and activate or deactivate it.", 'note' => 'The change shows in every company.', 'where' => 'Projects → Settings → Certifications'],
+        'projects.settings.certifications.delete' => ['summary' => 'Move certifications into Deleted — one, or several ticked at once.', 'note' => 'Reversible with restore; its code, and its name within its version, stay reserved. Not granted to project managers by default.', 'where' => 'Projects → Settings → Certifications'],
+        'projects.settings.certifications.restore' => ['summary' => 'Bring a certification back from Deleted.', 'where' => 'Projects → Settings → Certifications → Deleted'],
+        'projects.settings.certifications.force-delete' => ['summary' => 'Permanently delete certifications from Deleted — one, or several ticked at once.', 'note' => 'Cannot be undone.', 'where' => 'Projects → Settings → Certifications → Deleted'],
         'accounting.dashboard.view' => ['summary' => 'Open the Accounts overview.', 'note' => 'A preview with sample data for now.', 'where' => 'Accounts → Overview'],
         'hrm.dashboard.view' => ['summary' => 'Open the HRM overview.', 'note' => 'A preview with sample data for now.', 'where' => 'HRM → Overview'],
         'hrm.departments.view' => ['summary' => "Open the selected company's Departments list (active and deleted tabs) and search it.", 'where' => 'HRM → Departments'],
@@ -193,6 +193,28 @@ class PermissionDescriptions
     ];
 
     /**
+     * What a permission acts on: everything between its module and its action,
+     * so `projects.settings.clients.view` is `settings.clients` (ARCHITECTURE.md §6.2).
+     */
+    public static function resourceOf(string $name): string
+    {
+        $segments = explode('.', $name);
+
+        return implode('.', array_slice($segments, 1, count($segments) > 2 ? -1 : null));
+    }
+
+    /**
+     * What a permission allows: the last segment of its name, or nothing when
+     * the name has no resource.
+     */
+    public static function actionOf(string $name): string
+    {
+        $segments = explode('.', $name);
+
+        return count($segments) > 2 ? $segments[array_key_last($segments)] : '';
+    }
+
+    /**
      * The help for one permission, curated when there is an entry and generated from its name otherwise.
      *
      * @return array{summary: string, note: ?string, where: ?string, curated: bool}
@@ -210,7 +232,8 @@ class PermissionDescriptions
             ];
         }
 
-        [, $resource, $action] = array_pad(explode('.', $name, 3), 3, '');
+        $resource = Str::afterLast(self::resourceOf($name), '.');
+        $action = self::actionOf($name);
         $subject = Str::of($resource)->replace('-', ' ')->lower()->value() ?: $name;
         $sentence = self::ACTION_SENTENCES[$action] ?? null;
 

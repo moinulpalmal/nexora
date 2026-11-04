@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Suppliers (`projects.suppliers.index`), with its New supplier /
+ * Projects → Settings → Suppliers (`projects.settings.suppliers.index`), with its New supplier /
  * Edit dialog and the Deleted tab. Source: documentation/projects.md §4
  * (Suppliers).
  */
@@ -37,27 +37,29 @@ export default function SuppliersGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.suppliers.view</Ui> opens the list;{' '}
-                            <Ui>projects.suppliers.create</Ui>,{' '}
-                            <Ui>projects.suppliers.update</Ui> and{' '}
-                            <Ui>projects.suppliers.delete</Ui> add, edit and
-                            delete; <Ui>projects.suppliers.restore</Ui> and{' '}
-                            <Ui>projects.suppliers.force-delete</Ui> work on the
-                            Deleted tab. The project-manager role holds them
-                            all. You also need a company to work in.
+                            <Ui>projects.settings.suppliers.view</Ui> opens the
+                            list; <Ui>projects.settings.suppliers.create</Ui>,{' '}
+                            <Ui>projects.settings.suppliers.update</Ui> and{' '}
+                            <Ui>projects.settings.suppliers.delete</Ui> add,
+                            edit and delete;{' '}
+                            <Ui>projects.settings.suppliers.restore</Ui> and{' '}
+                            <Ui>projects.settings.suppliers.force-delete</Ui>{' '}
+                            work on the Deleted tab. The project-manager role
+                            holds them all. You also need a company to work in.
                         </>
                     }
                     bn={
                         <>
-                            <Ui>projects.suppliers.view</Ui> থাকলে তালিকা খোলা
-                            যায়; <Ui>projects.suppliers.create</Ui>,{' '}
-                            <Ui>projects.suppliers.update</Ui> ও{' '}
-                            <Ui>projects.suppliers.delete</Ui> দিয়ে যোগ,
-                            সম্পাদনা ও মোছা যায়;{' '}
-                            <Ui>projects.suppliers.restore</Ui> ও{' '}
-                            <Ui>projects.suppliers.force-delete</Ui> Deleted
-                            ট্যাবে কাজ করে। project-manager রোলের কাছে এর
-                            সবগুলোই আছে। এর সাথে কাজ করার জন্য একটি কোম্পানিও
+                            <Ui>projects.settings.suppliers.view</Ui> থাকলে
+                            তালিকা খোলা যায়;{' '}
+                            <Ui>projects.settings.suppliers.create</Ui>,{' '}
+                            <Ui>projects.settings.suppliers.update</Ui> ও{' '}
+                            <Ui>projects.settings.suppliers.delete</Ui> দিয়ে
+                            যোগ, সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>projects.settings.suppliers.restore</Ui> ও{' '}
+                            <Ui>projects.settings.suppliers.force-delete</Ui>{' '}
+                            Deleted ট্যাবে কাজ করে। project-manager রোলের কাছে
+                            এর সবগুলোই আছে। এর সাথে কাজ করার জন্য একটি কোম্পানিও
                             লাগবে।
                         </>
                     }
@@ -66,16 +68,16 @@ export default function SuppliersGuide() {
 
             <GuideSection kind="before">
                 <Para
-                    en="Check the company switcher in the header: the list, and every supplier you add, belongs to the company shown there. Every supplier needs a category, so make sure Projects → Supplier Categories has the one you need, and that it is Active."
-                    bn="হেডারের কোম্পানি সুইচারটি দেখে নিন: তালিকা এবং আপনি যে সরবরাহকারী যোগ করবেন সবই সেখানে দেখানো কোম্পানির। প্রতিটি সরবরাহকারীর একটি শ্রেণি লাগে, তাই Projects → Supplier Categories-এ আপনার দরকারি শ্রেণিটি আছে এবং সেটি Active কি না দেখে নিন।"
+                    en="Check the company switcher in the header: the list, and every supplier you add, belongs to the company shown there. Every supplier needs a category, so make sure Projects → Settings → Supplier Categories has the one you need, and that it is Active."
+                    bn="হেডারের কোম্পানি সুইচারটি দেখে নিন: তালিকা এবং আপনি যে সরবরাহকারী যোগ করবেন সবই সেখানে দেখানো কোম্পানির। প্রতিটি সরবরাহকারীর একটি শ্রেণি লাগে, তাই Projects → Settings → Supplier Categories-এ আপনার দরকারি শ্রেণিটি আছে এবং সেটি Active কি না দেখে নিন।"
                 />
             </GuideSection>
 
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Suppliers. The description under the title names the company the list belongs to. Search by code, name, category, contact person, phone, email, TIN or BIN in the row under the headings."
-                        bn="Projects → Suppliers খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে কোড, নাম, শ্রেণি, যোগাযোগকারী, ফোন, ইমেইল, TIN বা BIN দিয়ে খুঁজুন।"
+                        en="Open Projects → Settings → Suppliers. The description under the title names the company the list belongs to. Search by code, name, category, contact person, phone, email, TIN or BIN in the row under the headings."
+                        bn="Projects → Settings → Suppliers খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে কোড, নাম, শ্রেণি, যোগাযোগকারী, ফোন, ইমেইল, TIN বা BIN দিয়ে খুঁজুন।"
                     >
                         <Shot
                             id="overview"
@@ -248,12 +250,12 @@ export default function SuppliersGuide() {
 
             <GuideSection kind="related">
                 <RelatedGuide
-                    to="projects.supplier-categories"
+                    to="projects.settings.supplier-categories"
                     en="The categories every supplier is placed in."
                     bn="যে শ্রেণিগুলোতে প্রতিটি সরবরাহকারীকে রাখা হয়।"
                 />
                 <RelatedGuide
-                    to="projects.clients"
+                    to="projects.settings.clients"
                     en="The other side: the clients projects are run for."
                     bn="অন্য দিক: যেসব ক্লায়েন্টের জন্য প্রকল্প চালানো হয়।"
                 />

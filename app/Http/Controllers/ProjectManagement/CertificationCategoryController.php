@@ -14,7 +14,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Certification Categories: a group-wide list (ARCHITECTURE.md §9.10),
+ * Projects → Settings → Certification Categories: a group-wide list (ARCHITECTURE.md §9.10),
  * a copy of {@see SupplierCategoryController} — certifications point here as
  * suppliers point there. The page works whether or not a company is selected.
  *
@@ -46,7 +46,7 @@ class CertificationCategoryController extends Controller
                 'deleted_at' => $category->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/certification-categories/index', [
+        return Inertia::render('projects/settings/certification-categories/index', [
             'certificationCategories' => $categories,
             'statuses' => RecordStatus::options(),
             'sortable' => CertificationCategory::SORTABLE,

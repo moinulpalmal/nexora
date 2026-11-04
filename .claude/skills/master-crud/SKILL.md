@@ -53,7 +53,7 @@ props and a third of the page. Propose one with your reasoning and let the owner
 | Question | Shape | Sibling to read | Reference |
 | --- | --- | --- | --- |
 | The same fact for every company; retired by status | **Global** | `admin/roles` | `references/global.md` |
-| As global *and* restorable, inside an ERP module (owner's exception to §9.10) | **Global + restorable** | `hrm/designations` (code + name, import, role exclusions); `projects/tender-types` without import | `references/global.md` + `references/restorable.md` |
+| As global *and* restorable, inside an ERP module (owner's exception to §9.10) | **Global + restorable** | `hrm/designations` (code + name, import, role exclusions); `projects/settings/tender-types` without import | `references/global.md` + `references/restorable.md` |
 | As global, but a deleted row must be restorable (Active/Deleted tabs) | **Restorable** | `admin/users` | `references/restorable.md` |
 | A row means nothing outside the company that keeps it (§9.10: every Projects, Accounting and HRM record) | **Company-scoped** | `hrm/departments` (restorable too) | `references/company-scoped.md` |
 | A parent whose form edits a list of child rows with no identity of their own | **Parent + child ladder** | *none yet* | `references/child-table.md` |
@@ -79,7 +79,7 @@ Module paths follow from the owner (§4, layer first, module second):
 | Service | `app/Services/{Module}/` |
 | Shared validation rules | `app/Concerns/{Topic}ValidationRules.php` (flat) |
 | Factory | `database/factories/{Module}/` |
-| Routes | `routes/{module}.php` (`projects.php`, `accounting.php`, `hrm.php`, `admin.php`) |
+| Routes | `routes/{module}.php` (`projects.php`, `accounting.php`, `hrm.php`, `admin.php`). **A Projects master goes inside the `settings` group**: URL, route name, permission and page path all carry `settings` (ARCHITECTURE §6.2) |
 | Page | `resources/js/pages/{module}/{resource}/index.tsx` |
 | Dialog | `resources/js/components/{module}/{resource}-form-dialog.tsx` |
 | Types | `resources/js/types/{module}.ts`, re-exported from `types/index.ts` |
@@ -116,7 +116,7 @@ overrides.
 8. **Seed data** — none by default: master tables ship empty; rows arrive by import or by hand.
    The exception is a standard reference list every installation needs, on the owner's word —
    Admin → Countries (`database/seeders/Admin/CountrySeeder.php`, ARCHITECTURE.md §9.14) and
-   Projects → Units of Measure (`database/seeders/ProjectManagement/UnitSeeder.php`) are the
+   Projects → Settings → Units of Measure (`database/seeders/ProjectManagement/UnitSeeder.php`) are the
    siblings: idempotent, additive only, called from `DatabaseSeeder`.
 
 ---

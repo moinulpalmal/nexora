@@ -16,7 +16,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Products, laid out as {@see SupplierController} — one index page
+ * Projects → Settings → Products, laid out as {@see SupplierController} — one index page
  * with Active/Deleted tabs, every write arriving from a dialog on it and
  * answering `back()` with a toast.
  *
@@ -58,7 +58,7 @@ class ProductController extends Controller
                 'deleted_at' => $product->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/products/index', [
+        return Inertia::render('projects/settings/products/index', [
             'products' => $products,
             'company' => $company === null ? null : [
                 'id' => $company->id,

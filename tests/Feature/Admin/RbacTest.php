@@ -28,8 +28,8 @@ test('the seeder creates the catalogue and is idempotent', function () {
         ->and(Role::count())->toBe($roles);
 });
 
-test('every catalogued permission name reads module.resource.action in kebab case', function (string $name) {
-    expect($name)->toMatch('/^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.[a-z0-9]+(?:-[a-z0-9]+)*){2}$/');
+test('every catalogued permission name reads module.resource.action in kebab case, with an optional settings segment', function (string $name) {
+    expect($name)->toMatch('/^[a-z0-9]+(?:-[a-z0-9]+)*(?:\.settings)?(?:\.[a-z0-9]+(?:-[a-z0-9]+)*){2}$/');
 })->with(fn () => RolePermissionSeeder::names());
 
 test('super-admin holds the whole catalogue', function () {
@@ -182,13 +182,13 @@ test('a project manager may add and correct tender types, units, certifications 
 
     foreach (['tender-types', 'units', 'certification-categories', 'certifications'] as $resource) {
         foreach (['view', 'create', 'update', 'delete', 'restore', 'force-delete'] as $action) {
-            expect(Role::findByName('project-manager')->hasPermissionTo("projects.{$resource}.{$action}"))->toBe(in_array($action, ['view', 'create', 'update'], true))
-                ->and(Role::findByName('viewer')->hasPermissionTo("projects.{$resource}.{$action}"))->toBe($action === 'view')
-                ->and(Role::findByName('admin')->hasPermissionTo("projects.{$resource}.{$action}"))->toBeFalse();
+            expect(Role::findByName('project-manager')->hasPermissionTo("projects.settings.{$resource}.{$action}"))->toBe(in_array($action, ['view', 'create', 'update'], true))
+                ->and(Role::findByName('viewer')->hasPermissionTo("projects.settings.{$resource}.{$action}"))->toBe($action === 'view')
+                ->and(Role::findByName('admin')->hasPermissionTo("projects.settings.{$resource}.{$action}"))->toBeFalse();
         }
     }
 
-    expect(Role::findByName('project-manager')->hasPermissionTo('projects.clients.delete'))->toBeTrue();
+    expect(Role::findByName('project-manager')->hasPermissionTo('projects.settings.clients.delete'))->toBeTrue();
 });
 
 test('a project manager holds every supplier and supplier category permission, the viewer only view, and admin none', function () {
@@ -196,9 +196,9 @@ test('a project manager holds every supplier and supplier category permission, t
 
     foreach (['suppliers', 'supplier-categories'] as $resource) {
         foreach (['view', 'create', 'update', 'delete', 'restore', 'force-delete'] as $action) {
-            expect(Role::findByName('project-manager')->hasPermissionTo("projects.{$resource}.{$action}"))->toBeTrue()
-                ->and(Role::findByName('viewer')->hasPermissionTo("projects.{$resource}.{$action}"))->toBe($action === 'view')
-                ->and(Role::findByName('admin')->hasPermissionTo("projects.{$resource}.{$action}"))->toBeFalse();
+            expect(Role::findByName('project-manager')->hasPermissionTo("projects.settings.{$resource}.{$action}"))->toBeTrue()
+                ->and(Role::findByName('viewer')->hasPermissionTo("projects.settings.{$resource}.{$action}"))->toBe($action === 'view')
+                ->and(Role::findByName('admin')->hasPermissionTo("projects.settings.{$resource}.{$action}"))->toBeFalse();
         }
     }
 });

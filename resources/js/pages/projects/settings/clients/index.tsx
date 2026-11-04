@@ -16,7 +16,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/clients';
+import { index } from '@/routes/projects/settings/clients';
 import type {
     ClientFilters,
     ClientListItem,
@@ -40,7 +40,7 @@ type Props = {
 };
 
 /**
- * Projects → Clients — the ERP's one customer list, kept per company
+ * Projects → Settings → Clients — the ERP's one customer list, kept per company
  * (ARCHITECTURE.md §9.10). Laid out as `hrm/departments` (Active/Deleted tabs,
  * every action a dialog, bulk delete on both tabs), without the spreadsheet
  * import: clients are entered by hand (owner, 2026-11-02).
@@ -57,11 +57,11 @@ export default function ClientsIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.clients.create');
-    const canUpdate = useCan('projects.clients.update');
-    const canDelete = useCan('projects.clients.delete');
-    const canRestore = useCan('projects.clients.restore');
-    const canForceDelete = useCan('projects.clients.force-delete');
+    const canCreate = useCan('projects.settings.clients.create');
+    const canUpdate = useCan('projects.settings.clients.update');
+    const canDelete = useCan('projects.settings.clients.delete');
+    const canRestore = useCan('projects.settings.clients.restore');
+    const canForceDelete = useCan('projects.settings.clients.force-delete');
 
     const isDeleted = filters.view === 'trashed';
     const canBulkDelete = isDeleted ? canForceDelete : canDelete;

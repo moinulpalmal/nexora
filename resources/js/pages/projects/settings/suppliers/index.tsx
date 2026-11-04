@@ -16,7 +16,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/suppliers';
+import { index } from '@/routes/projects/settings/suppliers';
 import type {
     SupplierFilters,
     SupplierListItem,
@@ -43,8 +43,8 @@ type Props = {
 };
 
 /**
- * Projects → Suppliers — the ERP's one supplier list, kept per company
- * (ARCHITECTURE.md §9.10). Laid out as `projects/clients` (Active/Deleted
+ * Projects → Settings → Suppliers — the ERP's one supplier list, kept per company
+ * (ARCHITECTURE.md §9.10). Laid out as `projects/settings/clients` (Active/Deleted
  * tabs, every action a dialog, bulk delete on both tabs) plus the group-wide
  * category, filtered as `hrm/employees` filters designations, and the tax
  * numbers. No spreadsheet import: suppliers are entered by hand (owner,
@@ -63,11 +63,11 @@ export default function SuppliersIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.suppliers.create');
-    const canUpdate = useCan('projects.suppliers.update');
-    const canDelete = useCan('projects.suppliers.delete');
-    const canRestore = useCan('projects.suppliers.restore');
-    const canForceDelete = useCan('projects.suppliers.force-delete');
+    const canCreate = useCan('projects.settings.suppliers.create');
+    const canUpdate = useCan('projects.settings.suppliers.update');
+    const canDelete = useCan('projects.settings.suppliers.delete');
+    const canRestore = useCan('projects.settings.suppliers.restore');
+    const canForceDelete = useCan('projects.settings.suppliers.force-delete');
 
     const isDeleted = filters.view === 'trashed';
     const canBulkDelete = isDeleted ? canForceDelete : canDelete;

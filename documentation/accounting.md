@@ -15,10 +15,10 @@
 
 Accounting keeps the **books of each company**: a double-entry general ledger, the vouchers that
 feed it, and the statements read from it. It also owns **sales invoices**. It does **not** own the
-customer list: the ERP's one customer list is **Projects → Clients**, kept per company (owner,
+customer list: the ERP's one customer list is **Projects → Settings → Clients**, kept per company (owner,
 2026-11-02, moving it from here — Projects needs a client for every project before Accounting
 exists). Invoices will point at those clients ([`projects.md` §4](projects.md#clients--built)).
-Nor does it own the **supplier list**: the ERP's one supplier list is **Projects → Suppliers**, kept
+Nor does it own the **supplier list**: the ERP's one supplier list is **Projects → Settings → Suppliers**, kept
 per company and classified by group-wide supplier categories (owner, 2026-11-02). Phase 2's bills
 will point at those suppliers and add their billing fields — currency, payment terms, payable account
 ([`projects.md` §4](projects.md#suppliers--built)).

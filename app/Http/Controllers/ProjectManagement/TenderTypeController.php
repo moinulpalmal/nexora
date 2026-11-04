@@ -14,7 +14,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Tender Types: a group-wide list (ARCHITECTURE.md §9.10), shaped
+ * Projects → Settings → Tender Types: a group-wide list (ARCHITECTURE.md §9.10), shaped
  * as `Hrm\DesignationController` — the page works whether or not a company is
  * selected. Every write arrives from a dialog on it and answers `back()` with
  * a toast.
@@ -45,7 +45,7 @@ class TenderTypeController extends Controller
                 'deleted_at' => $tenderType->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/tender-types/index', [
+        return Inertia::render('projects/settings/tender-types/index', [
             'tenderTypes' => $tenderTypes,
             'statuses' => RecordStatus::options(),
             'sortable' => TenderType::SORTABLE,

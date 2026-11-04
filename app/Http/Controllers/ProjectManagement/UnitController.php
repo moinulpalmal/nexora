@@ -14,7 +14,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Units of Measure: a group-wide list (ARCHITECTURE.md §9.10),
+ * Projects → Settings → Units of Measure: a group-wide list (ARCHITECTURE.md §9.10),
  * shaped as `TenderTypeController` — the page works whether or not a company
  * is selected. Every write arrives from a dialog on it and answers `back()`
  * with a toast.
@@ -48,7 +48,7 @@ class UnitController extends Controller
                 'deleted_at' => $unit->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/units/index', [
+        return Inertia::render('projects/settings/units/index', [
             'units' => $units,
             'statuses' => RecordStatus::options(),
             'sortable' => Unit::SORTABLE,

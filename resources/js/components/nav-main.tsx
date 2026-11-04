@@ -8,10 +8,65 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarMenuSub,
+    SidebarMenuSubButton,
+    SidebarMenuSubItem,
     useSidebar,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import type { NavItem } from '@/types';
+import type { NavItem, NavParent } from '@/types';
+
+/**
+ * A row that opens a list of links under it, such as Projects → Settings. It
+ * goes nowhere itself. `NavMain` never draws it in the icon rail.
+ */
+function NavParentItem({
+    item,
+    expanded,
+    onToggle,
+}: {
+    item: NavParent;
+    expanded: boolean;
+    onToggle?: () => void;
+}) {
+    const { isCurrentUrl } = useCurrentUrl();
+    const contentId = useId();
+
+    return (
+        <SidebarMenuItem>
+            <SidebarMenuButton
+                type="button"
+                onClick={onToggle}
+                aria-expanded={expanded}
+                aria-controls={contentId}
+                className="cursor-pointer"
+            >
+                {item.icon && <item.icon />}
+                <span>{item.title}</span>
+                <ChevronDown
+                    className={`ml-auto transition-transform duration-200 ${expanded ? '' : '-rotate-90'}`}
+                    aria-hidden
+                />
+            </SidebarMenuButton>
+
+            <SidebarMenuSub id={contentId} hidden={!expanded}>
+                {item.items.map((child) => (
+                    <SidebarMenuSubItem key={child.title}>
+                        <SidebarMenuSubButton
+                            asChild
+                            isActive={isCurrentUrl(child.href)}
+                        >
+                            <Link href={child.href} prefetch>
+                                {child.icon && <child.icon />}
+                                <span>{child.title}</span>
+                            </Link>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                ))}
+            </SidebarMenuSub>
+        </SidebarMenuItem>
+    );
+}
 
 /**
  * One labelled group of sidebar links. `label` names the group — modules with
@@ -20,20 +75,24 @@ import type { NavItem } from '@/types';
  * The label is also the group's collapse toggle. This component owns none of
  * that state: `useNavGroups` does, from `app-sidebar.tsx` (ARCHITECTURE.md §8.3).
  *
- * The links stay flat and top-level. They are deliberately *not*
- * `SidebarMenuSub` items under a parent row — that shape is `display: none` in
- * the icon rail, which would turn a module into an icon leading nowhere.
+ * A parent row's links are `SidebarMenuSub` items, which are `display: none` in
+ * the icon rail. So the rail draws them flat and top-level instead, or a parent
+ * would be an icon leading nowhere.
  */
 export function NavMain({
     items = [],
     label = 'Platform',
     expanded = true,
     onToggle,
+    isParentExpanded,
+    onParentToggle,
 }: {
-    items: NavItem[];
+    items: (NavItem | NavParent)[];
     label?: string;
     expanded?: boolean;
     onToggle?: () => void;
+    isParentExpanded?: (title: string) => boolean;
+    onParentToggle?: (title: string) => void;
 }) {
     const { isCurrentUrl } = useCurrentUrl();
     const { state, isMobile } = useSidebar();
@@ -46,6 +105,10 @@ export function NavMain({
      */
     const isRail = state === 'collapsed' && !isMobile;
     const isOpen = isRail || expanded;
+
+    const rows = isRail
+        ? items.flatMap((item) => ('items' in item ? item.items : [item]))
+        : items;
 
     return (
         <SidebarGroup className="px-2 py-0">
@@ -67,20 +130,31 @@ export function NavMain({
 
             <SidebarGroupContent id={contentId} hidden={!isOpen}>
                 <SidebarMenu>
-                    {items.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton
-                                asChild
-                                isActive={isCurrentUrl(item.href)}
-                                tooltip={{ children: item.title }}
-                            >
-                                <Link href={item.href} prefetch>
-                                    {item.icon && <item.icon />}
-                                    <span>{item.title}</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
+                    {rows.map((item) =>
+                        'items' in item ? (
+                            <NavParentItem
+                                key={item.title}
+                                item={item}
+                                expanded={
+                                    isParentExpanded?.(item.title) ?? true
+                                }
+                                onToggle={() => onParentToggle?.(item.title)}
+                            />
+                        ) : (
+                            <SidebarMenuItem key={item.title}>
+                                <SidebarMenuButton
+                                    asChild
+                                    isActive={isCurrentUrl(item.href)}
+                                    tooltip={{ children: item.title }}
+                                >
+                                    <Link href={item.href} prefetch>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ),
+                    )}
                 </SidebarMenu>
             </SidebarGroupContent>
         </SidebarGroup>

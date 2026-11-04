@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Products (`projects.products.index`), with its New product / Edit
+ * Projects → Settings → Products (`projects.settings.products.index`), with its New product / Edit
  * dialog and the Deleted tab. Source: documentation/projects.md §4 (Products).
  */
 export default function ProductsGuide() {
@@ -36,27 +36,29 @@ export default function ProductsGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.products.view</Ui> opens the list;{' '}
-                            <Ui>projects.products.create</Ui>,{' '}
-                            <Ui>projects.products.update</Ui> and{' '}
-                            <Ui>projects.products.delete</Ui> add, edit and
-                            delete; <Ui>projects.products.restore</Ui> and{' '}
-                            <Ui>projects.products.force-delete</Ui> work on the
-                            Deleted tab. The project-manager role holds them
-                            all. You also need a company to work in.
+                            <Ui>projects.settings.products.view</Ui> opens the
+                            list; <Ui>projects.settings.products.create</Ui>,{' '}
+                            <Ui>projects.settings.products.update</Ui> and{' '}
+                            <Ui>projects.settings.products.delete</Ui> add, edit
+                            and delete;{' '}
+                            <Ui>projects.settings.products.restore</Ui> and{' '}
+                            <Ui>projects.settings.products.force-delete</Ui>{' '}
+                            work on the Deleted tab. The project-manager role
+                            holds them all. You also need a company to work in.
                         </>
                     }
                     bn={
                         <>
-                            <Ui>projects.products.view</Ui> থাকলে তালিকা খোলা
-                            যায়; <Ui>projects.products.create</Ui>,{' '}
-                            <Ui>projects.products.update</Ui> ও{' '}
-                            <Ui>projects.products.delete</Ui> দিয়ে যোগ,
-                            সম্পাদনা ও মোছা যায়;{' '}
-                            <Ui>projects.products.restore</Ui> ও{' '}
-                            <Ui>projects.products.force-delete</Ui> Deleted
-                            ট্যাবে কাজ করে। project-manager রোলের কাছে এর
-                            সবগুলোই আছে। এর সাথে কাজ করার জন্য একটি কোম্পানিও
+                            <Ui>projects.settings.products.view</Ui> থাকলে
+                            তালিকা খোলা যায়;{' '}
+                            <Ui>projects.settings.products.create</Ui>,{' '}
+                            <Ui>projects.settings.products.update</Ui> ও{' '}
+                            <Ui>projects.settings.products.delete</Ui> দিয়ে
+                            যোগ, সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>projects.settings.products.restore</Ui> ও{' '}
+                            <Ui>projects.settings.products.force-delete</Ui>{' '}
+                            Deleted ট্যাবে কাজ করে। project-manager রোলের কাছে
+                            এর সবগুলোই আছে। এর সাথে কাজ করার জন্য একটি কোম্পানিও
                             লাগবে।
                         </>
                     }
@@ -65,16 +67,16 @@ export default function ProductsGuide() {
 
             <GuideSection kind="before">
                 <Para
-                    en="Check the company switcher in the header: the list, and every product you add, belongs to the company shown there. The category you want must exist and be Active on Projects → Product Categories."
-                    bn="হেডারের কোম্পানি সুইচারটি দেখে নিন: তালিকা এবং আপনি যে পণ্য যোগ করবেন সবই সেখানে দেখানো কোম্পানির। যে শ্রেণিটি চান সেটি Projects → Product Categories-এ থাকতে হবে এবং Active হতে হবে।"
+                    en="Check the company switcher in the header: the list, and every product you add, belongs to the company shown there. The category you want must exist and be Active on Projects → Settings → Product Categories."
+                    bn="হেডারের কোম্পানি সুইচারটি দেখে নিন: তালিকা এবং আপনি যে পণ্য যোগ করবেন সবই সেখানে দেখানো কোম্পানির। যে শ্রেণিটি চান সেটি Projects → Settings → Product Categories-এ থাকতে হবে এবং Active হতে হবে।"
                 />
             </GuideSection>
 
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Products. The description under the title names the company the list belongs to. Search by code or name, or pick a category or status, in the row under the headings."
-                        bn="Projects → Products খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন, অথবা একটি শ্রেণি বা অবস্থা বেছে নিন।"
+                        en="Open Projects → Settings → Products. The description under the title names the company the list belongs to. Search by code or name, or pick a category or status, in the row under the headings."
+                        bn="Projects → Settings → Products খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন, অথবা একটি শ্রেণি বা অবস্থা বেছে নিন।"
                     >
                         <Shot
                             id="overview"
@@ -179,8 +181,8 @@ export default function ProductsGuide() {
                 />
                 <Message
                     text="Choose an active product category."
-                    en="The category chosen was made Inactive or deleted meanwhile. Pick another, or reactivate it on Projects → Product Categories."
-                    bn="বেছে নেওয়া শ্রেণিটি এর মধ্যে Inactive করা বা মোছা হয়েছে। অন্য একটি বেছে নিন, অথবা Projects → Product Categories-এ সেটি আবার সক্রিয় করুন।"
+                    en="The category chosen was made Inactive or deleted meanwhile. Pick another, or reactivate it on Projects → Settings → Product Categories."
+                    bn="বেছে নেওয়া শ্রেণিটি এর মধ্যে Inactive করা বা মোছা হয়েছে। অন্য একটি বেছে নিন, অথবা Projects → Settings → Product Categories-এ সেটি আবার সক্রিয় করুন।"
                 />
                 <Message
                     text='The code "CEM-50KG" is already taken in this company.'
@@ -219,7 +221,7 @@ export default function ProductsGuide() {
 
             <GuideSection kind="related">
                 <RelatedGuide
-                    to="projects.product-categories"
+                    to="projects.settings.product-categories"
                     en="The categories products are sorted into."
                     bn="যেসব শ্রেণিতে পণ্যগুলো ভাগ করা হয়।"
                 />

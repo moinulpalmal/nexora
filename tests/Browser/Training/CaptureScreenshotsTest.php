@@ -269,8 +269,8 @@ test('hrm.departments', function () {
     captureTrainingShot($page, $key, 'import');
 });
 
-test('projects.clients', function () {
-    $key = 'projects.clients';
+test('projects.settings.clients', function () {
+    $key = 'projects.settings.clients';
     $actor = trainingActor();
     $companies = trainingCompanies();
     $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
@@ -288,30 +288,30 @@ test('projects.clients', function () {
         ]);
     }
 
-    $page = visitForTraining(route('projects.clients.index', absolute: false))->assertSee('Northwind Retail Ltd.');
+    $page = visitForTraining(route('projects.settings.clients.index', absolute: false))->assertSee('Northwind Retail Ltd.');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-client"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.product-categories', function () {
-    $key = 'projects.product-categories';
+test('projects.settings.product-categories', function () {
+    $key = 'projects.settings.product-categories';
     $actor = trainingActor();
     $companies = trainingCompanies();
     $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
 
     app(ProductCategoryService::class)->addStarterSet($companies['atl']);
 
-    $page = visitForTraining(route('projects.product-categories.index', absolute: false))->assertSee('Raw Materials');
+    $page = visitForTraining(route('projects.settings.product-categories.index', absolute: false))->assertSee('Raw Materials');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-product-category"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.verification-items', function () {
-    $key = 'projects.verification-items';
+test('projects.settings.verification-items', function () {
+    $key = 'projects.settings.verification-items';
     $actor = trainingActor();
     $companies = trainingCompanies();
     $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
@@ -320,15 +320,15 @@ test('projects.verification-items', function () {
         VerificationItem::factory()->for($companies['atl'])->create(['name' => $name]);
     }
 
-    $page = visitForTraining(route('projects.verification-items.index', absolute: false))->assertSee('Trade licence checked');
+    $page = visitForTraining(route('projects.settings.verification-items.index', absolute: false))->assertSee('Trade licence checked');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-verification-item"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.products', function () {
-    $key = 'projects.products';
+test('projects.settings.products', function () {
+    $key = 'projects.settings.products';
     $actor = trainingActor();
     $companies = trainingCompanies();
     $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
@@ -351,30 +351,30 @@ test('projects.products', function () {
         Product::factory()->for($companies['atl'])->for($categories[$category], 'category')->create(['code' => $code, 'name' => $name]);
     }
 
-    $page = visitForTraining(route('projects.products.index', absolute: false))->assertSee('Portland Cement 50 kg');
+    $page = visitForTraining(route('projects.settings.products.index', absolute: false))->assertSee('Portland Cement 50 kg');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-product"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.supplier-categories', function () {
-    $key = 'projects.supplier-categories';
+test('projects.settings.supplier-categories', function () {
+    $key = 'projects.settings.supplier-categories';
     trainingActor();
 
     foreach ([['MAT', 'Materials'], ['SRV', 'Services'], ['SUB', 'Subcontractors'], ['EQP', 'Equipment Hire'], ['CON', 'Consultants']] as [$code, $name]) {
         SupplierCategory::factory()->create(['code' => $code, 'name' => $name]);
     }
 
-    $page = visitForTraining(route('projects.supplier-categories.index', absolute: false))->assertSee('Subcontractors');
+    $page = visitForTraining(route('projects.settings.supplier-categories.index', absolute: false))->assertSee('Subcontractors');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-supplier-category"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.suppliers', function () {
-    $key = 'projects.suppliers';
+test('projects.settings.suppliers', function () {
+    $key = 'projects.settings.suppliers';
     $actor = trainingActor();
     $companies = trainingCompanies();
     $actor->forceFill(['selected_company_id' => $companies['atl']->id])->saveQuietly();
@@ -398,59 +398,59 @@ test('projects.suppliers', function () {
         ]);
     }
 
-    $page = visitForTraining(route('projects.suppliers.index', absolute: false))->assertSee('Buildmart Supplies Ltd.');
+    $page = visitForTraining(route('projects.settings.suppliers.index', absolute: false))->assertSee('Buildmart Supplies Ltd.');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-supplier"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.tender-types', function () {
-    $key = 'projects.tender-types';
+test('projects.settings.tender-types', function () {
+    $key = 'projects.settings.tender-types';
     trainingActor();
 
     foreach ([['OTM', 'Open Tendering Method'], ['LTM', 'Limited Tendering Method'], ['RFQ', 'Request for Quotation'], ['DPM', 'Direct Procurement Method'], ['TSTM', 'Two-Stage Tendering Method']] as [$code, $name]) {
         TenderType::factory()->create(['code' => $code, 'name' => $name]);
     }
 
-    $page = visitForTraining(route('projects.tender-types.index', absolute: false))->assertSee('Request for Quotation');
+    $page = visitForTraining(route('projects.settings.tender-types.index', absolute: false))->assertSee('Request for Quotation');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-tender-type"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.units', function () {
-    $key = 'projects.units';
+test('projects.settings.units', function () {
+    $key = 'projects.settings.units';
     trainingActor();
     (new UnitSeeder)->run();
 
-    $page = visitForTraining(route('projects.units.index', absolute: false))->assertSee('Kilogram');
+    $page = visitForTraining(route('projects.settings.units.index', absolute: false))->assertSee('Kilogram');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-unit"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.certification-categories', function () {
-    $key = 'projects.certification-categories';
+test('projects.settings.certification-categories', function () {
+    $key = 'projects.settings.certification-categories';
     trainingActor();
     (new CertificationCategorySeeder)->run();
 
-    $page = visitForTraining(route('projects.certification-categories.index', absolute: false))->assertSee('Environmental Management');
+    $page = visitForTraining(route('projects.settings.certification-categories.index', absolute: false))->assertSee('Environmental Management');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-certification-category"]')->assertVisible('dialog[open]');
     captureTrainingShot($page, $key, 'form');
 });
 
-test('projects.certifications', function () {
-    $key = 'projects.certifications';
+test('projects.settings.certifications', function () {
+    $key = 'projects.settings.certifications';
     trainingActor();
     (new CertificationCategorySeeder)->run();
     (new CertificationSeeder)->run();
 
-    $page = visitForTraining(route('projects.certifications.index', absolute: false))->assertSee('BDS ISO 9001 Quality Management Systems');
+    $page = visitForTraining(route('projects.settings.certifications.index', absolute: false))->assertSee('BDS ISO 9001 Quality Management Systems');
     captureTrainingShot($page, $key, 'overview');
 
     $page->click('[data-test="new-certification"]')->assertVisible('dialog[open]');

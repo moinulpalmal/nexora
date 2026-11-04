@@ -15,7 +15,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/certifications';
+import { index } from '@/routes/projects/settings/certifications';
 import type {
     CertificationCategoryOption,
     CertificationFilters,
@@ -39,11 +39,11 @@ type Props = {
 };
 
 /**
- * Projects → Certifications — a catalogue of standards (ISO 9001, amfori
+ * Projects → Settings → Certifications — a catalogue of standards (ISO 9001, amfori
  * BSCI, CE…), one list every company shares (ARCHITECTURE.md §9.10). Laid out
- * as `projects/tender-types` (Active/Deleted tabs, every action a dialog, bulk
+ * as `projects/settings/tender-types` (Active/Deleted tabs, every action a dialog, bulk
  * delete on both tabs) with the category column and filter of
- * `projects/suppliers`; the page works whether or not a company is selected.
+ * `projects/settings/suppliers`; the page works whether or not a company is selected.
  *
  * Nothing references a certification yet, so every row can be deleted and
  * ticked.
@@ -58,11 +58,13 @@ export default function CertificationsIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.certifications.create');
-    const canUpdate = useCan('projects.certifications.update');
-    const canDelete = useCan('projects.certifications.delete');
-    const canRestore = useCan('projects.certifications.restore');
-    const canForceDelete = useCan('projects.certifications.force-delete');
+    const canCreate = useCan('projects.settings.certifications.create');
+    const canUpdate = useCan('projects.settings.certifications.update');
+    const canDelete = useCan('projects.settings.certifications.delete');
+    const canRestore = useCan('projects.settings.certifications.restore');
+    const canForceDelete = useCan(
+        'projects.settings.certifications.force-delete',
+    );
 
     const isDeleted = filters.view === 'trashed';
     const canBulkDelete = isDeleted ? canForceDelete : canDelete;

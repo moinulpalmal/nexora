@@ -51,6 +51,19 @@ test('a permission outside the catalogue falls back to a sentence built from its
         ->where->toBeNull();
 });
 
+test('a settings permission reads its resource and action around the settings segment', function () {
+    expect(PermissionDescriptions::resourceOf('projects.settings.clients.view'))->toBe('settings.clients')
+        ->and(PermissionDescriptions::actionOf('projects.settings.clients.view'))->toBe('view')
+        ->and(PermissionDescriptions::resourceOf('admin.users.view'))->toBe('users')
+        ->and(PermissionDescriptions::actionOf('admin.users.view'))->toBe('view');
+});
+
+test('a settings permission outside the catalogue falls back to a sentence built from its resource', function () {
+    expect(app(PermissionDescriptions::class)->for('reports.settings.sales-totals.view'))
+        ->curated->toBeFalse()
+        ->summary->toBe('Open and read sales totals.');
+});
+
 test('an unknown action falls back to the action itself', function () {
     expect(app(PermissionDescriptions::class)->for('reports.sales.approve-all'))
         ->summary->toBe('Approve all sales.');

@@ -85,8 +85,8 @@ export default function CompaniesGuide() {
                                 short code such as <Ui>ATL</Ui>, and save with{' '}
                                 <Ui>Save &amp; close</Ui>. The new company
                                 starts with 13 standard product categories
-                                (Projects → Product Categories), which its
-                                people can rename or retire.
+                                (Projects → Settings → Product Categories),
+                                which its people can rename or retire.
                             </>
                         }
                         bn={
@@ -95,8 +95,8 @@ export default function CompaniesGuide() {
                                 কোড দিন, যেমন <Ui>ATL</Ui>, তারপর{' '}
                                 <Ui>Save &amp; close</Ui> দিয়ে সেভ করুন। নতুন
                                 কোম্পানিটি ১৩টি সাধারণ পণ্যের শ্রেণি (Projects →
-                                Product Categories) নিয়ে শুরু হয়, যেগুলোর নাম
-                                বদলানো বা বাদ দেওয়া যায়।
+                                Settings → Product Categories) নিয়ে শুরু হয়,
+                                যেগুলোর নাম বদলানো বা বাদ দেওয়া যায়।
                             </>
                         }
                     >
@@ -205,18 +205,18 @@ export default function CompaniesGuide() {
                 />
                 <Message
                     text="4 products belong to this company. Deactivate the company instead, or delete them for good first."
-                    en="The same rule for Projects products, checked after suppliers. Delete them for good on Projects → Products before their categories."
-                    bn="Projects-এর পণ্যের জন্যও একই নিয়ম, সরবরাহকারীর পরে যাচাই হয়। এদের শ্রেণির আগে Projects → Products থেকে এগুলো চিরতরে মুছুন।"
+                    en="The same rule for Projects products, checked after suppliers. Delete them for good on Projects → Settings → Products before their categories."
+                    bn="Projects-এর পণ্যের জন্যও একই নিয়ম, সরবরাহকারীর পরে যাচাই হয়। এদের শ্রেণির আগে Projects → Settings → Products থেকে এগুলো চিরতরে মুছুন।"
                 />
                 <Message
                     text="13 product categories belong to this company. Deactivate the company instead, or delete them for good first."
-                    en="The same rule for Projects product categories, checked after products. Every company made on this screen starts with 13, so a company is deleted only after they are deleted for good on Projects → Product Categories."
-                    bn="Projects-এর পণ্যের শ্রেণির জন্যও একই নিয়ম, পণ্যের পরে যাচাই হয়। এই স্ক্রিনে বানানো প্রতিটি কোম্পানি ১৩টি শ্রেণি নিয়ে শুরু হয়, তাই Projects → Product Categories থেকে সেগুলো চিরতরে মোছার পরেই কোম্পানিটি মোছা যায়।"
+                    en="The same rule for Projects product categories, checked after products. Every company made on this screen starts with 13, so a company is deleted only after they are deleted for good on Projects → Settings → Product Categories."
+                    bn="Projects-এর পণ্যের শ্রেণির জন্যও একই নিয়ম, পণ্যের পরে যাচাই হয়। এই স্ক্রিনে বানানো প্রতিটি কোম্পানি ১৩টি শ্রেণি নিয়ে শুরু হয়, তাই Projects → Settings → Product Categories থেকে সেগুলো চিরতরে মোছার পরেই কোম্পানিটি মোছা যায়।"
                 />
                 <Message
                     text="2 verification items belong to this company. Deactivate the company instead, or delete them for good first."
-                    en="The same rule for Projects verification items, checked last. Delete them for good on Projects → Verification Items."
-                    bn="Projects-এর যাচাইয়ের বিষয়ের জন্যও একই নিয়ম, সবশেষে যাচাই হয়। Projects → Verification Items থেকে এগুলো চিরতরে মুছুন।"
+                    en="The same rule for Projects verification items, checked last. Delete them for good on Projects → Settings → Verification Items."
+                    bn="Projects-এর যাচাইয়ের বিষয়ের জন্যও একই নিয়ম, সবশেষে যাচাই হয়। Projects → Settings → Verification Items থেকে এগুলো চিরতরে মুছুন।"
                 />
             </GuideSection>
 
@@ -245,17 +245,17 @@ export default function CompaniesGuide() {
                     bn="প্রতিটি কোম্পানির অধীনের বিভাগগুলো।"
                 />
                 <RelatedGuide
-                    to="projects.clients"
+                    to="projects.settings.clients"
                     en="The clients that belong to each company."
                     bn="প্রতিটি কোম্পানির অধীনের ক্লায়েন্টরা।"
                 />
                 <RelatedGuide
-                    to="projects.suppliers"
+                    to="projects.settings.suppliers"
                     en="The suppliers that belong to each company."
                     bn="প্রতিটি কোম্পানির অধীনের সরবরাহকারীরা।"
                 />
                 <RelatedGuide
-                    to="projects.product-categories"
+                    to="projects.settings.product-categories"
                     en="The product categories each company starts with."
                     bn="প্রতিটি কোম্পানি যেসব পণ্যের শ্রেণি নিয়ে শুরু হয়।"
                 />

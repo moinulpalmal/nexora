@@ -46,7 +46,7 @@
 | `pending-import-banner` | reopens or cancels the uploader's staged import |
 | `import-result-panel` / `import-reject-list` | a partial import's rejected rows, with the download |
 | `preview-banner` / `preview-widgets` | the 🧪 POC overviews' "Preview" banner and sample-data cards — throwaway with those pages ([`ARCHITECTURE.md` §5](../ARCHITECTURE.md#5-module-registry)) |
-| `no-company-panel` | drawn by every company-scoped ERP list in place of its table when no company is selected ([`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company)); promoted from `hrm/` when Projects → Clients became its second module's user |
+| `no-company-panel` | drawn by every company-scoped ERP list in place of its table when no company is selected ([`ARCHITECTURE.md` §9.10](../ARCHITECTURE.md#910-multi-company)); promoted from `hrm/` when Projects → Settings → Clients became its second module's user |
 
 Module components that are not shared yet: the form dialogs —
 `components/hrm/{department,designation,employee}-form-dialog.tsx` and
@@ -68,7 +68,7 @@ whose state resets with `formKey`.
 | `usePasswordPolicy()` | the policy behind the live checklist |
 | `useAppearance()` / `useThemeSetting()` | the active theme; persist a choice |
 | `useFlashToast()` | renders `Inertia::flash('toast', …)` (mounted once in `app.tsx`) |
-| `useNavGroups(groups)` | sidebar group collapse state (call once, in `app-sidebar.tsx`) |
+| `useNavGroups(groups)` | sidebar group and parent-row collapse state (call once, in `app-sidebar.tsx`); a parent row such as Projects → Settings is a `NavParent` ([`ARCHITECTURE.md` §8.3](../ARCHITECTURE.md#83-navigation)) |
 | `useInitials()` | avatar fallback text |
 | `useUserNotifications(userId, cb)` (`lib/echo.ts`) | live push on the user's private channel |
 

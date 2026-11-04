@@ -16,7 +16,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/verification-items';
+import { index } from '@/routes/projects/settings/verification-items';
 import type {
     CompanySummary,
     Filterable,
@@ -40,8 +40,8 @@ type Props = {
 };
 
 /**
- * Projects → Verification Items — kept per company (ARCHITECTURE.md §9.10),
- * laid out as `projects/product-categories` (Active/Deleted tabs, every action
+ * Projects → Settings → Verification Items — kept per company (ARCHITECTURE.md §9.10),
+ * laid out as `projects/settings/product-categories` (Active/Deleted tabs, every action
  * a dialog, bulk delete on both tabs) without a code column and without a
  * spreadsheet import (owner, 2026-11-03).
  *
@@ -57,11 +57,13 @@ export default function VerificationItemsIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.verification-items.create');
-    const canUpdate = useCan('projects.verification-items.update');
-    const canDelete = useCan('projects.verification-items.delete');
-    const canRestore = useCan('projects.verification-items.restore');
-    const canForceDelete = useCan('projects.verification-items.force-delete');
+    const canCreate = useCan('projects.settings.verification-items.create');
+    const canUpdate = useCan('projects.settings.verification-items.update');
+    const canDelete = useCan('projects.settings.verification-items.delete');
+    const canRestore = useCan('projects.settings.verification-items.restore');
+    const canForceDelete = useCan(
+        'projects.settings.verification-items.force-delete',
+    );
 
     const isDeleted = filters.view === 'trashed';
     const canBulkDelete = isDeleted ? canForceDelete : canDelete;

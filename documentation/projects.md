@@ -32,6 +32,14 @@ invoices ([§7](#7-links-to-other-modules)).
 | Name / permission prefix | `projects.` |
 | URL prefix | `projects/` |
 | Pages | `pages/projects/*` |
+| Setup lists | **Projects → Settings** in the menu, `projects/settings/` in the URL, `projects.settings.` in route and permission names; pages in `pages/projects/settings/*` |
+
+**Every list built so far is a setup list under Settings** (owner, 2026-11-04). Settings is a row that
+opens its links in the sidebar and has no page of its own, so `/projects/settings` is a 404, and the
+old addresses (`/projects/clients` and so on) are gone, with no redirects. Overview stays directly
+under Projects. A new setup list goes under Settings; the working screens to come (projects, tasks,
+timesheets) go beside it. The permissions were renamed by a migration, so what a role already holds is
+kept ([ARCHITECTURE §6.2](../ARCHITECTURE.md#62-routes-and-permissions)).
 
 **Every record belongs to a company** ([ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)).
 A user works in one selected company at a time and sees only that company's projects.
@@ -63,7 +71,7 @@ modules:
 
 | Phase | Delivers |
 | --- | --- |
-| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)) — **built**. **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)) — **built** 2026-10-29; employees carry the monthly salary the cost rate will come from. **Projects → Clients** ([§4](#clients--built)) — **built** 2026-11-02, in place of the planned Accounting → Customers. **Projects → Suppliers** and their **Supplier Categories** ([§4](#suppliers--built)) — **built** 2026-11-02, in place of Accounting phase 2's planned supplier list. |
+| **0 — prerequisites** | Admin → Companies and user↔company access ([`admin.md`](admin.md#10-companies)) — **built**. **HRM-lite**: Employees, Departments, Designations ([`hrm.md`](hrm.md#3-phases)) — **built** 2026-10-29; employees carry the monthly salary the cost rate will come from. **Projects → Settings → Clients** ([§4](#clients--built)) — **built** 2026-11-02, in place of the planned Accounting → Customers. **Projects → Settings → Suppliers** and their **Supplier Categories** ([§4](#suppliers--built)) — **built** 2026-11-02, in place of Accounting phase 2's planned supplier list. |
 | **1 — delivery** | Projects with contract terms, milestones, tasks (list + board), project members with billing rates, timesheets with approval. |
 | **2 — billing** | Billing requests from approved milestones and hours. They wait as **ready to invoice** until Accounting's invoices exist, then become invoices. |
 | **3 — profitability** | Budget against actual per project and per milestone, using the employee cost rate. |
@@ -87,8 +95,8 @@ modules:
 
 ### Clients — built
 
-*Built 2026-11-02 (owner's decisions of that day).* **Projects → Clients** (`projects/clients`,
-`projects.clients.index`) is the organizations the company runs projects for — and **the ERP's one
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Settings → Clients** (`projects/settings/clients`,
+`projects.settings.clients.index`) is the organizations the company runs projects for — and **the ERP's one
 customer list**. It was planned as Accounting → Customers; the owner moved it here because Projects
 needs a client for every project before Accounting exists. Accounting's invoices will point at the
 same rows and add their billing fields (currency, credit terms, receivable account) when Accounting
@@ -123,15 +131,15 @@ is built ([`accounting.md`](accounting.md)).
   ([`admin.md` §10.1](admin.md#101-the-company-master--admin--companies)).
 - **No spreadsheet import** (owner, 2026-11-02): clients are entered by hand, so there is no
   bulk-load path.
-- **Roles:** `project-manager` holds every `projects.clients.*` by rule, `viewer` the `.view`; the
+- **Roles:** `project-manager` holds every `projects.settings.clients.*` by rule, `viewer` the `.view`; the
   `admin` role holds none (it takes no module prefix).
 
-Tests: `tests/Feature/ProjectManagement/ClientTest.php`. Guide: Projects → Clients.
+Tests: `tests/Feature/ProjectManagement/ClientTest.php`. Guide: Projects → Settings → Clients.
 
 ### Product categories — built
 
-*Built 2026-11-03 (owner's decisions of that day).* **Projects → Product Categories**
-(`projects/product-categories`, `projects.product-categories.index`, model `ProductCategory`) is the
+*Built 2026-11-03 (owner's decisions of that day).* **Projects → Settings → Product Categories**
+(`projects/settings/product-categories`, `projects.settings.product-categories.index`, model `ProductCategory`) is the
 groups a company's [products](#products--built) are sorted into. **Company-scoped**, shaped
 as Clients: each company keeps its own list, and the same code or name in another company is fine.
 
@@ -175,16 +183,16 @@ as Clients: each company keeps its own list, and the same code or name in anothe
   categories are permanently deleted** — the owner's choice (2026-11-03) over removing them with the
   company; deactivating remains the normal way to retire a company.
 - **No spreadsheet import** (owner, 2026-11-03): categories beyond the starter set are entered by hand.
-- **Roles:** `project-manager` holds every `projects.product-categories.*` by rule — per-company
+- **Roles:** `project-manager` holds every `projects.settings.product-categories.*` by rule — per-company
   data, so no `ROLE_EXCLUSIONS` entry — `viewer` the `.view`; the `admin` role holds none.
 
 Tests: `tests/Feature/ProjectManagement/ProductCategoryTest.php` (and the company-side rules in
-`tests/Feature/Admin/CompanyTest.php`). Guide: Projects → Product categories.
+`tests/Feature/Admin/CompanyTest.php`). Guide: Projects → Settings → Product categories.
 
 ### Products — built
 
-*Built 2026-11-03 (owner's decisions of that day).* **Projects → Products** (`projects/products`,
-`projects.products.index`, model `Product`) is what a company buys, stocks or supplies, each in one of
+*Built 2026-11-03 (owner's decisions of that day).* **Projects → Settings → Products** (`projects/settings/products`,
+`projects.settings.products.index`, model `Product`) is what a company buys, stocks or supplies, each in one of
 that company's [product categories](#product-categories--built) — the first table to point at a
 category. **Company-scoped**, shaped as Suppliers: each company keeps its own list, and the same code
 or name in another company is fine.
@@ -214,15 +222,15 @@ or name in another company is fine.
   cannot be deleted ([`admin.md` §10.1](admin.md#101-the-company-master--admin--companies)).
 - **No spreadsheet import and no seed** (owner, 2026-11-03): products are entered by hand, and a new
   company starts with none.
-- **Roles:** `project-manager` holds every `projects.products.*` by rule — per-company data, so no
+- **Roles:** `project-manager` holds every `projects.settings.products.*` by rule — per-company data, so no
   `ROLE_EXCLUSIONS` entry — `viewer` the `.view`; the `admin` role holds none.
 
-Tests: `tests/Feature/ProjectManagement/ProductTest.php`. Guide: Projects → Products.
+Tests: `tests/Feature/ProjectManagement/ProductTest.php`. Guide: Projects → Settings → Products.
 
 ### Supplier categories — built
 
-*Built 2026-11-02 (owner's decisions of that day).* **Projects → Supplier Categories**
-(`projects/supplier-categories`, `projects.supplier-categories.index`) is what kind of supplier each
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Settings → Supplier Categories**
+(`projects/settings/supplier-categories`, `projects.settings.supplier-categories.index`) is what kind of supplier each
 one is — materials, services, subcontractors, equipment hire and the like. Every supplier is in
 exactly one. A class of supplier is not a fact about one company, so the list is **group-wide**: one
 list every company shares, with no `company_id` — the third ERP exception to
@@ -251,17 +259,17 @@ description, and guarded like HRM → Designations.
   **Deactivating a category in use is allowed** (owner, 2026-11-02).
 - **No spreadsheet import and no seed** (owner, 2026-11-02): a handful of rows entered by hand; a new
   installation starts with none, so categories must be made before the first supplier.
-- **Roles:** `project-manager` holds every `projects.supplier-categories.*` by rule — unlike tender
+- **Roles:** `project-manager` holds every `projects.settings.supplier-categories.*` by rule — unlike tender
   types, there is no `ROLE_EXCLUSIONS` entry (owner, 2026-11-02, "mapped like Clients") — `viewer` the
   `.view`; the `admin` role holds none.
 
-Tests: `tests/Feature/ProjectManagement/SupplierCategoryTest.php`. Guide: Projects → Supplier
+Tests: `tests/Feature/ProjectManagement/SupplierCategoryTest.php`. Guide: Projects → Settings → Supplier
 categories.
 
 ### Suppliers — built
 
-*Built 2026-11-02 (owner's decisions of that day).* **Projects → Suppliers** (`projects/suppliers`,
-`projects.suppliers.index`) is the firms the company buys from — and **the ERP's one supplier list**.
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Settings → Suppliers** (`projects/settings/suppliers`,
+`projects.settings.suppliers.index`) is the firms the company buys from — and **the ERP's one supplier list**.
 It was planned as part of Accounting's payables; the owner placed it here, as with Clients, and
 Accounting's bills will point at the same rows and add their own billing fields (currency, payment
 terms, payable account) when Accounting phase 2 is built ([`accounting.md`](accounting.md)).
@@ -295,15 +303,15 @@ terms, payable account) when Accounting phase 2 is built ([`accounting.md`](acco
   ([`admin.md` §10.1](admin.md#101-the-company-master--admin--companies)); a category suppliers use
   cannot be deleted (above).
 - **No spreadsheet import** (owner, 2026-11-02): suppliers are entered by hand.
-- **Roles:** `project-manager` holds every `projects.suppliers.*` by rule, `viewer` the `.view`; the
+- **Roles:** `project-manager` holds every `projects.settings.suppliers.*` by rule, `viewer` the `.view`; the
   `admin` role holds none.
 
-Tests: `tests/Feature/ProjectManagement/SupplierTest.php`. Guide: Projects → Suppliers.
+Tests: `tests/Feature/ProjectManagement/SupplierTest.php`. Guide: Projects → Settings → Suppliers.
 
 ### Tender types — built
 
-*Built 2026-11-02 (owner's decisions of that day).* **Projects → Tender Types**
-(`projects/tender-types`, `projects.tender-types.index`) is how a project was procured — open
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Settings → Tender Types**
+(`projects/settings/tender-types`, `projects.settings.tender-types.index`) is how a project was procured — open
 tendering, limited tendering, request for quotation, direct procurement and the like. A procurement
 method is a classification, not a fact about one company, so the list is **group-wide**: one list
 every company shares, with no `company_id` — the second ERP exception to
@@ -329,17 +337,17 @@ every company shares, with no `company_id` — the second ERP exception to
   clause ([ARCHITECTURE §9.14](../ARCHITECTURE.md#914-master-data-and-deletion-guards)).
 - **No spreadsheet import and no seed** (owner, 2026-11-02): the list is a handful of rows entered by
   hand, so there is no bulk-load path, and a new installation starts with none.
-- **Roles:** `project-manager` holds `projects.tender-types.{view,create,update}` but not
+- **Roles:** `project-manager` holds `projects.settings.tender-types.{view,create,update}` but not
   `delete`, `restore` or `force-delete` (`ROLE_EXCLUSIONS`, owner, 2026-11-02): the list is shared by
   every company, so removing a tender type stays with super-admin — the rule HR officers follow for
   designations. `viewer` holds the `.view`; the `admin` role holds none.
 
-Tests: `tests/Feature/ProjectManagement/TenderTypeTest.php`. Guide: Projects → Tender types.
+Tests: `tests/Feature/ProjectManagement/TenderTypeTest.php`. Guide: Projects → Settings → Tender types.
 
 ### Units of measure — built
 
-*Built 2026-11-02 (owner's decisions of that day).* **Projects → Units of Measure**
-(`projects/units`, `projects.units.index`, model `Unit`) is what a quantity is counted in — pieces,
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Settings → Units of Measure**
+(`projects/settings/units`, `projects.settings.units.index`, model `Unit`) is what a quantity is counted in — pieces,
 kilograms, square metres, hours, lump sum and the like — for the BOQ, budget and bill lines that will
 point at it. A kilogram is the same in every company, so the list is **group-wide**: one list every
 company shares, with no `company_id` — the fourth ERP exception to
@@ -371,16 +379,16 @@ grouped by what they measure, so there are no conversions between them (owner, 2
 - **No spreadsheet import** (owner, 2026-11-02): units beyond the seeded set are added by hand.
 - **No deletion guard yet**: nothing points at a unit. The first table with a `unit_id` adds
   `restrictOnDelete()` and a `UnitService::deletionBlocker()` clause.
-- **Roles:** as tender types — `project-manager` holds `projects.units.{view,create,update}` but not
+- **Roles:** as tender types — `project-manager` holds `projects.settings.units.{view,create,update}` but not
   `delete`, `restore` or `force-delete` (`ROLE_EXCLUSIONS`); `viewer` holds the `.view`; the `admin`
   role holds none.
 
-Tests: `tests/Feature/ProjectManagement/UnitTest.php`. Guide: Projects → Units of measure.
+Tests: `tests/Feature/ProjectManagement/UnitTest.php`. Guide: Projects → Settings → Units of measure.
 
 ### Certification categories — built
 
-*Built 2026-11-02 (owner's decisions of that day).* **Projects → Certification Categories**
-(`projects/certification-categories`, `projects.certification-categories.index`, model
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Settings → Certification Categories**
+(`projects/settings/certification-categories`, `projects.settings.certification-categories.index`, model
 `CertificationCategory`) groups the certifications below — quality management, environmental,
 social compliance, textile & apparel, steel & metals, pipes & plastics and the like. **Group-wide**
 (the fifth ERP exception to [ARCHITECTURE §9.10](../ARCHITECTURE.md#910-multi-company)), and shaped
@@ -398,16 +406,16 @@ Active / Deleted tabs and bulk delete on both; audited as *Certification categor
   SOC, TXT, ELEC, STEEL, PIPE, MACH, RADAR, NAT (BSTI/BDS), OTHER — skipping any whose code or name is
   taken, as `UnitSeeder`.
 - **No spreadsheet import.** **Roles:** as tender types — `project-manager` holds
-  `projects.certification-categories.{view,create,update}` but not `delete`, `restore` or
+  `projects.settings.certification-categories.{view,create,update}` but not `delete`, `restore` or
   `force-delete` (`ROLE_EXCLUSIONS`); `viewer` holds the `.view`; the `admin` role holds none.
 
-Tests: `tests/Feature/ProjectManagement/CertificationCategoryTest.php`. Guide: Projects →
+Tests: `tests/Feature/ProjectManagement/CertificationCategoryTest.php`. Guide: Projects → Settings →
 Certification categories.
 
 ### Certifications — built
 
-*Built 2026-11-02 (owner's decisions of that day).* **Projects → Certifications**
-(`projects/certifications`, `projects.certifications.index`, model `Certification`) is a **catalogue
+*Built 2026-11-02 (owner's decisions of that day).* **Projects → Settings → Certifications**
+(`projects/settings/certifications`, `projects.settings.certifications.index`, model `Certification`) is a **catalogue
 of standards** — ISO 9001, ISO 14001, amfori BSCI, OEKO-TEX, CE, the BSTI mark — that a supplier may
 hold or a tender may demand. A row is a standard, **not a certificate someone holds**: a held
 certificate, with its number, issuer and expiry, will be a table of its own pointing here, on the
@@ -440,15 +448,15 @@ Types with a required category as Suppliers have.
 - **No spreadsheet import** (owner, 2026-11-02): standards beyond the seeded set are added by hand.
 - **No deletion guard yet**: nothing points at a certification. The first table with a
   `certification_id` adds `restrictOnDelete()` and a `CertificationService::deletionBlocker()` clause.
-- **Roles:** as tender types — `project-manager` holds `projects.certifications.{view,create,update}`
+- **Roles:** as tender types — `project-manager` holds `projects.settings.certifications.{view,create,update}`
   only; `viewer` the `.view`; `admin` none.
 
-Tests: `tests/Feature/ProjectManagement/CertificationTest.php`. Guide: Projects → Certifications.
+Tests: `tests/Feature/ProjectManagement/CertificationTest.php`. Guide: Projects → Settings → Certifications.
 
 ### Verification items — built
 
-*Built 2026-11-03 (owner's decisions of that day).* **Projects → Verification Items**
-(`projects/verification-items`, `projects.verification-items.index`, model `VerificationItem`) is a
+*Built 2026-11-03 (owner's decisions of that day).* **Projects → Settings → Verification Items**
+(`projects/settings/verification-items`, `projects.settings.verification-items.index`, model `VerificationItem`) is a
 company's reusable list of things it checks. **What will use an item is still the owner's to
 name**; for now it is a plain master. **Company-scoped**, shaped as Product Categories but **with no
 code** (the owner asked for a name, description and status only): each company keeps its own list,
@@ -476,11 +484,11 @@ and the same name in another company is fine.
   deleted ([`admin.md` §10.1](admin.md#101-the-company-master--admin--companies)).
 - **No spreadsheet import** (owner, 2026-11-03): items are entered by hand, so there is no bulk-load
   path.
-- **Roles:** `project-manager` holds every `projects.verification-items.*` by rule — per-company
+- **Roles:** `project-manager` holds every `projects.settings.verification-items.*` by rule — per-company
   data, so no `ROLE_EXCLUSIONS` entry — `viewer` the `.view`; the `admin` role holds none.
 
 Tests: `tests/Feature/ProjectManagement/VerificationItemTest.php` (and the company-side rule in
-`tests/Feature/Admin/CompanyTest.php`). Guide: Projects → Verification items.
+`tests/Feature/Admin/CompanyTest.php`). Guide: Projects → Settings → Verification items.
 
 ### Project stages
 
@@ -540,25 +548,25 @@ that stops anyone approving their own record.
 
 ## 6. Draft permission catalogue
 
-*Draft — not seeded*, except `projects.clients.*`, `projects.product-categories.*`, `projects.products.*`, `projects.supplier-categories.*`,
-`projects.suppliers.*`, `projects.tender-types.*`, `projects.units.*`,
-`projects.certification-categories.*` and `projects.certifications.*`
-(`{view,create,update,delete,restore,force-delete}` each), which shipped with their screens ([§4](#4-main-entities)). Names follow `{module}.{resource}.{action}` ([ARCHITECTURE
+*Draft — not seeded*, except `projects.settings.clients.*`, `projects.settings.product-categories.*`, `projects.settings.products.*`, `projects.settings.supplier-categories.*`,
+`projects.settings.suppliers.*`, `projects.settings.tender-types.*`, `projects.settings.units.*`,
+`projects.settings.certification-categories.*` and `projects.settings.certifications.*`
+(`{view,create,update,delete,restore,force-delete}` each), which shipped with their screens ([§4](#4-main-entities)). Names follow `{module}.{resource}.{action}`, with `settings` added before the resource of a setup list ([ARCHITECTURE
 §6.2](../ARCHITECTURE.md#62-routes-and-permissions)). Each is added to `RolePermissionSeeder::CATALOGUE`
 and `PermissionDescriptions` when its screen is built.
 
 | Permission | Allows |
 | --- | --- |
-| `projects.clients.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's clients |
-| `projects.product-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's product categories |
-| `projects.products.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's products |
-| `projects.supplier-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the supplier categories every company shares |
-| `projects.suppliers.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's suppliers |
-| `projects.tender-types.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the tender types every company shares |
-| `projects.units.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the units of measure every company shares |
-| `projects.certification-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the certification categories every company shares |
-| `projects.certifications.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the catalogue of certifications every company shares |
-| `projects.verification-items.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's verification items |
+| `projects.settings.clients.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's clients |
+| `projects.settings.product-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's product categories |
+| `projects.settings.products.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's products |
+| `projects.settings.supplier-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the supplier categories every company shares |
+| `projects.settings.suppliers.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's suppliers |
+| `projects.settings.tender-types.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the tender types every company shares |
+| `projects.settings.units.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the units of measure every company shares |
+| `projects.settings.certification-categories.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the certification categories every company shares |
+| `projects.settings.certifications.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the catalogue of certifications every company shares |
+| `projects.settings.verification-items.{view,create,update,delete,restore,force-delete}` | **Built.** Manage the selected company's verification items |
 | `projects.projects.{view,create,update,delete}` | Manage projects and their contract terms |
 | `projects.projects.reopen` | Move a project out of Completed or Cancelled ([§4](#project-stages)) |
 | `projects.milestones.{view,create,update,delete}` | Manage milestones |

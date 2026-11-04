@@ -42,30 +42,57 @@ export type UseNavGroupsReturn = {
     toggle: (label: string) => void;
 };
 
+/**
+ * The key a parent row's collapsed state is remembered under, in the same set
+ * and cookie as the groups: `Projects/Settings`.
+ */
+export function navParentKey(groupLabel: string, title: string): string {
+    return `${groupLabel}/${title}`;
+}
+
+/** Every group's key, with the keys of the parent rows inside it. */
+function allKeys(groups: NavGroup[]): string[] {
+    return groups.flatMap((group) => [
+        group.label,
+        ...group.items.flatMap((item) =>
+            'items' in item ? [navParentKey(group.label, item.title)] : [],
+        ),
+    ]);
+}
+
 export function useNavGroups(groups: NavGroup[]): UseNavGroupsReturn {
     const collapsedProp = usePage().props.collapsedNavGroups;
     const { currentUrl, isCurrentOrParentUrl } = useCurrentUrl();
 
     const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(() =>
         collapsedProp.includes('*')
-            ? new Set(groups.map((g) => g.label))
+            ? new Set(allKeys(groups))
             : new Set(collapsedProp),
     );
 
-    /** The group holding the page being viewed, if any. */
-    const activeLabel =
-        groups.find((group) =>
-            group.items.some((item) => isCurrentOrParentUrl(item.href)),
-        )?.label ?? null;
+    /** The group holding the page being viewed and any parent row around it. */
+    const activeKeys = groups.flatMap((group) =>
+        group.items.flatMap((item) => {
+            if ('items' in item) {
+                return item.items.some((child) =>
+                    isCurrentOrParentUrl(child.href),
+                )
+                    ? [group.label, navParentKey(group.label, item.title)]
+                    : [];
+            }
+
+            return isCurrentOrParentUrl(item.href) ? [group.label] : [];
+        }),
+    );
 
     const [seenUrl, setSeenUrl] = useState(currentUrl);
 
     if (seenUrl !== currentUrl) {
         setSeenUrl(currentUrl);
 
-        if (activeLabel !== null && collapsed.has(activeLabel)) {
+        if (activeKeys.some((key) => collapsed.has(key))) {
             const next = new Set(collapsed);
-            next.delete(activeLabel);
+            activeKeys.forEach((key) => next.delete(key));
 
             setCollapsed(next);
         }

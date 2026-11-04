@@ -9,7 +9,7 @@ use Database\Seeders\Admin\RolePermissionSeeder;
 
 /*
 |--------------------------------------------------------------------------
-| Projects → Clients
+| Projects → Settings → Clients
 |--------------------------------------------------------------------------
 |
 | The ERP's one customer list, company-scoped as HRM → Departments
@@ -56,12 +56,12 @@ function clientPayload(array $overrides = []): array
 */
 
 test('guests are sent to the login page', function () {
-    $this->get(route('projects.clients.index'))->assertRedirect(route('login'));
+    $this->get(route('projects.settings.clients.index'))->assertRedirect(route('login'));
 });
 
 test('the list is refused without the view permission', function () {
     $this->actingAs(clientActor(Company::factory()->create()))
-        ->get(route('projects.clients.index'))
+        ->get(route('projects.settings.clients.index'))
         ->assertForbidden();
 });
 
@@ -73,19 +73,19 @@ test('each write is refused without its own permission', function (string $metho
         $client->delete();
     }
 
-    $this->actingAs(clientActor($company, 'projects.clients.view'))
+    $this->actingAs(clientActor($company, 'projects.settings.clients.view'))
         ->{$method}(route($route, $client), clientPayload())
         ->assertForbidden();
 })->with([
-    'update' => ['put', 'projects.clients.update', false],
-    'delete' => ['delete', 'projects.clients.destroy', false],
-    'restore' => ['put', 'projects.clients.restore', true],
-    'force delete' => ['delete', 'projects.clients.force-delete', true],
+    'update' => ['put', 'projects.settings.clients.update', false],
+    'delete' => ['delete', 'projects.settings.clients.destroy', false],
+    'restore' => ['put', 'projects.settings.clients.restore', true],
+    'force delete' => ['delete', 'projects.settings.clients.force-delete', true],
 ]);
 
 test('creating is refused without the create permission', function () {
-    $this->actingAs(clientActor(Company::factory()->create(), 'projects.clients.view'))
-        ->post(route('projects.clients.store'), clientPayload())
+    $this->actingAs(clientActor(Company::factory()->create(), 'projects.settings.clients.view'))
+        ->post(route('projects.settings.clients.store'), clientPayload())
         ->assertForbidden();
 });
 
@@ -97,8 +97,8 @@ test('the project-manager role holds every client permission and the viewer only
     $viewer = User::factory()->create()->assignRole('viewer');
 
     foreach ($permissions as $action) {
-        expect($manager->can("projects.clients.{$action}"))->toBeTrue()
-            ->and($viewer->can("projects.clients.{$action}"))->toBe($action === 'view');
+        expect($manager->can("projects.settings.clients.{$action}"))->toBeTrue()
+            ->and($viewer->can("projects.settings.clients.{$action}"))->toBe($action === 'view');
     }
 });
 
@@ -111,11 +111,11 @@ test('the list shows only the selected company\'s clients', function () {
     Client::factory()->for($mine)->create(['code' => 'MINE']);
     Client::factory()->for($theirs)->create(['code' => 'THEIRS']);
 
-    $this->actingAs(clientActor($mine, 'projects.clients.view'))
-        ->get(route('projects.clients.index'))
+    $this->actingAs(clientActor($mine, 'projects.settings.clients.view'))
+        ->get(route('projects.settings.clients.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('projects/clients/index')
+            ->component('projects/settings/clients/index')
             ->where('company.id', $mine->id)
             ->has('clients.data', 1)
             ->where('clients.data.0.code', 'MINE')
@@ -128,8 +128,8 @@ test('the list filters on the contact columns', function (string $column, string
     Client::factory()->for($company)->create(['code' => 'HIT', 'contact_person' => 'Sadia Islam', 'phone' => '+880 1711 223344', 'email' => 'sadia@hit.example.com']);
     Client::factory()->for($company)->create(['code' => 'MISS', 'contact_person' => 'Lena Vogel', 'phone' => '+49 30 1234567', 'email' => 'lena@miss.example.com']);
 
-    $this->actingAs(clientActor($company, 'projects.clients.view'))
-        ->get(route('projects.clients.index', ['filter' => [$column => $value]]))
+    $this->actingAs(clientActor($company, 'projects.settings.clients.view'))
+        ->get(route('projects.settings.clients.index', ['filter' => [$column => $value]]))
         ->assertInertia(fn ($page) => $page
             ->has('clients.data', 1)
             ->where('clients.data.0.code', 'HIT'),
@@ -145,8 +145,8 @@ test('the deleted tab lists only deleted clients', function () {
     Client::factory()->for($company)->create(['code' => 'LIVE']);
     Client::factory()->for($company)->create(['code' => 'GONE'])->delete();
 
-    $this->actingAs(clientActor($company, 'projects.clients.view'))
-        ->get(route('projects.clients.index', ['view' => 'trashed']))
+    $this->actingAs(clientActor($company, 'projects.settings.clients.view'))
+        ->get(route('projects.settings.clients.index', ['view' => 'trashed']))
         ->assertInertia(fn ($page) => $page
             ->has('clients.data', 1)
             ->where('clients.data.0.code', 'GONE')
@@ -158,21 +158,21 @@ test('another company\'s client is a 404', function (string $method, string $rou
     [$mine, $theirs] = Company::factory()->count(2)->create();
     $foreign = Client::factory()->for($theirs)->create();
 
-    $this->actingAs(clientActor($mine, 'projects.clients.update', 'projects.clients.delete'))
+    $this->actingAs(clientActor($mine, 'projects.settings.clients.update', 'projects.settings.clients.delete'))
         ->{$method}(route($route, $foreign), clientPayload())
         ->assertNotFound();
 })->with([
-    'update' => ['put', 'projects.clients.update'],
-    'delete' => ['delete', 'projects.clients.destroy'],
+    'update' => ['put', 'projects.settings.clients.update'],
+    'delete' => ['delete', 'projects.settings.clients.destroy'],
 ]);
 
 test('with no company selected the page says so and lists nothing', function () {
     Client::factory()->create();
-    $user = userWithPermissions('projects.clients.view');
+    $user = userWithPermissions('projects.settings.clients.view');
     $user->companies()->attach(Company::factory()->count(2)->create());
 
     $this->actingAs($user)
-        ->get(route('projects.clients.index'))
+        ->get(route('projects.settings.clients.index'))
         ->assertInertia(fn ($page) => $page
             ->where('company', null)
             ->has('clients.data', 0),
@@ -182,17 +182,17 @@ test('with no company selected the page says so and lists nothing', function () 
 test('a client lands in the selected company whatever company_id is posted', function () {
     [$mine, $theirs] = Company::factory()->count(2)->create();
 
-    $this->actingAs(clientActor($mine, 'projects.clients.create'));
+    $this->actingAs(clientActor($mine, 'projects.settings.clients.create'));
 
-    assertToast($this->post(route('projects.clients.store'), clientPayload(['company_id' => $theirs->id])), 'success');
+    assertToast($this->post(route('projects.settings.clients.store'), clientPayload(['company_id' => $theirs->id])), 'success');
 
     expect(Client::withoutGlobalScopes()->sole()->company_id)->toBe($mine->id);
 });
 
 test('creating without a selected company is refused', function () {
-    $user = userWithPermissions('projects.clients.create');
+    $user = userWithPermissions('projects.settings.clients.create');
 
-    assertToast($this->actingAs($user)->post(route('projects.clients.store'), clientPayload()), 'warning');
+    assertToast($this->actingAs($user)->post(route('projects.settings.clients.store'), clientPayload()), 'warning');
 
     expect(Client::withoutGlobalScopes()->count())->toBe(0);
 });
@@ -204,8 +204,8 @@ test('creating without a selected company is refused', function () {
 test('a client is created with its values tidied and empty optional fields saved as null', function () {
     $company = Company::factory()->create();
 
-    $this->actingAs(clientActor($company, 'projects.clients.create'))
-        ->post(route('projects.clients.store'), clientPayload([
+    $this->actingAs(clientActor($company, 'projects.settings.clients.create'))
+        ->post(route('projects.settings.clients.store'), clientPayload([
             'code' => ' acme-01 ',
             'name' => ' Acme   Trading ',
             'contact_person' => ' Sadia   Islam ',
@@ -227,8 +227,8 @@ test('a client is created with its values tidied and empty optional fields saved
 });
 
 test('a malformed field is refused', function (string $field, string $value) {
-    $this->actingAs(clientActor(Company::factory()->create(), 'projects.clients.create'))
-        ->post(route('projects.clients.store'), clientPayload([$field => $value]))
+    $this->actingAs(clientActor(Company::factory()->create(), 'projects.settings.clients.create'))
+        ->post(route('projects.settings.clients.store'), clientPayload([$field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
     'code missing' => ['code', ''],
@@ -243,8 +243,8 @@ test('a code or name already used in the company is refused whatever its case', 
     $company = Company::factory()->create();
     Client::factory()->for($company)->create(['code' => 'ACME', 'name' => 'Acme Trading Ltd.']);
 
-    $this->actingAs(clientActor($company, 'projects.clients.create'))
-        ->post(route('projects.clients.store'), clientPayload(['code' => 'OTHER', 'name' => 'Other', $field => $value]))
+    $this->actingAs(clientActor($company, 'projects.settings.clients.create'))
+        ->post(route('projects.settings.clients.store'), clientPayload(['code' => 'OTHER', 'name' => 'Other', $field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
     'code, lower case' => ['code', 'acme'],
@@ -256,8 +256,8 @@ test('the same code and name are allowed in another company, and an email may re
     Client::factory()->for($theirs)->create(['code' => 'ACME', 'name' => 'Acme Trading Ltd.']);
     Client::factory()->for($mine)->create(['code' => 'SISTER', 'email' => 'projects@acme.example.com']);
 
-    $this->actingAs(clientActor($mine, 'projects.clients.create'))
-        ->post(route('projects.clients.store'), clientPayload())
+    $this->actingAs(clientActor($mine, 'projects.settings.clients.create'))
+        ->post(route('projects.settings.clients.store'), clientPayload())
         ->assertSessionHasNoErrors();
 
     expect(Client::withoutGlobalScopes()->where('code', 'ACME')->count())->toBe(2);
@@ -267,8 +267,8 @@ test('a deleted client keeps its code and name reserved and says to restore it',
     $company = Company::factory()->create();
     Client::factory()->for($company)->create(['code' => 'ACME', 'name' => 'Acme Trading Ltd.'])->delete();
 
-    $this->actingAs(clientActor($company, 'projects.clients.create'))
-        ->post(route('projects.clients.store'), clientPayload())
+    $this->actingAs(clientActor($company, 'projects.settings.clients.create'))
+        ->post(route('projects.settings.clients.store'), clientPayload())
         ->assertSessionHasErrors([
             'code' => 'The code "ACME" belongs to a deleted client in this company. Restore it from the Deleted tab instead.',
             'name' => 'A deleted client in this company is named "Acme Trading Ltd.". Restore it from the Deleted tab instead.',
@@ -279,8 +279,8 @@ test('a client can be edited, keeping its own code and name', function () {
     $company = Company::factory()->create();
     $client = Client::factory()->for($company)->create(['code' => 'ACME', 'name' => 'Acme Trading Ltd.']);
 
-    $this->actingAs(clientActor($company, 'projects.clients.update'))
-        ->put(route('projects.clients.update', $client), clientPayload(['status' => RecordStatus::Inactive->value, 'description' => 'Key account.']))
+    $this->actingAs(clientActor($company, 'projects.settings.clients.update'))
+        ->put(route('projects.settings.clients.update', $client), clientPayload(['status' => RecordStatus::Inactive->value, 'description' => 'Key account.']))
         ->assertSessionHasNoErrors();
 
     expect($client->refresh()->status)->toBe(RecordStatus::Inactive)
@@ -291,17 +291,17 @@ test('a client is soft deleted, restored and permanently deleted', function () {
     $company = Company::factory()->create();
     $client = Client::factory()->for($company)->create();
 
-    $this->actingAs(clientActor($company, 'projects.clients.delete', 'projects.clients.restore', 'projects.clients.force-delete'));
+    $this->actingAs(clientActor($company, 'projects.settings.clients.delete', 'projects.settings.clients.restore', 'projects.settings.clients.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.clients.destroy', $client)), 'success');
+    assertToast($this->delete(route('projects.settings.clients.destroy', $client)), 'success');
     expect($client->refresh()->trashed())->toBeTrue();
 
-    assertToast($this->put(route('projects.clients.restore', $client)), 'success');
+    assertToast($this->put(route('projects.settings.clients.restore', $client)), 'success');
     expect($client->refresh()->trashed())->toBeFalse();
 
     $client->delete();
-    assertToast($this->delete(route('projects.clients.force-delete', $client)), 'success');
+    assertToast($this->delete(route('projects.settings.clients.force-delete', $client)), 'success');
 
     expect(Client::withoutGlobalScopes()->withTrashed()->find($client->id))->toBeNull()
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'client')->exists())->toBeTrue();
@@ -310,10 +310,10 @@ test('a client is soft deleted, restored and permanently deleted', function () {
 test('creating a client is audited with its company', function () {
     $company = Company::factory()->create();
 
-    $this->actingAs(clientActor($company, 'projects.clients.create'));
+    $this->actingAs(clientActor($company, 'projects.settings.clients.create'));
     config(['audit.console' => true]);
 
-    $this->post(route('projects.clients.store'), clientPayload());
+    $this->post(route('projects.settings.clients.store'), clientPayload());
 
     $audit = AuditLog::where('event', 'created')->where('auditable_type', 'client')->sole();
 
@@ -329,19 +329,19 @@ test('bulk delete and bulk permanent delete each need their own permission', fun
     $company = Company::factory()->create();
     $client = Client::factory()->for($company)->create();
 
-    $this->actingAs(clientActor($company, 'projects.clients.view'))
+    $this->actingAs(clientActor($company, 'projects.settings.clients.view'))
         ->delete(route($route), ['ids' => [$client->id]])
         ->assertForbidden();
-})->with(['projects.clients.bulk-destroy', 'projects.clients.bulk-force-delete']);
+})->with(['projects.settings.clients.bulk-destroy', 'projects.settings.clients.bulk-force-delete']);
 
 test('bulk delete moves the ticked clients to Deleted, never another company\'s', function () {
     [$mine, $theirs] = Company::factory()->count(2)->create();
     [$first, $second] = Client::factory()->for($mine)->count(2)->create();
     $foreign = Client::factory()->for($theirs)->create();
 
-    $this->actingAs(clientActor($mine, 'projects.clients.delete'));
+    $this->actingAs(clientActor($mine, 'projects.settings.clients.delete'));
 
-    $response = $this->delete(route('projects.clients.bulk-destroy'), ['ids' => [$first->id, $second->id, $foreign->id]]);
+    $response = $this->delete(route('projects.settings.clients.bulk-destroy'), ['ids' => [$first->id, $second->id, $foreign->id]]);
 
     assertToast($response, 'success')->assertSessionHas('inertia.flash_data.toast.message', '2 clients moved to Deleted.');
 
@@ -356,10 +356,10 @@ test('bulk permanent delete removes the ticked deleted clients and records each'
     $first->delete();
     $second->delete();
 
-    $this->actingAs(clientActor($company, 'projects.clients.force-delete'));
+    $this->actingAs(clientActor($company, 'projects.settings.clients.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.clients.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.clients.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
 
     expect(Client::withoutGlobalScopes()->withTrashed()->count())->toBe(0)
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'client')->count())->toBe(2);

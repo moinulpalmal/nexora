@@ -15,7 +15,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Certifications: a group-wide catalogue of standards
+ * Projects → Settings → Certifications: a group-wide catalogue of standards
  * (ARCHITECTURE.md §9.10), shaped as {@see TenderTypeController} with a
  * group-wide category offered as {@see SupplierController} offers supplier
  * categories. The page works whether or not a company is selected. Every
@@ -53,7 +53,7 @@ class CertificationController extends Controller
                 'deleted_at' => $certification->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/certifications/index', [
+        return Inertia::render('projects/settings/certifications/index', [
             'certifications' => $certifications,
             'statuses' => RecordStatus::options(),
             'categories' => $this->categoryOptions(),

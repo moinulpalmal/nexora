@@ -15,7 +15,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Clients: the Projects module's first real screen, laid out as
+ * Projects → Settings → Clients: the Projects module's first real screen, laid out as
  * `Hrm\DepartmentController` — one index page with Active/Deleted tabs, every
  * write arriving from a dialog on it and answering `back()` with a toast.
  *
@@ -59,7 +59,7 @@ class ClientController extends Controller
                 'deleted_at' => $client->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/clients/index', [
+        return Inertia::render('projects/settings/clients/index', [
             'clients' => $clients,
             'company' => $company === null ? null : [
                 'id' => $company->id,

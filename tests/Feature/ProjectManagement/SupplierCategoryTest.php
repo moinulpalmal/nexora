@@ -8,7 +8,7 @@ use App\Models\ProjectManagement\SupplierCategory;
 
 /*
 |--------------------------------------------------------------------------
-| Projects → Supplier Categories
+| Projects → Settings → Supplier Categories
 |--------------------------------------------------------------------------
 |
 | A group-wide list (ARCHITECTURE.md §9.10) in the Tender Types shape: code and
@@ -38,12 +38,12 @@ function supplierCategoryPayload(array $overrides = []): array
 */
 
 test('guests are sent to the login page', function () {
-    $this->get(route('projects.supplier-categories.index'))->assertRedirect(route('login'));
+    $this->get(route('projects.settings.supplier-categories.index'))->assertRedirect(route('login'));
 });
 
 test('the list is refused without the view permission', function () {
     $this->actingAs(userWithPermissions())
-        ->get(route('projects.supplier-categories.index'))
+        ->get(route('projects.settings.supplier-categories.index'))
         ->assertForbidden();
 });
 
@@ -54,19 +54,19 @@ test('each write is refused without its own permission', function (string $metho
         $category->delete();
     }
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.view'))
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.view'))
         ->{$method}(route($route, $category), supplierCategoryPayload())
         ->assertForbidden();
 })->with([
-    'update' => ['put', 'projects.supplier-categories.update', false],
-    'delete' => ['delete', 'projects.supplier-categories.destroy', false],
-    'restore' => ['put', 'projects.supplier-categories.restore', true],
-    'force delete' => ['delete', 'projects.supplier-categories.force-delete', true],
+    'update' => ['put', 'projects.settings.supplier-categories.update', false],
+    'delete' => ['delete', 'projects.settings.supplier-categories.destroy', false],
+    'restore' => ['put', 'projects.settings.supplier-categories.restore', true],
+    'force delete' => ['delete', 'projects.settings.supplier-categories.force-delete', true],
 ]);
 
 test('creating is refused without the create permission', function () {
-    $this->actingAs(userWithPermissions('projects.supplier-categories.view'))
-        ->post(route('projects.supplier-categories.store'), supplierCategoryPayload())
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.view'))
+        ->post(route('projects.settings.supplier-categories.store'), supplierCategoryPayload())
         ->assertForbidden();
 });
 
@@ -78,18 +78,18 @@ test('the list shows every category with no company selected, and the deleted ta
     SupplierCategory::factory()->create(['code' => 'LIVE']);
     SupplierCategory::factory()->create(['code' => 'GONE'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.view'));
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.view'));
 
-    $this->get(route('projects.supplier-categories.index'))
+    $this->get(route('projects.settings.supplier-categories.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('projects/supplier-categories/index')
+            ->component('projects/settings/supplier-categories/index')
             ->has('supplierCategories.data', 1)
             ->where('supplierCategories.data.0.code', 'LIVE')
             ->where('counts', ['active' => 1, 'trashed' => 1]),
         );
 
-    $this->get(route('projects.supplier-categories.index', ['view' => 'trashed']))
+    $this->get(route('projects.settings.supplier-categories.index', ['view' => 'trashed']))
         ->assertInertia(fn ($page) => $page
             ->has('supplierCategories.data', 1)
             ->where('supplierCategories.data.0.code', 'GONE'),
@@ -101,9 +101,9 @@ test('the list shows every category with no company selected, and the deleted ta
 */
 
 test('a category is created with its code in capitals and its name tidied', function () {
-    $this->actingAs(userWithPermissions('projects.supplier-categories.create'));
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.create'));
 
-    assertToast($this->post(route('projects.supplier-categories.store'), supplierCategoryPayload(['code' => ' mat-01 ', 'name' => ' Raw   Materials ', 'description' => ''])), 'success');
+    assertToast($this->post(route('projects.settings.supplier-categories.store'), supplierCategoryPayload(['code' => ' mat-01 ', 'name' => ' Raw   Materials ', 'description' => ''])), 'success');
 
     $category = SupplierCategory::sole();
 
@@ -116,12 +116,12 @@ test('a code or name already used is refused whatever its case, and a deleted on
     SupplierCategory::factory()->create(['code' => 'MAT', 'name' => 'Materials']);
     SupplierCategory::factory()->create(['code' => 'SRV', 'name' => 'Services'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.create'));
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.create'));
 
-    $this->post(route('projects.supplier-categories.store'), supplierCategoryPayload(['code' => 'mat', 'name' => 'MATERIALS']))
+    $this->post(route('projects.settings.supplier-categories.store'), supplierCategoryPayload(['code' => 'mat', 'name' => 'MATERIALS']))
         ->assertSessionHasErrors(['code', 'name']);
 
-    $this->post(route('projects.supplier-categories.store'), supplierCategoryPayload(['code' => 'SRV', 'name' => 'Services']))
+    $this->post(route('projects.settings.supplier-categories.store'), supplierCategoryPayload(['code' => 'SRV', 'name' => 'Services']))
         ->assertSessionHasErrors([
             'code' => 'The code "SRV" belongs to a deleted supplier category. Restore it from the Deleted tab instead.',
             'name' => 'A deleted supplier category is named "Services". Restore it from the Deleted tab instead.',
@@ -132,8 +132,8 @@ test('a category in use can be deactivated', function () {
     $category = SupplierCategory::factory()->create(['code' => 'MAT', 'name' => 'Materials']);
     Supplier::factory()->for($category, 'category')->create();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.update'))
-        ->put(route('projects.supplier-categories.update', $category), supplierCategoryPayload(['status' => RecordStatus::Inactive->value]))
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.update'))
+        ->put(route('projects.settings.supplier-categories.update', $category), supplierCategoryPayload(['status' => RecordStatus::Inactive->value]))
         ->assertSessionHasNoErrors();
 
     expect($category->refresh()->status)->toBe(RecordStatus::Inactive);
@@ -142,17 +142,17 @@ test('a category in use can be deactivated', function () {
 test('a category is soft deleted, restored and permanently deleted, the last recorded', function () {
     $category = SupplierCategory::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.delete', 'projects.supplier-categories.restore', 'projects.supplier-categories.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.delete', 'projects.settings.supplier-categories.restore', 'projects.settings.supplier-categories.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.supplier-categories.destroy', $category)), 'success');
+    assertToast($this->delete(route('projects.settings.supplier-categories.destroy', $category)), 'success');
     expect($category->refresh()->trashed())->toBeTrue();
 
-    assertToast($this->put(route('projects.supplier-categories.restore', $category)), 'success');
+    assertToast($this->put(route('projects.settings.supplier-categories.restore', $category)), 'success');
     expect($category->refresh()->trashed())->toBeFalse();
 
     $category->delete();
-    assertToast($this->delete(route('projects.supplier-categories.force-delete', $category)), 'success');
+    assertToast($this->delete(route('projects.settings.supplier-categories.force-delete', $category)), 'success');
 
     expect(SupplierCategory::withTrashed()->find($category->id))->toBeNull()
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'supplier-category')->exists())->toBeTrue();
@@ -167,9 +167,9 @@ test('a category used by suppliers in any company cannot be deleted, deleted sup
     Supplier::factory()->for($category, 'category')->for(Company::factory())->create();
     Supplier::factory()->for($category, 'category')->for(Company::factory())->create()->delete();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.delete'));
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.delete'));
 
-    assertToast($this->delete(route('projects.supplier-categories.destroy', $category)), 'warning')
+    assertToast($this->delete(route('projects.settings.supplier-categories.destroy', $category)), 'warning')
         ->assertSessionHas('inertia.flash_data.toast.message', 'Used by 2 suppliers. Move them to another category, or deactivate this one instead.');
 
     expect($category->refresh()->trashed())->toBeFalse();
@@ -180,9 +180,9 @@ test('a deleted category still used cannot be permanently deleted', function () 
     Supplier::factory()->for($category, 'category')->create();
     $category->delete();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.force-delete'));
 
-    assertToast($this->delete(route('projects.supplier-categories.force-delete', $category)), 'warning')
+    assertToast($this->delete(route('projects.settings.supplier-categories.force-delete', $category)), 'warning')
         ->assertSessionHas('inertia.flash_data.toast.message', 'Used by one supplier. Move it to another category, or deactivate this one instead.');
 
     expect(SupplierCategory::withTrashed()->find($category->id))->not->toBeNull();
@@ -193,9 +193,9 @@ test('bulk delete deletes the free categories and names the ones in use', functi
     $used = SupplierCategory::factory()->create(['code' => 'USED']);
     Supplier::factory()->for($used, 'category')->create();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.delete'));
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.delete'));
 
-    assertToast($this->delete(route('projects.supplier-categories.bulk-destroy'), ['ids' => [$free->id, $used->id]]), 'warning')
+    assertToast($this->delete(route('projects.settings.supplier-categories.bulk-destroy'), ['ids' => [$free->id, $used->id]]), 'warning')
         ->assertSessionHas('inertia.flash_data.toast.message', '1 supplier category moved to Deleted. Not deleted — USED: Used by one supplier. Move it to another category, or deactivate this one instead.');
 
     expect($free->refresh()->trashed())->toBeTrue()
@@ -205,20 +205,20 @@ test('bulk delete deletes the free categories and names the ones in use', functi
 test('bulk delete and bulk permanent delete each need their own permission', function (string $route) {
     $category = SupplierCategory::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.view'))
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.view'))
         ->delete(route($route), ['ids' => [$category->id]])
         ->assertForbidden();
-})->with(['projects.supplier-categories.bulk-destroy', 'projects.supplier-categories.bulk-force-delete']);
+})->with(['projects.settings.supplier-categories.bulk-destroy', 'projects.settings.supplier-categories.bulk-force-delete']);
 
 test('bulk permanent delete removes the ticked deleted categories and records each', function () {
     [$first, $second] = SupplierCategory::factory()->count(2)->create();
     $first->delete();
     $second->delete();
 
-    $this->actingAs(userWithPermissions('projects.supplier-categories.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.supplier-categories.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.supplier-categories.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.supplier-categories.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
 
     expect(SupplierCategory::withTrashed()->count())->toBe(0)
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'supplier-category')->count())->toBe(2);

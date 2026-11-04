@@ -16,7 +16,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/product-categories';
+import { index } from '@/routes/projects/settings/product-categories';
 import type {
     CompanySummary,
     Filterable,
@@ -40,8 +40,8 @@ type Props = {
 };
 
 /**
- * Projects → Product Categories — kept per company (ARCHITECTURE.md §9.10),
- * laid out as `projects/clients` (Active/Deleted tabs, every action a dialog,
+ * Projects → Settings → Product Categories — kept per company (ARCHITECTURE.md §9.10),
+ * laid out as `projects/settings/clients` (Active/Deleted tabs, every action a dialog,
  * bulk delete on both tabs), without a spreadsheet import. Every company starts
  * with a starter set (owner, 2026-11-03).
  *
@@ -58,11 +58,13 @@ export default function ProductCategoriesIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.product-categories.create');
-    const canUpdate = useCan('projects.product-categories.update');
-    const canDelete = useCan('projects.product-categories.delete');
-    const canRestore = useCan('projects.product-categories.restore');
-    const canForceDelete = useCan('projects.product-categories.force-delete');
+    const canCreate = useCan('projects.settings.product-categories.create');
+    const canUpdate = useCan('projects.settings.product-categories.update');
+    const canDelete = useCan('projects.settings.product-categories.delete');
+    const canRestore = useCan('projects.settings.product-categories.restore');
+    const canForceDelete = useCan(
+        'projects.settings.product-categories.force-delete',
+    );
 
     const isDeleted = filters.view === 'trashed';
     const canBulkDelete = isDeleted ? canForceDelete : canDelete;

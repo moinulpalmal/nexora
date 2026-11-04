@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Verification Items (`projects.verification-items.index`), with its
+ * Projects → Settings → Verification Items (`projects.settings.verification-items.index`), with its
  * New verification item / Edit dialog and the Deleted tab. Source:
  * documentation/projects.md §4 (Verification items).
  */
@@ -37,27 +37,42 @@ export default function VerificationItemsGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.verification-items.view</Ui> opens the
-                            list; <Ui>projects.verification-items.create</Ui>,{' '}
-                            <Ui>projects.verification-items.update</Ui> and{' '}
-                            <Ui>projects.verification-items.delete</Ui> add,
-                            edit and delete;{' '}
-                            <Ui>projects.verification-items.restore</Ui> and{' '}
-                            <Ui>projects.verification-items.force-delete</Ui>{' '}
+                            <Ui>projects.settings.verification-items.view</Ui>{' '}
+                            opens the list;{' '}
+                            <Ui>projects.settings.verification-items.create</Ui>
+                            ,{' '}
+                            <Ui>projects.settings.verification-items.update</Ui>{' '}
+                            and{' '}
+                            <Ui>projects.settings.verification-items.delete</Ui>{' '}
+                            add, edit and delete;{' '}
+                            <Ui>
+                                projects.settings.verification-items.restore
+                            </Ui>{' '}
+                            and{' '}
+                            <Ui>
+                                projects.settings.verification-items.force-delete
+                            </Ui>{' '}
                             work on the Deleted tab. The project-manager role
                             holds them all. You also need a company to work in.
                         </>
                     }
                     bn={
                         <>
-                            <Ui>projects.verification-items.view</Ui> থাকলে
-                            তালিকা খোলা যায়;{' '}
-                            <Ui>projects.verification-items.create</Ui>,{' '}
-                            <Ui>projects.verification-items.update</Ui> ও{' '}
-                            <Ui>projects.verification-items.delete</Ui> দিয়ে
-                            যোগ, সম্পাদনা ও মোছা যায়;{' '}
-                            <Ui>projects.verification-items.restore</Ui> ও{' '}
-                            <Ui>projects.verification-items.force-delete</Ui>{' '}
+                            <Ui>projects.settings.verification-items.view</Ui>{' '}
+                            থাকলে তালিকা খোলা যায়;{' '}
+                            <Ui>projects.settings.verification-items.create</Ui>
+                            ,{' '}
+                            <Ui>projects.settings.verification-items.update</Ui>{' '}
+                            ও{' '}
+                            <Ui>projects.settings.verification-items.delete</Ui>{' '}
+                            দিয়ে যোগ, সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>
+                                projects.settings.verification-items.restore
+                            </Ui>{' '}
+                            ও{' '}
+                            <Ui>
+                                projects.settings.verification-items.force-delete
+                            </Ui>{' '}
                             Deleted ট্যাবে কাজ করে। project-manager রোলের কাছে
                             এর সবগুলোই আছে। এর সাথে কাজ করার জন্য একটি কোম্পানিও
                             লাগবে।
@@ -76,8 +91,8 @@ export default function VerificationItemsGuide() {
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Verification Items. The description under the title names the company the list belongs to. Search by name in the row under the headings."
-                        bn="Projects → Verification Items খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে নাম দিয়ে খুঁজুন।"
+                        en="Open Projects → Settings → Verification Items. The description under the title names the company the list belongs to. Search by name in the row under the headings."
+                        bn="Projects → Settings → Verification Items খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে নাম দিয়ে খুঁজুন।"
                     >
                         <Shot
                             id="overview"
@@ -202,7 +217,7 @@ export default function VerificationItemsGuide() {
                     bn="যেসব কোম্পানির অধীনে যাচাইয়ের বিষয়গুলো থাকে।"
                 />
                 <RelatedGuide
-                    to="projects.certifications"
+                    to="projects.settings.certifications"
                     en="The standard certifications every company shares."
                     bn="সব কোম্পানির জন্য একই সাধারণ সার্টিফিকেশনগুলো।"
                 />

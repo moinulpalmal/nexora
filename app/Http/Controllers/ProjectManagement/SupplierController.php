@@ -16,7 +16,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Suppliers: the ERP's one supplier list, laid out as
+ * Projects → Settings → Suppliers: the ERP's one supplier list, laid out as
  * {@see ClientController} — one index page with Active/Deleted tabs, every
  * write arriving from a dialog on it and answering `back()` with a toast.
  *
@@ -70,7 +70,7 @@ class SupplierController extends Controller
                 'deleted_at' => $supplier->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/suppliers/index', [
+        return Inertia::render('projects/settings/suppliers/index', [
             'suppliers' => $suppliers,
             'company' => $company === null ? null : [
                 'id' => $company->id,

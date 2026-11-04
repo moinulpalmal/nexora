@@ -15,7 +15,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/tender-types';
+import { index } from '@/routes/projects/settings/tender-types';
 import type {
     Filterable,
     Paginated,
@@ -36,8 +36,8 @@ type Props = {
 };
 
 /**
- * Projects → Tender Types — how a project was procured, one list every company
- * shares (ARCHITECTURE.md §9.10). Laid out as `projects/clients` (Active/Deleted
+ * Projects → Settings → Tender Types — how a project was procured, one list every company
+ * shares (ARCHITECTURE.md §9.10). Laid out as `projects/settings/clients` (Active/Deleted
  * tabs, every action a dialog, bulk delete on both tabs) without the company:
  * the page works whether or not one is selected, as `hrm/designations`.
  *
@@ -53,11 +53,13 @@ export default function TenderTypesIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.tender-types.create');
-    const canUpdate = useCan('projects.tender-types.update');
-    const canDelete = useCan('projects.tender-types.delete');
-    const canRestore = useCan('projects.tender-types.restore');
-    const canForceDelete = useCan('projects.tender-types.force-delete');
+    const canCreate = useCan('projects.settings.tender-types.create');
+    const canUpdate = useCan('projects.settings.tender-types.update');
+    const canDelete = useCan('projects.settings.tender-types.delete');
+    const canRestore = useCan('projects.settings.tender-types.restore');
+    const canForceDelete = useCan(
+        'projects.settings.tender-types.force-delete',
+    );
 
     const isDeleted = filters.view === 'trashed';
     const canBulkDelete = isDeleted ? canForceDelete : canDelete;

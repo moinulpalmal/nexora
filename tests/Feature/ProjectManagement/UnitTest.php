@@ -7,7 +7,7 @@ use Database\Seeders\ProjectManagement\UnitSeeder;
 
 /*
 |--------------------------------------------------------------------------
-| Projects → Units of Measure
+| Projects → Settings → Units of Measure
 |--------------------------------------------------------------------------
 |
 | A group-wide master table (ARCHITECTURE.md §9.10, owner 2026-11-02): one
@@ -41,12 +41,12 @@ function unitPayload(array $overrides = []): array
 */
 
 test('guests are sent to the login page', function () {
-    $this->get(route('projects.units.index'))->assertRedirect(route('login'));
+    $this->get(route('projects.settings.units.index'))->assertRedirect(route('login'));
 });
 
 test('the list is refused without the view permission', function () {
     $this->actingAs(userWithPermissions())
-        ->get(route('projects.units.index'))
+        ->get(route('projects.settings.units.index'))
         ->assertForbidden();
 });
 
@@ -57,19 +57,19 @@ test('each write is refused without its own permission', function (string $metho
         $unit->delete();
     }
 
-    $this->actingAs(userWithPermissions('projects.units.view'))
+    $this->actingAs(userWithPermissions('projects.settings.units.view'))
         ->{$method}(route($route, $unit), unitPayload())
         ->assertForbidden();
 })->with([
-    'update' => ['put', 'projects.units.update', false],
-    'delete' => ['delete', 'projects.units.destroy', false],
-    'restore' => ['put', 'projects.units.restore', true],
-    'force delete' => ['delete', 'projects.units.force-delete', true],
+    'update' => ['put', 'projects.settings.units.update', false],
+    'delete' => ['delete', 'projects.settings.units.destroy', false],
+    'restore' => ['put', 'projects.settings.units.restore', true],
+    'force delete' => ['delete', 'projects.settings.units.force-delete', true],
 ]);
 
 test('creating is refused without the create permission', function () {
-    $this->actingAs(userWithPermissions('projects.units.view'))
-        ->post(route('projects.units.store'), unitPayload())
+    $this->actingAs(userWithPermissions('projects.settings.units.view'))
+        ->post(route('projects.settings.units.store'), unitPayload())
         ->assertForbidden();
 });
 
@@ -81,11 +81,11 @@ test('the list works with no company selected and shows every unit', function ()
     Unit::factory()->create(['code' => 'KG', 'symbol' => 'kg', 'decimal_places' => 3]);
     Unit::factory()->create(['code' => 'PCS'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.units.view'))
-        ->get(route('projects.units.index'))
+    $this->actingAs(userWithPermissions('projects.settings.units.view'))
+        ->get(route('projects.settings.units.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('projects/units/index')
+            ->component('projects/settings/units/index')
             ->missing('company')
             ->has('units.data', 1)
             ->where('units.data.0.code', 'KG')
@@ -100,8 +100,8 @@ test('the deleted tab lists only deleted units', function () {
     Unit::factory()->create(['code' => 'KG']);
     Unit::factory()->create(['code' => 'PCS'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.units.view'))
-        ->get(route('projects.units.index', ['view' => 'trashed']))
+    $this->actingAs(userWithPermissions('projects.settings.units.view'))
+        ->get(route('projects.settings.units.index', ['view' => 'trashed']))
         ->assertInertia(fn ($page) => $page
             ->has('units.data', 1)
             ->where('units.data.0.code', 'PCS'),
@@ -113,8 +113,8 @@ test('the list filters by code prefix, name and symbol, and sorts by decimal pla
     Unit::factory()->create(['code' => 'SQKM', 'name' => 'Square Kilometre', 'symbol' => 'km²', 'decimal_places' => 4]);
     Unit::factory()->create(['code' => 'SFT', 'name' => 'Square Foot', 'symbol' => 'sft', 'decimal_places' => 1]);
 
-    $this->actingAs(userWithPermissions('projects.units.view'))
-        ->get(route('projects.units.index', ['filter' => ['code' => 'SQ', 'name' => 'square', 'symbol' => '²'], 'sort' => 'decimal_places', 'direction' => 'desc']))
+    $this->actingAs(userWithPermissions('projects.settings.units.view'))
+        ->get(route('projects.settings.units.index', ['filter' => ['code' => 'SQ', 'name' => 'square', 'symbol' => '²'], 'sort' => 'decimal_places', 'direction' => 'desc']))
         ->assertInertia(fn ($page) => $page
             ->has('units.data', 2)
             ->where('units.data.0.code', 'SQKM'),
@@ -122,8 +122,8 @@ test('the list filters by code prefix, name and symbol, and sorts by decimal pla
 });
 
 test('a status filter outside the enum is an error, not an empty list', function () {
-    $this->actingAs(userWithPermissions('projects.units.view'))
-        ->get(route('projects.units.index', ['filter' => ['status' => 'X']]))
+    $this->actingAs(userWithPermissions('projects.settings.units.view'))
+        ->get(route('projects.settings.units.index', ['filter' => ['status' => 'X']]))
         ->assertSessionHasErrors('filter.status');
 });
 
@@ -132,9 +132,9 @@ test('a status filter outside the enum is an error, not an empty list', function
 */
 
 test('a unit is created with no company, its code uppercased, its name tidied and its symbol kept as typed', function () {
-    $this->actingAs(userWithPermissions('projects.units.create'));
+    $this->actingAs(userWithPermissions('projects.settings.units.create'));
 
-    assertToast($this->post(route('projects.units.store'), unitPayload(['code' => ' sqm ', 'name' => ' Square   Metre ', 'symbol' => ' m² ', 'description' => ' Floor area. '])), 'success');
+    assertToast($this->post(route('projects.settings.units.store'), unitPayload(['code' => ' sqm ', 'name' => ' Square   Metre ', 'symbol' => ' m² ', 'description' => ' Floor area. '])), 'success');
 
     $unit = Unit::sole();
 
@@ -146,22 +146,22 @@ test('a unit is created with no company, its code uppercased, its name tidied an
 });
 
 test('symbol and description are optional', function () {
-    $this->actingAs(userWithPermissions('projects.units.create'));
+    $this->actingAs(userWithPermissions('projects.settings.units.create'));
 
-    assertToast($this->post(route('projects.units.store'), unitPayload(['symbol' => '', 'description' => ''])), 'success');
+    assertToast($this->post(route('projects.settings.units.store'), unitPayload(['symbol' => '', 'description' => ''])), 'success');
 
     expect(Unit::sole())->symbol->toBeNull()->description->toBeNull();
 });
 
 test('code, name, decimal places and status are required', function () {
-    $this->actingAs(userWithPermissions('projects.units.create'))
-        ->post(route('projects.units.store'), ['code' => '', 'name' => '', 'decimal_places' => '', 'status' => ''])
+    $this->actingAs(userWithPermissions('projects.settings.units.create'))
+        ->post(route('projects.settings.units.store'), ['code' => '', 'name' => '', 'decimal_places' => '', 'status' => ''])
         ->assertSessionHasErrors(['code', 'name', 'decimal_places', 'status']);
 });
 
 test('decimal places outside 0 to 6, a long symbol, and a code with spaces are refused', function (string $field, mixed $value) {
-    $this->actingAs(userWithPermissions('projects.units.create'))
-        ->post(route('projects.units.store'), unitPayload([$field => $value]))
+    $this->actingAs(userWithPermissions('projects.settings.units.create'))
+        ->post(route('projects.settings.units.store'), unitPayload([$field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
     'decimals, negative' => ['decimal_places', -1],
@@ -177,8 +177,8 @@ test('decimal places outside 0 to 6, a long symbol, and a code with spaces are r
 test('a code or name already used is refused whatever its case', function (string $field, string $value) {
     Unit::factory()->create(['code' => 'KG', 'name' => 'Kilogram']);
 
-    $this->actingAs(userWithPermissions('projects.units.create'))
-        ->post(route('projects.units.store'), unitPayload(['code' => 'OTHER', 'name' => 'Other', $field => $value]))
+    $this->actingAs(userWithPermissions('projects.settings.units.create'))
+        ->post(route('projects.settings.units.store'), unitPayload(['code' => 'OTHER', 'name' => 'Other', $field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
     'code, lower case' => ['code', 'kg'],
@@ -188,9 +188,9 @@ test('a code or name already used is refused whatever its case', function (strin
 test('two units may share a symbol', function () {
     Unit::factory()->create(['code' => 'LS', 'name' => 'Lump Sum', 'symbol' => 'LS']);
 
-    $this->actingAs(userWithPermissions('projects.units.create'));
+    $this->actingAs(userWithPermissions('projects.settings.units.create'));
 
-    assertToast($this->post(route('projects.units.store'), unitPayload(['code' => 'LOT', 'name' => 'Lot', 'symbol' => 'LS'])), 'success');
+    assertToast($this->post(route('projects.settings.units.store'), unitPayload(['code' => 'LOT', 'name' => 'Lot', 'symbol' => 'LS'])), 'success');
 
     expect(Unit::where('symbol', 'LS')->count())->toBe(2);
 });
@@ -198,8 +198,8 @@ test('two units may share a symbol', function () {
 test('a deleted unit keeps its code and name reserved and says to restore it', function () {
     Unit::factory()->create(['code' => 'KG', 'name' => 'Kilogram'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.units.create'))
-        ->post(route('projects.units.store'), unitPayload())
+    $this->actingAs(userWithPermissions('projects.settings.units.create'))
+        ->post(route('projects.settings.units.store'), unitPayload())
         ->assertSessionHasErrors([
             'code' => 'The code "KG" belongs to a deleted unit. Restore it from the Deleted tab instead.',
             'name' => 'A deleted unit is named "Kilogram". Restore it from the Deleted tab instead.',
@@ -213,9 +213,9 @@ test('a deleted unit keeps its code and name reserved and says to restore it', f
 test('a unit can be edited, keeping its own code and name', function () {
     $unit = Unit::factory()->create(['code' => 'KG', 'name' => 'Kilogram']);
 
-    $this->actingAs(userWithPermissions('projects.units.update'));
+    $this->actingAs(userWithPermissions('projects.settings.units.update'));
 
-    assertToast($this->put(route('projects.units.update', $unit), unitPayload(['decimal_places' => 2, 'status' => RecordStatus::Inactive->value])), 'success');
+    assertToast($this->put(route('projects.settings.units.update', $unit), unitPayload(['decimal_places' => 2, 'status' => RecordStatus::Inactive->value])), 'success');
 
     expect($unit->refresh())
         ->decimal_places->toBe(2)
@@ -225,27 +225,27 @@ test('a unit can be edited, keeping its own code and name', function () {
 test('a unit is soft deleted, restored and permanently deleted', function () {
     $unit = Unit::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.units.delete', 'projects.units.restore', 'projects.units.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.units.delete', 'projects.settings.units.restore', 'projects.settings.units.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.units.destroy', $unit)), 'success');
+    assertToast($this->delete(route('projects.settings.units.destroy', $unit)), 'success');
     expect($unit->refresh()->trashed())->toBeTrue();
 
-    assertToast($this->put(route('projects.units.restore', $unit)), 'success');
+    assertToast($this->put(route('projects.settings.units.restore', $unit)), 'success');
     expect($unit->refresh()->trashed())->toBeFalse();
 
     $unit->delete();
-    assertToast($this->delete(route('projects.units.force-delete', $unit)), 'success');
+    assertToast($this->delete(route('projects.settings.units.force-delete', $unit)), 'success');
 
     expect(Unit::withTrashed()->find($unit->id))->toBeNull()
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'unit')->exists())->toBeTrue();
 });
 
 test('creating a unit is audited', function () {
-    $this->actingAs(userWithPermissions('projects.units.create'));
+    $this->actingAs(userWithPermissions('projects.settings.units.create'));
     config(['audit.console' => true]);
 
-    $this->post(route('projects.units.store'), unitPayload());
+    $this->post(route('projects.settings.units.store'), unitPayload());
 
     $audit = AuditLog::where('event', 'created')->where('auditable_type', 'unit')->sole();
 
@@ -259,17 +259,17 @@ test('creating a unit is audited', function () {
 test('bulk delete and bulk permanent delete each need their own permission', function (string $route) {
     $unit = Unit::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.units.view'))
+    $this->actingAs(userWithPermissions('projects.settings.units.view'))
         ->delete(route($route), ['ids' => [$unit->id]])
         ->assertForbidden();
-})->with(['projects.units.bulk-destroy', 'projects.units.bulk-force-delete']);
+})->with(['projects.settings.units.bulk-destroy', 'projects.settings.units.bulk-force-delete']);
 
 test('bulk delete moves the ticked units to Deleted', function () {
     [$first, $second, $untouched] = Unit::factory()->count(3)->create();
 
-    $this->actingAs(userWithPermissions('projects.units.delete'));
+    $this->actingAs(userWithPermissions('projects.settings.units.delete'));
 
-    assertToast($this->delete(route('projects.units.bulk-destroy'), ['ids' => [$first->id, $second->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.units.bulk-destroy'), ['ids' => [$first->id, $second->id]]), 'success');
 
     expect($first->refresh()->trashed())->toBeTrue()
         ->and($second->refresh()->trashed())->toBeTrue()
@@ -281,9 +281,9 @@ test('bulk permanent delete destroys only deleted units', function () {
     $deleted->delete();
     $live = Unit::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.units.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.units.force-delete'));
 
-    assertToast($this->delete(route('projects.units.bulk-force-delete'), ['ids' => [$deleted->id, $live->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.units.bulk-force-delete'), ['ids' => [$deleted->id, $live->id]]), 'success');
 
     expect(Unit::withTrashed()->find($deleted->id))->toBeNull()
         ->and($live->refresh()->exists)->toBeTrue();

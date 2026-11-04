@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Product Categories (`projects.product-categories.index`), with its
+ * Projects → Settings → Product Categories (`projects.settings.product-categories.index`), with its
  * New product category / Edit dialog and the Deleted tab. Source:
  * documentation/projects.md §4 (Product categories).
  */
@@ -28,8 +28,8 @@ export default function ProductCategoriesGuide() {
         <Guide>
             <GuideSection kind="purpose">
                 <Para
-                    en="The product categories of the company you are working in — the groups the company's products (Projects → Products) are sorted into. Each company keeps its own list, and every new company starts with 13 standard ones (Raw Materials, Consumables, Spare Parts, Services and the like) that you can rename, deactivate or delete."
-                    bn="আপনি যে কোম্পানিতে কাজ করছেন তার পণ্যের শ্রেণিগুলো — কোম্পানির পণ্যগুলো (Projects → Products) যেসব দলে ভাগ করা হয়। প্রতিটি কোম্পানির নিজস্ব তালিকা থাকে, এবং প্রতিটি নতুন কোম্পানি ১৩টি সাধারণ শ্রেণি (Raw Materials, Consumables, Spare Parts, Services ইত্যাদি) নিয়ে শুরু হয়, যেগুলোর নাম বদলানো, নিষ্ক্রিয় করা বা মোছা যায়।"
+                    en="The product categories of the company you are working in — the groups the company's products (Projects → Settings → Products) are sorted into. Each company keeps its own list, and every new company starts with 13 standard ones (Raw Materials, Consumables, Spare Parts, Services and the like) that you can rename, deactivate or delete."
+                    bn="আপনি যে কোম্পানিতে কাজ করছেন তার পণ্যের শ্রেণিগুলো — কোম্পানির পণ্যগুলো (Projects → Settings → Products) যেসব দলে ভাগ করা হয়। প্রতিটি কোম্পানির নিজস্ব তালিকা থাকে, এবং প্রতিটি নতুন কোম্পানি ১৩টি সাধারণ শ্রেণি (Raw Materials, Consumables, Spare Parts, Services ইত্যাদি) নিয়ে শুরু হয়, যেগুলোর নাম বদলানো, নিষ্ক্রিয় করা বা মোছা যায়।"
                 />
             </GuideSection>
 
@@ -37,27 +37,42 @@ export default function ProductCategoriesGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.product-categories.view</Ui> opens the
-                            list; <Ui>projects.product-categories.create</Ui>,{' '}
-                            <Ui>projects.product-categories.update</Ui> and{' '}
-                            <Ui>projects.product-categories.delete</Ui> add,
-                            edit and delete;{' '}
-                            <Ui>projects.product-categories.restore</Ui> and{' '}
-                            <Ui>projects.product-categories.force-delete</Ui>{' '}
+                            <Ui>projects.settings.product-categories.view</Ui>{' '}
+                            opens the list;{' '}
+                            <Ui>projects.settings.product-categories.create</Ui>
+                            ,{' '}
+                            <Ui>projects.settings.product-categories.update</Ui>{' '}
+                            and{' '}
+                            <Ui>projects.settings.product-categories.delete</Ui>{' '}
+                            add, edit and delete;{' '}
+                            <Ui>
+                                projects.settings.product-categories.restore
+                            </Ui>{' '}
+                            and{' '}
+                            <Ui>
+                                projects.settings.product-categories.force-delete
+                            </Ui>{' '}
                             work on the Deleted tab. The project-manager role
                             holds them all. You also need a company to work in.
                         </>
                     }
                     bn={
                         <>
-                            <Ui>projects.product-categories.view</Ui> থাকলে
-                            তালিকা খোলা যায়;{' '}
-                            <Ui>projects.product-categories.create</Ui>,{' '}
-                            <Ui>projects.product-categories.update</Ui> ও{' '}
-                            <Ui>projects.product-categories.delete</Ui> দিয়ে
-                            যোগ, সম্পাদনা ও মোছা যায়;{' '}
-                            <Ui>projects.product-categories.restore</Ui> ও{' '}
-                            <Ui>projects.product-categories.force-delete</Ui>{' '}
+                            <Ui>projects.settings.product-categories.view</Ui>{' '}
+                            থাকলে তালিকা খোলা যায়;{' '}
+                            <Ui>projects.settings.product-categories.create</Ui>
+                            ,{' '}
+                            <Ui>projects.settings.product-categories.update</Ui>{' '}
+                            ও{' '}
+                            <Ui>projects.settings.product-categories.delete</Ui>{' '}
+                            দিয়ে যোগ, সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>
+                                projects.settings.product-categories.restore
+                            </Ui>{' '}
+                            ও{' '}
+                            <Ui>
+                                projects.settings.product-categories.force-delete
+                            </Ui>{' '}
                             Deleted ট্যাবে কাজ করে। project-manager রোলের কাছে
                             এর সবগুলোই আছে। এর সাথে কাজ করার জন্য একটি কোম্পানিও
                             লাগবে।
@@ -76,8 +91,8 @@ export default function ProductCategoriesGuide() {
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Product Categories. The description under the title names the company the list belongs to. Search by code or name in the row under the headings."
-                        bn="Projects → Product Categories খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন।"
+                        en="Open Projects → Settings → Product Categories. The description under the title names the company the list belongs to. Search by code or name in the row under the headings."
+                        bn="Projects → Settings → Product Categories খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন।"
                     >
                         <Shot
                             id="overview"
@@ -212,7 +227,7 @@ export default function ProductCategoriesGuide() {
 
             <GuideSection kind="related">
                 <RelatedGuide
-                    to="projects.products"
+                    to="projects.settings.products"
                     en="The products sorted into these categories."
                     bn="যেসব পণ্য এই শ্রেণিগুলোতে ভাগ করা হয়।"
                 />
@@ -222,7 +237,7 @@ export default function ProductCategoriesGuide() {
                     bn="যেসব কোম্পানির অধীনে পণ্যের শ্রেণিগুলো থাকে।"
                 />
                 <RelatedGuide
-                    to="projects.units"
+                    to="projects.settings.units"
                     en="The units quantities are counted in."
                     bn="যেসব এককে পরিমাণ গোনা হয়।"
                 />

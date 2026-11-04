@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Units of Measure (`projects.units.index`), with its New unit /
+ * Projects → Settings → Units of Measure (`projects.settings.units.index`), with its New unit /
  * Edit dialog and the Deleted tab. Source: documentation/projects.md §4
  * (Units of measure).
  */
@@ -37,30 +37,32 @@ export default function UnitsGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.units.view</Ui> opens the list;{' '}
-                            <Ui>projects.units.create</Ui>,{' '}
-                            <Ui>projects.units.update</Ui> and{' '}
-                            <Ui>projects.units.delete</Ui> add, edit and delete;{' '}
-                            <Ui>projects.units.restore</Ui> and{' '}
-                            <Ui>projects.units.force-delete</Ui> work on the
-                            Deleted tab. The project-manager role may view, add
-                            and edit, but not delete or restore: the list is
-                            shared, so removing a unit is left to the super
-                            admin. No company needs to be selected.
+                            <Ui>projects.settings.units.view</Ui> opens the
+                            list; <Ui>projects.settings.units.create</Ui>,{' '}
+                            <Ui>projects.settings.units.update</Ui> and{' '}
+                            <Ui>projects.settings.units.delete</Ui> add, edit
+                            and delete; <Ui>projects.settings.units.restore</Ui>{' '}
+                            and <Ui>projects.settings.units.force-delete</Ui>{' '}
+                            work on the Deleted tab. The project-manager role
+                            may view, add and edit, but not delete or restore:
+                            the list is shared, so removing a unit is left to
+                            the super admin. No company needs to be selected.
                         </>
                     }
                     bn={
                         <>
-                            <Ui>projects.units.view</Ui> থাকলে তালিকা খোলা যায়;{' '}
-                            <Ui>projects.units.create</Ui>,{' '}
-                            <Ui>projects.units.update</Ui> ও{' '}
-                            <Ui>projects.units.delete</Ui> দিয়ে যোগ, সম্পাদনা ও
-                            মোছা যায়; <Ui>projects.units.restore</Ui> ও{' '}
-                            <Ui>projects.units.force-delete</Ui> Deleted ট্যাবে
-                            কাজ করে। project-manager রোল দেখতে, যোগ করতে ও
-                            সম্পাদনা করতে পারে, কিন্তু মুছতে বা ফিরিয়ে আনতে
-                            পারে না: তালিকাটি সবার, তাই একক মোছার কাজ সুপার
-                            অ্যাডমিনের। কোনো কোম্পানি বেছে নেওয়ার দরকার নেই।
+                            <Ui>projects.settings.units.view</Ui> থাকলে তালিকা
+                            খোলা যায়; <Ui>projects.settings.units.create</Ui>,{' '}
+                            <Ui>projects.settings.units.update</Ui> ও{' '}
+                            <Ui>projects.settings.units.delete</Ui> দিয়ে যোগ,
+                            সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>projects.settings.units.restore</Ui> ও{' '}
+                            <Ui>projects.settings.units.force-delete</Ui>{' '}
+                            Deleted ট্যাবে কাজ করে। project-manager রোল দেখতে,
+                            যোগ করতে ও সম্পাদনা করতে পারে, কিন্তু মুছতে বা
+                            ফিরিয়ে আনতে পারে না: তালিকাটি সবার, তাই একক মোছার
+                            কাজ সুপার অ্যাডমিনের। কোনো কোম্পানি বেছে নেওয়ার
+                            দরকার নেই।
                         </>
                     }
                 />
@@ -76,8 +78,8 @@ export default function UnitsGuide() {
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Units of Measure. Search by code, name or symbol in the row under the headings."
-                        bn="Projects → Units of Measure খুলুন। শিরোনামের নিচের সারিতে কোড, নাম বা প্রতীক দিয়ে খুঁজুন।"
+                        en="Open Projects → Settings → Units of Measure. Search by code, name or symbol in the row under the headings."
+                        bn="Projects → Settings → Units of Measure খুলুন। শিরোনামের নিচের সারিতে কোড, নাম বা প্রতীক দিয়ে খুঁজুন।"
                     >
                         <Shot
                             id="overview"
@@ -213,7 +215,7 @@ export default function UnitsGuide() {
 
             <GuideSection kind="related">
                 <RelatedGuide
-                    to="projects.tender-types"
+                    to="projects.settings.tender-types"
                     en="The other list every company shares in Projects."
                     bn="Projects-এর আরেকটি তালিকা যা সব কোম্পানি ভাগ করে।"
                 />

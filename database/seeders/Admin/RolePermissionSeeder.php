@@ -56,23 +56,23 @@ class RolePermissionSeeder extends Seeder
         // One overview per ERP module; each opens the module's dashboard.
         'projects.dashboard' => ['view'],
         // The ERP's one customer list, kept per company (owner, 2026-11-02).
-        'projects.clients' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.clients' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Kept per company, each starting with a starter set (owner, 2026-11-03).
-        'projects.product-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
-        'projects.products' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.product-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.products' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Kept per company; what will use an item is still to be named (owner, 2026-11-03).
-        'projects.verification-items' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.verification-items' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Group-wide (§9.10): one list every company's suppliers are classified by (owner, 2026-11-02).
-        'projects.supplier-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.supplier-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // The ERP's one supplier list, kept per company (owner, 2026-11-02).
-        'projects.suppliers' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.suppliers' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Group-wide (§9.10): one list of procurement methods every company shares (owner, 2026-11-02).
-        'projects.tender-types' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.tender-types' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Group-wide (§9.10): one list of units of measure every company shares, seeded (owner, 2026-11-02).
-        'projects.units' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.units' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         // Group-wide (§9.10): one catalogue of standards and its categories, seeded (owner, 2026-11-02).
-        'projects.certification-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
-        'projects.certifications' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.certification-categories' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
+        'projects.settings.certifications' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete'],
         'accounting.dashboard' => ['view'],
         'hrm.dashboard' => ['view'],
         'hrm.departments' => ['view', 'create', 'update', 'delete', 'restore', 'force-delete', 'import'],
@@ -103,18 +103,18 @@ class RolePermissionSeeder extends Seeder
             'hrm.designations.force-delete',
         ],
         'project-manager' => [
-            'projects.tender-types.delete',
-            'projects.tender-types.restore',
-            'projects.tender-types.force-delete',
-            'projects.units.delete',
-            'projects.units.restore',
-            'projects.units.force-delete',
-            'projects.certification-categories.delete',
-            'projects.certification-categories.restore',
-            'projects.certification-categories.force-delete',
-            'projects.certifications.delete',
-            'projects.certifications.restore',
-            'projects.certifications.force-delete',
+            'projects.settings.tender-types.delete',
+            'projects.settings.tender-types.restore',
+            'projects.settings.tender-types.force-delete',
+            'projects.settings.units.delete',
+            'projects.settings.units.restore',
+            'projects.settings.units.force-delete',
+            'projects.settings.certification-categories.delete',
+            'projects.settings.certification-categories.restore',
+            'projects.settings.certification-categories.force-delete',
+            'projects.settings.certifications.delete',
+            'projects.settings.certifications.restore',
+            'projects.settings.certifications.force-delete',
         ],
     ];
 

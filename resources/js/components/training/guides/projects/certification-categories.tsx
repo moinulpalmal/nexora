@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Certification Categories (`projects.certification-categories.index`),
+ * Projects → Settings → Certification Categories (`projects.settings.certification-categories.index`),
  * with its New certification category / Edit dialog and the Deleted tab.
  * Source: documentation/projects.md §4 (Certification categories).
  */
@@ -37,17 +37,28 @@ export default function CertificationCategoriesGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.certification-categories.view</Ui>{' '}
+                            <Ui>
+                                projects.settings.certification-categories.view
+                            </Ui>{' '}
                             opens the list;{' '}
-                            <Ui>projects.certification-categories.create</Ui>,{' '}
-                            <Ui>projects.certification-categories.update</Ui>{' '}
-                            and{' '}
-                            <Ui>projects.certification-categories.delete</Ui>{' '}
-                            add, edit and delete;{' '}
-                            <Ui>projects.certification-categories.restore</Ui>{' '}
+                            <Ui>
+                                projects.settings.certification-categories.create
+                            </Ui>
+                            ,{' '}
+                            <Ui>
+                                projects.settings.certification-categories.update
+                            </Ui>{' '}
                             and{' '}
                             <Ui>
-                                projects.certification-categories.force-delete
+                                projects.settings.certification-categories.delete
+                            </Ui>{' '}
+                            add, edit and delete;{' '}
+                            <Ui>
+                                projects.settings.certification-categories.restore
+                            </Ui>{' '}
+                            and{' '}
+                            <Ui>
+                                projects.settings.certification-categories.force-delete
                             </Ui>{' '}
                             work on the Deleted tab. The project-manager role
                             may view, add and edit, but not delete or restore:
@@ -57,15 +68,28 @@ export default function CertificationCategoriesGuide() {
                     }
                     bn={
                         <>
-                            <Ui>projects.certification-categories.view</Ui>{' '}
-                            থাকলে তালিকা খোলা যায়;{' '}
-                            <Ui>projects.certification-categories.create</Ui>,{' '}
-                            <Ui>projects.certification-categories.update</Ui> ও{' '}
-                            <Ui>projects.certification-categories.delete</Ui>{' '}
-                            দিয়ে যোগ, সম্পাদনা ও মোছা যায়;{' '}
-                            <Ui>projects.certification-categories.restore</Ui> ও{' '}
                             <Ui>
-                                projects.certification-categories.force-delete
+                                projects.settings.certification-categories.view
+                            </Ui>{' '}
+                            থাকলে তালিকা খোলা যায়;{' '}
+                            <Ui>
+                                projects.settings.certification-categories.create
+                            </Ui>
+                            ,{' '}
+                            <Ui>
+                                projects.settings.certification-categories.update
+                            </Ui>{' '}
+                            ও{' '}
+                            <Ui>
+                                projects.settings.certification-categories.delete
+                            </Ui>{' '}
+                            দিয়ে যোগ, সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>
+                                projects.settings.certification-categories.restore
+                            </Ui>{' '}
+                            ও{' '}
+                            <Ui>
+                                projects.settings.certification-categories.force-delete
                             </Ui>{' '}
                             Deleted ট্যাবে কাজ করে। project-manager রোল দেখতে,
                             যোগ করতে ও সম্পাদনা করতে পারে, কিন্তু মুছতে বা
@@ -87,8 +111,8 @@ export default function CertificationCategoriesGuide() {
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Certification Categories. Search by code or name in the row under the headings."
-                        bn="Projects → Certification Categories খুলুন। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন।"
+                        en="Open Projects → Settings → Certification Categories. Search by code or name in the row under the headings."
+                        bn="Projects → Settings → Certification Categories খুলুন। শিরোনামের নিচের সারিতে কোড বা নাম দিয়ে খুঁজুন।"
                     >
                         <Shot
                             id="overview"
@@ -213,7 +237,7 @@ export default function CertificationCategoriesGuide() {
 
             <GuideSection kind="related">
                 <RelatedGuide
-                    to="projects.certifications"
+                    to="projects.settings.certifications"
                     en="The certifications each category classifies."
                     bn="যে সার্টিফিকেশনগুলো প্রতিটি শ্রেণি ভাগ করে।"
                 />

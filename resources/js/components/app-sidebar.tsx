@@ -20,6 +20,7 @@ import {
     Mail,
     Package,
     Ruler,
+    Settings,
     ShieldCheck,
     SlidersHorizontal,
     Tags,
@@ -40,7 +41,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useCan } from '@/hooks/use-can';
-import { useNavGroups } from '@/hooks/use-nav-groups';
+import { navParentKey, useNavGroups } from '@/hooks/use-nav-groups';
 import { dashboard } from '@/routes';
 import { dashboard as accountingDashboard } from '@/routes/accounting';
 import { edit as applicationSettingsEdit } from '@/routes/admin/application-settings';
@@ -57,16 +58,16 @@ import { index as departmentsIndex } from '@/routes/hrm/departments';
 import { index as designationsIndex } from '@/routes/hrm/designations';
 import { index as employeesIndex } from '@/routes/hrm/employees';
 import { dashboard as projectsDashboard } from '@/routes/projects';
-import { index as certificationCategoriesIndex } from '@/routes/projects/certification-categories';
-import { index as certificationsIndex } from '@/routes/projects/certifications';
-import { index as clientsIndex } from '@/routes/projects/clients';
-import { index as productCategoriesIndex } from '@/routes/projects/product-categories';
-import { index as productsIndex } from '@/routes/projects/products';
-import { index as supplierCategoriesIndex } from '@/routes/projects/supplier-categories';
-import { index as suppliersIndex } from '@/routes/projects/suppliers';
-import { index as tenderTypesIndex } from '@/routes/projects/tender-types';
-import { index as unitsIndex } from '@/routes/projects/units';
-import { index as verificationItemsIndex } from '@/routes/projects/verification-items';
+import { index as certificationCategoriesIndex } from '@/routes/projects/settings/certification-categories';
+import { index as certificationsIndex } from '@/routes/projects/settings/certifications';
+import { index as clientsIndex } from '@/routes/projects/settings/clients';
+import { index as productCategoriesIndex } from '@/routes/projects/settings/product-categories';
+import { index as productsIndex } from '@/routes/projects/settings/products';
+import { index as supplierCategoriesIndex } from '@/routes/projects/settings/supplier-categories';
+import { index as suppliersIndex } from '@/routes/projects/settings/suppliers';
+import { index as tenderTypesIndex } from '@/routes/projects/settings/tender-types';
+import { index as unitsIndex } from '@/routes/projects/settings/units';
+import { index as verificationItemsIndex } from '@/routes/projects/settings/verification-items';
 import { index as trainingIndex } from '@/routes/training';
 import type { NavGroup, NavItem } from '@/types';
 
@@ -106,20 +107,26 @@ export function AppSidebar() {
     const canViewQuickLogin = useCan('admin.quick-login.view');
 
     const canViewProjects = useCan('projects.dashboard.view');
-    const canViewClients = useCan('projects.clients.view');
-    const canViewProductCategories = useCan('projects.product-categories.view');
-    const canViewProducts = useCan('projects.products.view');
+    const canViewClients = useCan('projects.settings.clients.view');
+    const canViewProductCategories = useCan(
+        'projects.settings.product-categories.view',
+    );
+    const canViewProducts = useCan('projects.settings.products.view');
     const canViewSupplierCategories = useCan(
-        'projects.supplier-categories.view',
+        'projects.settings.supplier-categories.view',
     );
-    const canViewSuppliers = useCan('projects.suppliers.view');
-    const canViewTenderTypes = useCan('projects.tender-types.view');
-    const canViewUnits = useCan('projects.units.view');
+    const canViewSuppliers = useCan('projects.settings.suppliers.view');
+    const canViewTenderTypes = useCan('projects.settings.tender-types.view');
+    const canViewUnits = useCan('projects.settings.units.view');
     const canViewCertificationCategories = useCan(
-        'projects.certification-categories.view',
+        'projects.settings.certification-categories.view',
     );
-    const canViewCertifications = useCan('projects.certifications.view');
-    const canViewVerificationItems = useCan('projects.verification-items.view');
+    const canViewCertifications = useCan(
+        'projects.settings.certifications.view',
+    );
+    const canViewVerificationItems = useCan(
+        'projects.settings.verification-items.view',
+    );
     const canViewAccounting = useCan('accounting.dashboard.view');
     const canViewHrm = useCan('hrm.dashboard.view');
     const canViewDepartments = useCan('hrm.departments.view');
@@ -187,15 +194,9 @@ export function AppSidebar() {
         .filter((link) => link.visible)
         .map(({ title, href, icon }) => ({ title, href, icon }));
 
-    // Clients, the first real screen, turned the group into a list of links,
-    // each behind its own permission, as HRM's.
-    const projectsNavLinks: (NavItem & { visible: boolean })[] = [
-        {
-            title: 'Overview',
-            href: projectsDashboard(),
-            icon: FolderKanban,
-            visible: canViewProjects,
-        },
+    // Projects → Settings holds the module's setup lists (owner, 2026-11-04),
+    // each behind its own permission, as HRM's links are.
+    const projectsSettingsLinks: (NavItem & { visible: boolean })[] = [
         {
             title: 'Clients',
             href: clientsIndex(),
@@ -258,9 +259,30 @@ export function AppSidebar() {
         },
     ];
 
-    const projectsNavItems: NavItem[] = projectsNavLinks
+    const projectsSettingsItems: NavItem[] = projectsSettingsLinks
         .filter((link) => link.visible)
         .map(({ title, href, icon }) => ({ title, href, icon }));
+
+    const projectsNavItems: NavGroup['items'] = [
+        ...(canViewProjects
+            ? [
+                  {
+                      title: 'Overview',
+                      href: projectsDashboard(),
+                      icon: FolderKanban,
+                  },
+              ]
+            : []),
+        ...(projectsSettingsItems.length > 0
+            ? [
+                  {
+                      title: 'Settings',
+                      icon: Settings,
+                      items: projectsSettingsItems,
+                  },
+              ]
+            : []),
+    ];
 
     // HRM's first real screen turned its group into a list of links, each
     // behind its own permission, like Admin's.
@@ -342,6 +364,12 @@ export function AppSidebar() {
                         label={group.label}
                         expanded={isExpanded(group.label)}
                         onToggle={() => toggle(group.label)}
+                        isParentExpanded={(title) =>
+                            isExpanded(navParentKey(group.label, title))
+                        }
+                        onParentToggle={(title) =>
+                            toggle(navParentKey(group.label, title))
+                        }
                     />
                 ))}
             </SidebarContent>

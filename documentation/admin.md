@@ -146,7 +146,7 @@ its sentence, and the code that checks it — `PermissionDescriptionsTest` fails
 | `super-admin` | everything | passes every check via `Gate::before`; cannot be edited or deleted |
 | `admin` | every `admin.*` and `settings.*` except ★ | day-to-day administration |
 | `viewer` | every `*.view` except ★ | read-only |
-| `project-manager` | every `projects.*` except `projects.tender-types.{delete,restore,force-delete}` `projects.units.{delete,restore,force-delete}`, `projects.certification-categories.{delete,restore,force-delete}` and `projects.certifications.{delete,restore,force-delete}` | the Projects module; tender types, units of measure, certifications and certification categories are shared by every company, so their removal stays with super-admin (`ROLE_EXCLUSIONS`, [`projects.md` §4](projects.md#tender-types--built)) |
+| `project-manager` | every `projects.*` except `projects.settings.tender-types.{delete,restore,force-delete}` `projects.settings.units.{delete,restore,force-delete}`, `projects.settings.certification-categories.{delete,restore,force-delete}` and `projects.settings.certifications.{delete,restore,force-delete}` | the Projects module; tender types, units of measure, certifications and certification categories are shared by every company, so their removal stays with super-admin (`ROLE_EXCLUSIONS`, [`projects.md` §4](projects.md#tender-types--built)) |
 | `accountant` | every `accounting.*` | the Accounting module (menu: Accounts) |
 | `hr-officer` | every `hrm.*` except `hrm.designations.{delete,restore,force-delete}` | the HRM module; designations are shared by every company, so their removal stays with super-admin (`ROLE_EXCLUSIONS`, [`hrm.md` §4.2](hrm.md#42-designations--built)) |
 
@@ -363,10 +363,10 @@ still reaches Admin and Settings; an ERP page shows a "no company" panel instead
 
 *(owner, 2026-11-02)* Admin → Countries is a **group-wide** master table — one list every company
 shares, no `company_id` — shaped as HRM → Designations: restorable, Active / Deleted tabs, bulk delete
-on both tabs, every action a dialog. It **ships filled** (ARCHITECTURE §9.14) — with Projects → Units of
-Measure ([`projects.md` §4](projects.md#units-of-measure--built)) and Projects → Certifications with
+on both tabs, every action a dialog. It **ships filled** (ARCHITECTURE §9.14) — with Projects → Settings → Units of
+Measure ([`projects.md` §4](projects.md#units-of-measure--built)) and Projects → Settings → Certifications with
 their categories ([`projects.md` §4](projects.md#certifications--built)), one of the seeded master
-tables (Projects → Product Categories is seeded too, but per company —
+tables (Projects → Settings → Product Categories is seeded too, but per company —
 [`projects.md` §4](projects.md#product-categories--built)).
 
 | Column | Rule |

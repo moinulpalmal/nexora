@@ -15,7 +15,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Verification Items, laid out as `ProductCategoryController` — one
+ * Projects → Settings → Verification Items, laid out as `ProductCategoryController` — one
  * index page with Active/Deleted tabs, every write arriving from a dialog on it
  * and answering `back()` with a toast.
  *
@@ -56,7 +56,7 @@ class VerificationItemController extends Controller
                 'deleted_at' => $item->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/verification-items/index', [
+        return Inertia::render('projects/settings/verification-items/index', [
             'items' => $items,
             'company' => $company === null ? null : [
                 'id' => $company->id,

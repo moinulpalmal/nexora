@@ -6,7 +6,7 @@ use App\Models\ProjectManagement\TenderType;
 
 /*
 |--------------------------------------------------------------------------
-| Projects → Tender Types
+| Projects → Settings → Tender Types
 |--------------------------------------------------------------------------
 |
 | A group-wide master table (ARCHITECTURE.md §9.10, owner 2026-11-02): one
@@ -36,12 +36,12 @@ function tenderTypePayload(array $overrides = []): array
 */
 
 test('guests are sent to the login page', function () {
-    $this->get(route('projects.tender-types.index'))->assertRedirect(route('login'));
+    $this->get(route('projects.settings.tender-types.index'))->assertRedirect(route('login'));
 });
 
 test('the list is refused without the view permission', function () {
     $this->actingAs(userWithPermissions())
-        ->get(route('projects.tender-types.index'))
+        ->get(route('projects.settings.tender-types.index'))
         ->assertForbidden();
 });
 
@@ -52,19 +52,19 @@ test('each write is refused without its own permission', function (string $metho
         $tenderType->delete();
     }
 
-    $this->actingAs(userWithPermissions('projects.tender-types.view'))
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.view'))
         ->{$method}(route($route, $tenderType), tenderTypePayload())
         ->assertForbidden();
 })->with([
-    'update' => ['put', 'projects.tender-types.update', false],
-    'delete' => ['delete', 'projects.tender-types.destroy', false],
-    'restore' => ['put', 'projects.tender-types.restore', true],
-    'force delete' => ['delete', 'projects.tender-types.force-delete', true],
+    'update' => ['put', 'projects.settings.tender-types.update', false],
+    'delete' => ['delete', 'projects.settings.tender-types.destroy', false],
+    'restore' => ['put', 'projects.settings.tender-types.restore', true],
+    'force delete' => ['delete', 'projects.settings.tender-types.force-delete', true],
 ]);
 
 test('creating is refused without the create permission', function () {
-    $this->actingAs(userWithPermissions('projects.tender-types.view'))
-        ->post(route('projects.tender-types.store'), tenderTypePayload())
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.view'))
+        ->post(route('projects.settings.tender-types.store'), tenderTypePayload())
         ->assertForbidden();
 });
 
@@ -76,11 +76,11 @@ test('the list works with no company selected and shows every tender type', func
     TenderType::factory()->create(['code' => 'OTM']);
     TenderType::factory()->create(['code' => 'RFQ'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.tender-types.view'))
-        ->get(route('projects.tender-types.index'))
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.view'))
+        ->get(route('projects.settings.tender-types.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('projects/tender-types/index')
+            ->component('projects/settings/tender-types/index')
             ->missing('company')
             ->has('tenderTypes.data', 1)
             ->where('tenderTypes.data.0.code', 'OTM')
@@ -93,8 +93,8 @@ test('the deleted tab lists only deleted tender types', function () {
     TenderType::factory()->create(['code' => 'OTM']);
     TenderType::factory()->create(['code' => 'RFQ'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.tender-types.view'))
-        ->get(route('projects.tender-types.index', ['view' => 'trashed']))
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.view'))
+        ->get(route('projects.settings.tender-types.index', ['view' => 'trashed']))
         ->assertInertia(fn ($page) => $page
             ->has('tenderTypes.data', 1)
             ->where('tenderTypes.data.0.code', 'RFQ'),
@@ -106,8 +106,8 @@ test('the list filters by code prefix and name, and sorts by status', function (
     TenderType::factory()->create(['code' => 'LTM-2', 'name' => 'Limited Tendering (Two Stage)']);
     TenderType::factory()->create(['code' => 'OTM', 'name' => 'Open Tendering']);
 
-    $this->actingAs(userWithPermissions('projects.tender-types.view'))
-        ->get(route('projects.tender-types.index', ['filter' => ['code' => 'LTM', 'name' => 'tendering'], 'sort' => 'status', 'direction' => 'asc']))
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.view'))
+        ->get(route('projects.settings.tender-types.index', ['filter' => ['code' => 'LTM', 'name' => 'tendering'], 'sort' => 'status', 'direction' => 'asc']))
         ->assertInertia(fn ($page) => $page
             ->has('tenderTypes.data', 2)
             ->where('tenderTypes.data.0.code', 'LTM-2'),
@@ -115,15 +115,15 @@ test('the list filters by code prefix and name, and sorts by status', function (
 });
 
 test('a status filter outside the enum is an error, not an empty list', function () {
-    $this->actingAs(userWithPermissions('projects.tender-types.view'))
-        ->get(route('projects.tender-types.index', ['filter' => ['status' => 'X']]))
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.view'))
+        ->get(route('projects.settings.tender-types.index', ['filter' => ['status' => 'X']]))
         ->assertSessionHasErrors('filter.status');
 });
 
 test('a tender type is created with no company, its code uppercased and its name tidied', function () {
-    $this->actingAs(userWithPermissions('projects.tender-types.create'));
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.create'));
 
-    assertToast($this->post(route('projects.tender-types.store'), tenderTypePayload(['code' => ' otm ', 'name' => ' Open   Tendering Method '])), 'success');
+    assertToast($this->post(route('projects.settings.tender-types.store'), tenderTypePayload(['code' => ' otm ', 'name' => ' Open   Tendering Method '])), 'success');
 
     $tenderType = TenderType::sole();
 
@@ -132,14 +132,14 @@ test('a tender type is created with no company, its code uppercased and its name
 });
 
 test('code, name and status are required', function () {
-    $this->actingAs(userWithPermissions('projects.tender-types.create'))
-        ->post(route('projects.tender-types.store'), ['code' => '', 'name' => '', 'status' => ''])
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.create'))
+        ->post(route('projects.settings.tender-types.store'), ['code' => '', 'name' => '', 'status' => ''])
         ->assertSessionHasErrors(['code', 'name', 'status']);
 });
 
 test('a code with spaces or symbols is refused', function () {
-    $this->actingAs(userWithPermissions('projects.tender-types.create'))
-        ->post(route('projects.tender-types.store'), tenderTypePayload(['code' => 'O T/M']))
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.create'))
+        ->post(route('projects.settings.tender-types.store'), tenderTypePayload(['code' => 'O T/M']))
         ->assertSessionHasErrors('code');
 });
 
@@ -150,8 +150,8 @@ test('a code with spaces or symbols is refused', function () {
 test('a code or name already used is refused whatever its case', function (string $field, string $value) {
     TenderType::factory()->create(['code' => 'OTM', 'name' => 'Open Tendering Method']);
 
-    $this->actingAs(userWithPermissions('projects.tender-types.create'))
-        ->post(route('projects.tender-types.store'), tenderTypePayload(['code' => 'OTHER', 'name' => 'Other', $field => $value]))
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.create'))
+        ->post(route('projects.settings.tender-types.store'), tenderTypePayload(['code' => 'OTHER', 'name' => 'Other', $field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
     'code, lower case' => ['code', 'otm'],
@@ -162,8 +162,8 @@ test('a code or name already used is refused whatever its case', function (strin
 test('a deleted tender type keeps its code and name reserved and says to restore it', function () {
     TenderType::factory()->create(['code' => 'OTM', 'name' => 'Open Tendering Method'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.tender-types.create'))
-        ->post(route('projects.tender-types.store'), tenderTypePayload())
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.create'))
+        ->post(route('projects.settings.tender-types.store'), tenderTypePayload())
         ->assertSessionHasErrors([
             'code' => 'The code "OTM" belongs to a deleted tender type. Restore it from the Deleted tab instead.',
             'name' => 'A deleted tender type is named "Open Tendering Method". Restore it from the Deleted tab instead.',
@@ -177,9 +177,9 @@ test('a deleted tender type keeps its code and name reserved and says to restore
 test('a tender type can be edited, keeping its own values', function () {
     $tenderType = TenderType::factory()->create(['code' => 'OTM', 'name' => 'Open Tendering Method']);
 
-    $this->actingAs(userWithPermissions('projects.tender-types.update'));
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.update'));
 
-    assertToast($this->put(route('projects.tender-types.update', $tenderType), tenderTypePayload(['status' => RecordStatus::Inactive->value])), 'success');
+    assertToast($this->put(route('projects.settings.tender-types.update', $tenderType), tenderTypePayload(['status' => RecordStatus::Inactive->value])), 'success');
 
     expect($tenderType->refresh()->status)->toBe(RecordStatus::Inactive);
 });
@@ -187,27 +187,27 @@ test('a tender type can be edited, keeping its own values', function () {
 test('a tender type is soft deleted, restored and permanently deleted', function () {
     $tenderType = TenderType::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.tender-types.delete', 'projects.tender-types.restore', 'projects.tender-types.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.delete', 'projects.settings.tender-types.restore', 'projects.settings.tender-types.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.tender-types.destroy', $tenderType)), 'success');
+    assertToast($this->delete(route('projects.settings.tender-types.destroy', $tenderType)), 'success');
     expect($tenderType->refresh()->trashed())->toBeTrue();
 
-    assertToast($this->put(route('projects.tender-types.restore', $tenderType)), 'success');
+    assertToast($this->put(route('projects.settings.tender-types.restore', $tenderType)), 'success');
     expect($tenderType->refresh()->trashed())->toBeFalse();
 
     $tenderType->delete();
-    assertToast($this->delete(route('projects.tender-types.force-delete', $tenderType)), 'success');
+    assertToast($this->delete(route('projects.settings.tender-types.force-delete', $tenderType)), 'success');
 
     expect(TenderType::withTrashed()->find($tenderType->id))->toBeNull()
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'tender-type')->exists())->toBeTrue();
 });
 
 test('creating a tender type is audited', function () {
-    $this->actingAs(userWithPermissions('projects.tender-types.create'));
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.create'));
     config(['audit.console' => true]);
 
-    $this->post(route('projects.tender-types.store'), tenderTypePayload());
+    $this->post(route('projects.settings.tender-types.store'), tenderTypePayload());
 
     $audit = AuditLog::where('event', 'created')->where('auditable_type', 'tender-type')->sole();
 
@@ -221,17 +221,17 @@ test('creating a tender type is audited', function () {
 test('bulk delete and bulk permanent delete each need their own permission', function (string $route) {
     $tenderType = TenderType::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.tender-types.view'))
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.view'))
         ->delete(route($route), ['ids' => [$tenderType->id]])
         ->assertForbidden();
-})->with(['projects.tender-types.bulk-destroy', 'projects.tender-types.bulk-force-delete']);
+})->with(['projects.settings.tender-types.bulk-destroy', 'projects.settings.tender-types.bulk-force-delete']);
 
 test('bulk delete moves the ticked tender types to Deleted', function () {
     [$first, $second, $untouched] = TenderType::factory()->count(3)->create();
 
-    $this->actingAs(userWithPermissions('projects.tender-types.delete'));
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.delete'));
 
-    assertToast($this->delete(route('projects.tender-types.bulk-destroy'), ['ids' => [$first->id, $second->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.tender-types.bulk-destroy'), ['ids' => [$first->id, $second->id]]), 'success');
 
     expect($first->refresh()->trashed())->toBeTrue()
         ->and($second->refresh()->trashed())->toBeTrue()
@@ -243,9 +243,9 @@ test('bulk permanent delete destroys only deleted tender types', function () {
     $deleted->delete();
     $live = TenderType::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.tender-types.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.tender-types.force-delete'));
 
-    assertToast($this->delete(route('projects.tender-types.bulk-force-delete'), ['ids' => [$deleted->id, $live->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.tender-types.bulk-force-delete'), ['ids' => [$deleted->id, $live->id]]), 'success');
 
     expect(TenderType::withTrashed()->find($deleted->id))->toBeNull()
         ->and($live->refresh()->exists)->toBeTrue();

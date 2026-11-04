@@ -15,7 +15,7 @@ import { useCan } from '@/hooks/use-can';
 import { useListFilters } from '@/hooks/use-list-filters';
 import { useRowSelection } from '@/hooks/use-row-selection';
 import { RECORD_STATUS } from '@/lib/enums';
-import { index } from '@/routes/projects/certification-categories';
+import { index } from '@/routes/projects/settings/certification-categories';
 import type {
     Filterable,
     Paginated,
@@ -36,10 +36,10 @@ type Props = {
 };
 
 /**
- * Projects → Certification Categories — what kind of standard each
+ * Projects → Settings → Certification Categories — what kind of standard each
  * certification is, one list every company shares (ARCHITECTURE.md §9.10).
- * A copy of `projects/supplier-categories`, itself laid out as
- * `projects/tender-types` (Active/Deleted tabs, every action a dialog, bulk
+ * A copy of `projects/settings/supplier-categories`, itself laid out as
+ * `projects/settings/tender-types` (Active/Deleted tabs, every action a dialog, bulk
  * delete on both tabs); the page works whether or not a company is selected.
  *
  * Certifications point here, so the server refuses to delete a category in use
@@ -56,12 +56,20 @@ export default function CertificationCategoriesIndex({
     filters,
     counts,
 }: Props) {
-    const canCreate = useCan('projects.certification-categories.create');
-    const canUpdate = useCan('projects.certification-categories.update');
-    const canDelete = useCan('projects.certification-categories.delete');
-    const canRestore = useCan('projects.certification-categories.restore');
+    const canCreate = useCan(
+        'projects.settings.certification-categories.create',
+    );
+    const canUpdate = useCan(
+        'projects.settings.certification-categories.update',
+    );
+    const canDelete = useCan(
+        'projects.settings.certification-categories.delete',
+    );
+    const canRestore = useCan(
+        'projects.settings.certification-categories.restore',
+    );
     const canForceDelete = useCan(
-        'projects.certification-categories.force-delete',
+        'projects.settings.certification-categories.force-delete',
     );
 
     const isDeleted = filters.view === 'trashed';

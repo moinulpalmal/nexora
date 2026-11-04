@@ -15,7 +15,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Product Categories, laid out as `ClientController` — one index
+ * Projects → Settings → Product Categories, laid out as `ClientController` — one index
  * page with Active/Deleted tabs, every write arriving from a dialog on it and
  * answering `back()` with a toast.
  *
@@ -56,7 +56,7 @@ class ProductCategoryController extends Controller
                 'deleted_at' => $category->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/product-categories/index', [
+        return Inertia::render('projects/settings/product-categories/index', [
             'categories' => $categories,
             'company' => $company === null ? null : [
                 'id' => $company->id,

@@ -9,7 +9,7 @@ use Database\Seeders\ProjectManagement\CertificationSeeder;
 
 /*
 |--------------------------------------------------------------------------
-| Projects → Certifications
+| Projects → Settings → Certifications
 |--------------------------------------------------------------------------
 |
 | A group-wide catalogue of standards (ARCHITECTURE.md §9.10, owner
@@ -44,12 +44,12 @@ function certificationPayload(array $overrides = []): array
 */
 
 test('guests are sent to the login page', function () {
-    $this->get(route('projects.certifications.index'))->assertRedirect(route('login'));
+    $this->get(route('projects.settings.certifications.index'))->assertRedirect(route('login'));
 });
 
 test('the list is refused without the view permission', function () {
     $this->actingAs(userWithPermissions())
-        ->get(route('projects.certifications.index'))
+        ->get(route('projects.settings.certifications.index'))
         ->assertForbidden();
 });
 
@@ -60,19 +60,19 @@ test('each write is refused without its own permission', function (string $metho
         $certification->delete();
     }
 
-    $this->actingAs(userWithPermissions('projects.certifications.view'))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.view'))
         ->{$method}(route($route, $certification), certificationPayload())
         ->assertForbidden();
 })->with([
-    'update' => ['put', 'projects.certifications.update', false],
-    'delete' => ['delete', 'projects.certifications.destroy', false],
-    'restore' => ['put', 'projects.certifications.restore', true],
-    'force delete' => ['delete', 'projects.certifications.force-delete', true],
+    'update' => ['put', 'projects.settings.certifications.update', false],
+    'delete' => ['delete', 'projects.settings.certifications.destroy', false],
+    'restore' => ['put', 'projects.settings.certifications.restore', true],
+    'force delete' => ['delete', 'projects.settings.certifications.force-delete', true],
 ]);
 
 test('creating is refused without the create permission', function () {
-    $this->actingAs(userWithPermissions('projects.certifications.view'))
-        ->post(route('projects.certifications.store'), certificationPayload())
+    $this->actingAs(userWithPermissions('projects.settings.certifications.view'))
+        ->post(route('projects.settings.certifications.store'), certificationPayload())
         ->assertForbidden();
 });
 
@@ -85,11 +85,11 @@ test('the list works with no company selected and shows every certification with
     Certification::factory()->for($category, 'category')->create(['code' => 'ISO9001-2015']);
     Certification::factory()->create(['code' => 'CE'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.certifications.view'))
-        ->get(route('projects.certifications.index'))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.view'))
+        ->get(route('projects.settings.certifications.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('projects/certifications/index')
+            ->component('projects/settings/certifications/index')
             ->missing('company')
             ->has('certifications.data', 1)
             ->where('certifications.data.0.code', 'ISO9001-2015')
@@ -104,8 +104,8 @@ test('the deleted tab lists only deleted certifications', function () {
     Certification::factory()->create(['code' => 'ISO9001-2015']);
     Certification::factory()->create(['code' => 'CE'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.certifications.view'))
-        ->get(route('projects.certifications.index', ['view' => 'trashed']))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.view'))
+        ->get(route('projects.settings.certifications.index', ['view' => 'trashed']))
         ->assertInertia(fn ($page) => $page
             ->has('certifications.data', 1)
             ->where('certifications.data.0.code', 'CE'),
@@ -118,8 +118,8 @@ test('the list filters by code prefix, name, category and issuing body, and sort
     Certification::factory()->for($quality, 'category')->create(['code' => 'ISO9001-2015', 'name' => 'ISO 9001 Quality', 'version' => '2015', 'issuing_body' => 'ISO']);
     Certification::factory()->create(['code' => 'ISO14001-2015', 'name' => 'ISO 14001 Environmental', 'version' => '2015', 'issuing_body' => 'ISO']);
 
-    $this->actingAs(userWithPermissions('projects.certifications.view'))
-        ->get(route('projects.certifications.index', [
+    $this->actingAs(userWithPermissions('projects.settings.certifications.view'))
+        ->get(route('projects.settings.certifications.index', [
             'filter' => ['code' => 'ISO', 'name' => 'quality', 'certification_category_id' => (string) $quality->id, 'issuing_body' => 'is'],
             'sort' => 'version',
             'direction' => 'desc',
@@ -131,8 +131,8 @@ test('the list filters by code prefix, name, category and issuing body, and sort
 });
 
 test('a status or category filter of the wrong kind is an error, not an empty list', function (string $column, string $value) {
-    $this->actingAs(userWithPermissions('projects.certifications.view'))
-        ->get(route('projects.certifications.index', ['filter' => [$column => $value]]))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.view'))
+        ->get(route('projects.settings.certifications.index', ['filter' => [$column => $value]]))
         ->assertSessionHasErrors("filter.{$column}");
 })->with([
     'status' => ['status', 'X'],
@@ -140,9 +140,9 @@ test('a status or category filter of the wrong kind is an error, not an empty li
 ]);
 
 test('a certification is created with no company, its code uppercased and its text tidied', function () {
-    $this->actingAs(userWithPermissions('projects.certifications.create'));
+    $this->actingAs(userWithPermissions('projects.settings.certifications.create'));
 
-    assertToast($this->post(route('projects.certifications.store'), certificationPayload([
+    assertToast($this->post(route('projects.settings.certifications.store'), certificationPayload([
         'code' => ' iso9001-2015 ',
         'name' => ' ISO 9001   Quality Management Systems ',
         'issuing_body' => '  ISO ',
@@ -158,8 +158,8 @@ test('a certification is created with no company, its code uppercased and its te
 });
 
 test('an empty issuing body, version and description are saved as null', function () {
-    $this->actingAs(userWithPermissions('projects.certifications.create'))
-        ->post(route('projects.certifications.store'), certificationPayload(['code' => 'CE', 'name' => 'CE Marking', 'issuing_body' => '', 'version' => '', 'description' => '']))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.create'))
+        ->post(route('projects.settings.certifications.store'), certificationPayload(['code' => 'CE', 'name' => 'CE Marking', 'issuing_body' => '', 'version' => '', 'description' => '']))
         ->assertSessionHasNoErrors();
 
     expect(Certification::sole()->only(['issuing_body', 'version', 'description']))
@@ -167,14 +167,14 @@ test('an empty issuing body, version and description are saved as null', functio
 });
 
 test('category, code, name and status are required', function () {
-    $this->actingAs(userWithPermissions('projects.certifications.create'))
-        ->post(route('projects.certifications.store'), ['certification_category_id' => '', 'code' => '', 'name' => '', 'status' => ''])
+    $this->actingAs(userWithPermissions('projects.settings.certifications.create'))
+        ->post(route('projects.settings.certifications.store'), ['certification_category_id' => '', 'code' => '', 'name' => '', 'status' => ''])
         ->assertSessionHasErrors(['certification_category_id' => 'The category field is required.', 'code', 'name', 'status']);
 });
 
 test('a code with spaces or symbols is refused', function () {
-    $this->actingAs(userWithPermissions('projects.certifications.create'))
-        ->post(route('projects.certifications.store'), certificationPayload(['code' => 'ISO 9001/2015']))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.create'))
+        ->post(route('projects.settings.certifications.store'), certificationPayload(['code' => 'ISO 9001/2015']))
         ->assertSessionHasErrors('code');
 });
 
@@ -190,8 +190,8 @@ test('an inactive or deleted category cannot be chosen', function (bool $deleted
         $category->delete();
     }
 
-    $this->actingAs(userWithPermissions('projects.certifications.create'))
-        ->post(route('projects.certifications.store'), certificationPayload(['certification_category_id' => $category->id]))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.create'))
+        ->post(route('projects.settings.certifications.store'), certificationPayload(['certification_category_id' => $category->id]))
         ->assertSessionHasErrors(['certification_category_id' => 'Choose an active certification category.']);
 })->with(['inactive' => false, 'deleted' => true]);
 
@@ -200,8 +200,8 @@ test('a certification keeps its category on edit after the category is deactivat
     $certification = Certification::factory()->for($category, 'category')->create(['code' => 'ISO9001-2015', 'name' => 'ISO 9001 Quality Management Systems', 'version' => '2015']);
     $category->update(['status' => RecordStatus::Inactive]);
 
-    $this->actingAs(userWithPermissions('projects.certifications.update'))
-        ->put(route('projects.certifications.update', $certification), certificationPayload(['certification_category_id' => $category->id, 'issuing_body' => 'ISO (Geneva)']))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.update'))
+        ->put(route('projects.settings.certifications.update', $certification), certificationPayload(['certification_category_id' => $category->id, 'issuing_body' => 'ISO (Geneva)']))
         ->assertSessionHasNoErrors();
 
     expect($certification->refresh()->issuing_body)->toBe('ISO (Geneva)');
@@ -214,16 +214,16 @@ test('a certification keeps its category on edit after the category is deactivat
 test('a code already used is refused whatever its case', function () {
     Certification::factory()->create(['code' => 'ISO9001-2015']);
 
-    $this->actingAs(userWithPermissions('projects.certifications.create'))
-        ->post(route('projects.certifications.store'), certificationPayload(['code' => 'iso9001-2015', 'name' => 'Something else']))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.create'))
+        ->post(route('projects.settings.certifications.store'), certificationPayload(['code' => 'iso9001-2015', 'name' => 'Something else']))
         ->assertSessionHasErrors('code');
 });
 
 test('a name may repeat across versions but not within one', function (?string $existing, ?string $typed, bool $refused) {
     Certification::factory()->create(['code' => 'EXISTING', 'name' => 'ISO 9001 Quality Management Systems', 'version' => $existing]);
 
-    $response = $this->actingAs(userWithPermissions('projects.certifications.create'))
-        ->post(route('projects.certifications.store'), certificationPayload(['name' => 'iso 9001  quality management systems', 'version' => $typed]));
+    $response = $this->actingAs(userWithPermissions('projects.settings.certifications.create'))
+        ->post(route('projects.settings.certifications.store'), certificationPayload(['name' => 'iso 9001  quality management systems', 'version' => $typed]));
 
     $refused ? $response->assertSessionHasErrors('name') : $response->assertSessionHasNoErrors();
 })->with([
@@ -236,8 +236,8 @@ test('a name may repeat across versions but not within one', function (?string $
 test('a deleted certification keeps its code and name reserved and says to restore it', function () {
     Certification::factory()->create(['code' => 'ISO9001-2015', 'name' => 'ISO 9001 Quality Management Systems', 'version' => '2015'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.certifications.create'))
-        ->post(route('projects.certifications.store'), certificationPayload())
+    $this->actingAs(userWithPermissions('projects.settings.certifications.create'))
+        ->post(route('projects.settings.certifications.store'), certificationPayload())
         ->assertSessionHasErrors([
             'code' => 'The code "ISO9001-2015" belongs to a deleted certification. Restore it from the Deleted tab instead.',
             'name' => 'A deleted certification is named "ISO 9001 Quality Management Systems" in this version. Restore it from the Deleted tab instead.',
@@ -251,9 +251,9 @@ test('a deleted certification keeps its code and name reserved and says to resto
 test('a certification can be edited, keeping its own values', function () {
     $certification = Certification::factory()->create(['code' => 'ISO9001-2015', 'name' => 'ISO 9001 Quality Management Systems', 'version' => '2015']);
 
-    $this->actingAs(userWithPermissions('projects.certifications.update'));
+    $this->actingAs(userWithPermissions('projects.settings.certifications.update'));
 
-    assertToast($this->put(route('projects.certifications.update', $certification), certificationPayload(['status' => RecordStatus::Inactive->value])), 'success');
+    assertToast($this->put(route('projects.settings.certifications.update', $certification), certificationPayload(['status' => RecordStatus::Inactive->value])), 'success');
 
     expect($certification->refresh()->status)->toBe(RecordStatus::Inactive);
 });
@@ -261,28 +261,28 @@ test('a certification can be edited, keeping its own values', function () {
 test('a certification is soft deleted, restored and permanently deleted', function () {
     $certification = Certification::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.certifications.delete', 'projects.certifications.restore', 'projects.certifications.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.certifications.delete', 'projects.settings.certifications.restore', 'projects.settings.certifications.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.certifications.destroy', $certification)), 'success');
+    assertToast($this->delete(route('projects.settings.certifications.destroy', $certification)), 'success');
     expect($certification->refresh()->trashed())->toBeTrue();
 
-    assertToast($this->put(route('projects.certifications.restore', $certification)), 'success');
+    assertToast($this->put(route('projects.settings.certifications.restore', $certification)), 'success');
     expect($certification->refresh()->trashed())->toBeFalse();
 
     $certification->delete();
-    assertToast($this->delete(route('projects.certifications.force-delete', $certification)), 'success');
+    assertToast($this->delete(route('projects.settings.certifications.force-delete', $certification)), 'success');
 
     expect(Certification::withTrashed()->find($certification->id))->toBeNull()
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'certification')->exists())->toBeTrue();
 });
 
 test('creating a certification is audited', function () {
-    $this->actingAs(userWithPermissions('projects.certifications.create'));
+    $this->actingAs(userWithPermissions('projects.settings.certifications.create'));
     $payload = certificationPayload();
     config(['audit.console' => true]);
 
-    $this->post(route('projects.certifications.store'), $payload);
+    $this->post(route('projects.settings.certifications.store'), $payload);
 
     $audit = AuditLog::where('event', 'created')->where('auditable_type', 'certification')->sole();
 
@@ -296,17 +296,17 @@ test('creating a certification is audited', function () {
 test('bulk delete and bulk permanent delete each need their own permission', function (string $route) {
     $certification = Certification::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.certifications.view'))
+    $this->actingAs(userWithPermissions('projects.settings.certifications.view'))
         ->delete(route($route), ['ids' => [$certification->id]])
         ->assertForbidden();
-})->with(['projects.certifications.bulk-destroy', 'projects.certifications.bulk-force-delete']);
+})->with(['projects.settings.certifications.bulk-destroy', 'projects.settings.certifications.bulk-force-delete']);
 
 test('bulk delete moves the ticked certifications to Deleted', function () {
     [$first, $second, $untouched] = Certification::factory()->count(3)->create();
 
-    $this->actingAs(userWithPermissions('projects.certifications.delete'));
+    $this->actingAs(userWithPermissions('projects.settings.certifications.delete'));
 
-    assertToast($this->delete(route('projects.certifications.bulk-destroy'), ['ids' => [$first->id, $second->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.certifications.bulk-destroy'), ['ids' => [$first->id, $second->id]]), 'success');
 
     expect($first->refresh()->trashed())->toBeTrue()
         ->and($second->refresh()->trashed())->toBeTrue()
@@ -318,9 +318,9 @@ test('bulk permanent delete destroys only deleted certifications', function () {
     $deleted->delete();
     $live = Certification::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.certifications.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.certifications.force-delete'));
 
-    assertToast($this->delete(route('projects.certifications.bulk-force-delete'), ['ids' => [$deleted->id, $live->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.certifications.bulk-force-delete'), ['ids' => [$deleted->id, $live->id]]), 'success');
 
     expect(Certification::withTrashed()->find($deleted->id))->toBeNull()
         ->and($live->refresh()->exists)->toBeTrue();

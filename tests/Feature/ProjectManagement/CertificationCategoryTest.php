@@ -7,7 +7,7 @@ use App\Models\ProjectManagement\CertificationCategory;
 
 /*
 |--------------------------------------------------------------------------
-| Projects → Certification Categories
+| Projects → Settings → Certification Categories
 |--------------------------------------------------------------------------
 |
 | A group-wide list (ARCHITECTURE.md §9.10) in the Supplier Categories shape: code and
@@ -36,12 +36,12 @@ function certificationCategoryPayload(array $overrides = []): array
 */
 
 test('guests are sent to the login page', function () {
-    $this->get(route('projects.certification-categories.index'))->assertRedirect(route('login'));
+    $this->get(route('projects.settings.certification-categories.index'))->assertRedirect(route('login'));
 });
 
 test('the list is refused without the view permission', function () {
     $this->actingAs(userWithPermissions())
-        ->get(route('projects.certification-categories.index'))
+        ->get(route('projects.settings.certification-categories.index'))
         ->assertForbidden();
 });
 
@@ -52,19 +52,19 @@ test('each write is refused without its own permission', function (string $metho
         $category->delete();
     }
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.view'))
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.view'))
         ->{$method}(route($route, $category), certificationCategoryPayload())
         ->assertForbidden();
 })->with([
-    'update' => ['put', 'projects.certification-categories.update', false],
-    'delete' => ['delete', 'projects.certification-categories.destroy', false],
-    'restore' => ['put', 'projects.certification-categories.restore', true],
-    'force delete' => ['delete', 'projects.certification-categories.force-delete', true],
+    'update' => ['put', 'projects.settings.certification-categories.update', false],
+    'delete' => ['delete', 'projects.settings.certification-categories.destroy', false],
+    'restore' => ['put', 'projects.settings.certification-categories.restore', true],
+    'force delete' => ['delete', 'projects.settings.certification-categories.force-delete', true],
 ]);
 
 test('creating is refused without the create permission', function () {
-    $this->actingAs(userWithPermissions('projects.certification-categories.view'))
-        ->post(route('projects.certification-categories.store'), certificationCategoryPayload())
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.view'))
+        ->post(route('projects.settings.certification-categories.store'), certificationCategoryPayload())
         ->assertForbidden();
 });
 
@@ -76,18 +76,18 @@ test('the list shows every category with no company selected, and the deleted ta
     CertificationCategory::factory()->create(['code' => 'LIVE']);
     CertificationCategory::factory()->create(['code' => 'GONE'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.view'));
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.view'));
 
-    $this->get(route('projects.certification-categories.index'))
+    $this->get(route('projects.settings.certification-categories.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('projects/certification-categories/index')
+            ->component('projects/settings/certification-categories/index')
             ->has('certificationCategories.data', 1)
             ->where('certificationCategories.data.0.code', 'LIVE')
             ->where('counts', ['active' => 1, 'trashed' => 1]),
         );
 
-    $this->get(route('projects.certification-categories.index', ['view' => 'trashed']))
+    $this->get(route('projects.settings.certification-categories.index', ['view' => 'trashed']))
         ->assertInertia(fn ($page) => $page
             ->has('certificationCategories.data', 1)
             ->where('certificationCategories.data.0.code', 'GONE'),
@@ -99,9 +99,9 @@ test('the list shows every category with no company selected, and the deleted ta
 */
 
 test('a category is created with its code in capitals and its name tidied', function () {
-    $this->actingAs(userWithPermissions('projects.certification-categories.create'));
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.create'));
 
-    assertToast($this->post(route('projects.certification-categories.store'), certificationCategoryPayload(['code' => ' mat-01 ', 'name' => ' Raw   Materials ', 'description' => ''])), 'success');
+    assertToast($this->post(route('projects.settings.certification-categories.store'), certificationCategoryPayload(['code' => ' mat-01 ', 'name' => ' Raw   Materials ', 'description' => ''])), 'success');
 
     $category = CertificationCategory::sole();
 
@@ -114,12 +114,12 @@ test('a code or name already used is refused whatever its case, and a deleted on
     CertificationCategory::factory()->create(['code' => 'MAT', 'name' => 'Materials']);
     CertificationCategory::factory()->create(['code' => 'SRV', 'name' => 'Services'])->delete();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.create'));
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.create'));
 
-    $this->post(route('projects.certification-categories.store'), certificationCategoryPayload(['code' => 'mat', 'name' => 'MATERIALS']))
+    $this->post(route('projects.settings.certification-categories.store'), certificationCategoryPayload(['code' => 'mat', 'name' => 'MATERIALS']))
         ->assertSessionHasErrors(['code', 'name']);
 
-    $this->post(route('projects.certification-categories.store'), certificationCategoryPayload(['code' => 'SRV', 'name' => 'Services']))
+    $this->post(route('projects.settings.certification-categories.store'), certificationCategoryPayload(['code' => 'SRV', 'name' => 'Services']))
         ->assertSessionHasErrors([
             'code' => 'The code "SRV" belongs to a deleted certification category. Restore it from the Deleted tab instead.',
             'name' => 'A deleted certification category is named "Services". Restore it from the Deleted tab instead.',
@@ -130,8 +130,8 @@ test('a category in use can be deactivated', function () {
     $category = CertificationCategory::factory()->create(['code' => 'MAT', 'name' => 'Materials']);
     Certification::factory()->for($category, 'category')->create();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.update'))
-        ->put(route('projects.certification-categories.update', $category), certificationCategoryPayload(['status' => RecordStatus::Inactive->value]))
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.update'))
+        ->put(route('projects.settings.certification-categories.update', $category), certificationCategoryPayload(['status' => RecordStatus::Inactive->value]))
         ->assertSessionHasNoErrors();
 
     expect($category->refresh()->status)->toBe(RecordStatus::Inactive);
@@ -140,17 +140,17 @@ test('a category in use can be deactivated', function () {
 test('a category is soft deleted, restored and permanently deleted, the last recorded', function () {
     $category = CertificationCategory::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.delete', 'projects.certification-categories.restore', 'projects.certification-categories.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.delete', 'projects.settings.certification-categories.restore', 'projects.settings.certification-categories.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.certification-categories.destroy', $category)), 'success');
+    assertToast($this->delete(route('projects.settings.certification-categories.destroy', $category)), 'success');
     expect($category->refresh()->trashed())->toBeTrue();
 
-    assertToast($this->put(route('projects.certification-categories.restore', $category)), 'success');
+    assertToast($this->put(route('projects.settings.certification-categories.restore', $category)), 'success');
     expect($category->refresh()->trashed())->toBeFalse();
 
     $category->delete();
-    assertToast($this->delete(route('projects.certification-categories.force-delete', $category)), 'success');
+    assertToast($this->delete(route('projects.settings.certification-categories.force-delete', $category)), 'success');
 
     expect(CertificationCategory::withTrashed()->find($category->id))->toBeNull()
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'certification-category')->exists())->toBeTrue();
@@ -165,9 +165,9 @@ test('a category used by certifications cannot be deleted, deleted certification
     Certification::factory()->for($category, 'category')->create();
     Certification::factory()->for($category, 'category')->create()->delete();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.delete'));
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.delete'));
 
-    assertToast($this->delete(route('projects.certification-categories.destroy', $category)), 'warning')
+    assertToast($this->delete(route('projects.settings.certification-categories.destroy', $category)), 'warning')
         ->assertSessionHas('inertia.flash_data.toast.message', 'Used by 2 certifications. Move them to another category, or deactivate this one instead.');
 
     expect($category->refresh()->trashed())->toBeFalse();
@@ -178,9 +178,9 @@ test('a deleted category still used cannot be permanently deleted', function () 
     Certification::factory()->for($category, 'category')->create();
     $category->delete();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.force-delete'));
 
-    assertToast($this->delete(route('projects.certification-categories.force-delete', $category)), 'warning')
+    assertToast($this->delete(route('projects.settings.certification-categories.force-delete', $category)), 'warning')
         ->assertSessionHas('inertia.flash_data.toast.message', 'Used by one certification. Move it to another category, or deactivate this one instead.');
 
     expect(CertificationCategory::withTrashed()->find($category->id))->not->toBeNull();
@@ -191,9 +191,9 @@ test('bulk delete deletes the free categories and names the ones in use', functi
     $used = CertificationCategory::factory()->create(['code' => 'USED']);
     Certification::factory()->for($used, 'category')->create();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.delete'));
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.delete'));
 
-    assertToast($this->delete(route('projects.certification-categories.bulk-destroy'), ['ids' => [$free->id, $used->id]]), 'warning')
+    assertToast($this->delete(route('projects.settings.certification-categories.bulk-destroy'), ['ids' => [$free->id, $used->id]]), 'warning')
         ->assertSessionHas('inertia.flash_data.toast.message', '1 certification category moved to Deleted. Not deleted — USED: Used by one certification. Move it to another category, or deactivate this one instead.');
 
     expect($free->refresh()->trashed())->toBeTrue()
@@ -203,20 +203,20 @@ test('bulk delete deletes the free categories and names the ones in use', functi
 test('bulk delete and bulk permanent delete each need their own permission', function (string $route) {
     $category = CertificationCategory::factory()->create();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.view'))
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.view'))
         ->delete(route($route), ['ids' => [$category->id]])
         ->assertForbidden();
-})->with(['projects.certification-categories.bulk-destroy', 'projects.certification-categories.bulk-force-delete']);
+})->with(['projects.settings.certification-categories.bulk-destroy', 'projects.settings.certification-categories.bulk-force-delete']);
 
 test('bulk permanent delete removes the ticked deleted categories and records each', function () {
     [$first, $second] = CertificationCategory::factory()->count(2)->create();
     $first->delete();
     $second->delete();
 
-    $this->actingAs(userWithPermissions('projects.certification-categories.force-delete'));
+    $this->actingAs(userWithPermissions('projects.settings.certification-categories.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.certification-categories.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.certification-categories.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
 
     expect(CertificationCategory::withTrashed()->count())->toBe(0)
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'certification-category')->count())->toBe(2);

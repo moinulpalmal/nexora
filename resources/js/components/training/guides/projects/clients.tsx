@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Clients (`projects.clients.index`), with its New client / Edit
+ * Projects → Settings → Clients (`projects.settings.clients.index`), with its New client / Edit
  * dialog and the Deleted tab. Source: documentation/projects.md §4 (Clients).
  */
 export default function ClientsGuide() {
@@ -36,26 +36,28 @@ export default function ClientsGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.clients.view</Ui> opens the list;{' '}
-                            <Ui>projects.clients.create</Ui>,{' '}
-                            <Ui>projects.clients.update</Ui> and{' '}
-                            <Ui>projects.clients.delete</Ui> add, edit and
-                            delete; <Ui>projects.clients.restore</Ui> and{' '}
-                            <Ui>projects.clients.force-delete</Ui> work on the
-                            Deleted tab. The project-manager role holds them
-                            all. You also need a company to work in.
+                            <Ui>projects.settings.clients.view</Ui> opens the
+                            list; <Ui>projects.settings.clients.create</Ui>,{' '}
+                            <Ui>projects.settings.clients.update</Ui> and{' '}
+                            <Ui>projects.settings.clients.delete</Ui> add, edit
+                            and delete;{' '}
+                            <Ui>projects.settings.clients.restore</Ui> and{' '}
+                            <Ui>projects.settings.clients.force-delete</Ui> work
+                            on the Deleted tab. The project-manager role holds
+                            them all. You also need a company to work in.
                         </>
                     }
                     bn={
                         <>
-                            <Ui>projects.clients.view</Ui> থাকলে তালিকা খোলা
-                            যায়; <Ui>projects.clients.create</Ui>,{' '}
-                            <Ui>projects.clients.update</Ui> ও{' '}
-                            <Ui>projects.clients.delete</Ui> দিয়ে যোগ, সম্পাদনা
-                            ও মোছা যায়; <Ui>projects.clients.restore</Ui> ও{' '}
-                            <Ui>projects.clients.force-delete</Ui> Deleted
-                            ট্যাবে কাজ করে। project-manager রোলের কাছে এর
-                            সবগুলোই আছে। এর সাথে কাজ করার জন্য একটি কোম্পানিও
+                            <Ui>projects.settings.clients.view</Ui> থাকলে তালিকা
+                            খোলা যায়; <Ui>projects.settings.clients.create</Ui>
+                            , <Ui>projects.settings.clients.update</Ui> ও{' '}
+                            <Ui>projects.settings.clients.delete</Ui> দিয়ে যোগ,
+                            সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>projects.settings.clients.restore</Ui> ও{' '}
+                            <Ui>projects.settings.clients.force-delete</Ui>{' '}
+                            Deleted ট্যাবে কাজ করে। project-manager রোলের কাছে
+                            এর সবগুলোই আছে। এর সাথে কাজ করার জন্য একটি কোম্পানিও
                             লাগবে।
                         </>
                     }
@@ -72,8 +74,8 @@ export default function ClientsGuide() {
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Clients. The description under the title names the company the list belongs to. Search by code, name, contact person, phone or email in the row under the headings."
-                        bn="Projects → Clients খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে কোড, নাম, যোগাযোগকারী, ফোন বা ইমেইল দিয়ে খুঁজুন।"
+                        en="Open Projects → Settings → Clients. The description under the title names the company the list belongs to. Search by code, name, contact person, phone or email in the row under the headings."
+                        bn="Projects → Settings → Clients খুলুন। শিরোনামের নিচের বর্ণনায় তালিকাটি কোন কোম্পানির তা লেখা থাকে। শিরোনামের নিচের সারিতে কোড, নাম, যোগাযোগকারী, ফোন বা ইমেইল দিয়ে খুঁজুন।"
                     >
                         <Shot
                             id="overview"

@@ -24,7 +24,7 @@ sent mail). Business modules are added on top of it, one module per folder in ev
 ([§4](#4-the-organizing-rule)).
 
 The first business modules are **Project Management**, **Accounts** and **HRM**. Each is a 🧪 POC,
-two with their first slices built (Projects → Clients, Product Categories, Products, Suppliers, Supplier Categories, Tender Types, Units of Measure, Certification Categories, Certifications, Verification Items; HRM → Departments, Designations, Employees);
+two with their first slices built (Projects → Settings → Clients, Product Categories, Products, Suppliers, Supplier Categories, Tender Types, Units of Measure, Certification Categories, Certifications, Verification Items; HRM → Departments, Designations, Employees);
 their agreed scope is in [§5](#5-module-registry) and in their module docs.
 
 Accounts are **created by administrators only** — there is no public registration — and sign in with
@@ -157,7 +157,7 @@ routes/
   settings.php                the user's own account settings
   training.php                the in-app manual (ungated)
   projects.php, accounting.php, hrm.php   the ERP modules (🧪 POC: an overview each; projects.php
-                              also clients, product categories, products, suppliers, supplier categories, tender types, units, certification categories,
+                              also, under projects/settings/, clients, product categories, products, suppliers, supplier categories, tender types, units, certification categories,
                               certifications, verification items; hrm.php also departments, designations, employees and
                               their imports)
   channels.php                private broadcast channels
@@ -261,38 +261,40 @@ Customers, is Projects' own **Clients** (owner, 2026-11-02).
 **Projects** runs client projects from contract to billing request: projects for a client,
 milestones, tasks, members (Employees, each with a per-contract billing rate), approved timesheets,
 and budget against actual. It raises billing requests; it never issues invoices. Namespace
-`ProjectManagement`, prefix `projects.` so permission names stay short. **Built so far: the
+`ProjectManagement`, prefix `projects.` so permission names stay short. **Every list built so far is
+a setup list under Projects → Settings** (§6.2; owner, 2026-11-04); only Overview sits directly under
+Projects. **Built so far: the
 `ProjectStage` enum** (Upcoming, Evaluation, Running, On Hold, Completed, Cancelled — one stage at a
 time, free moves, reopening a closed one behind its own permission; owner, 2026-11-02) and **Clients**
-(`projects/clients`; owner, 2026-11-02) — **the ERP's one customer list**, company-scoped and
+(`projects/settings/clients`; owner, 2026-11-02) — **the ERP's one customer list**, company-scoped and
 restorable in the `hrm/departments` shape, with bulk delete and no import. Projects owns it because
 every project needs a client before Accounting exists; Accounting's invoices will point at the same
-rows. **Product Categories** (`projects/product-categories`; owner, 2026-11-03) are company-scoped and
+rows. **Product Categories** (`projects/settings/product-categories`; owner, 2026-11-03) are company-scoped and
 restorable in the Clients shape, without import, and **every company starts with a 13-row starter
-set** (§9.14). **Products** (`projects/products`; owner, 2026-11-03) are the first thing to point at
+set** (§9.14). **Products** (`projects/settings/products`; owner, 2026-11-03) are the first thing to point at
 a category: company-scoped and restorable in the Suppliers shape, each in one of its company's
 categories, which `ProductCategoryService::deletionBlocker()` then guards.
-**Tender Types** (`projects/tender-types`; owner, 2026-11-02) — how a project was procured —
+**Tender Types** (`projects/settings/tender-types`; owner, 2026-11-02) — how a project was procured —
 are group-wide, the second ERP exception to §9.10, in the `hrm/designations` shape without import.
-**Suppliers** (`projects/suppliers`; owner, 2026-11-02) are **the ERP's one supplier list** — Projects
+**Suppliers** (`projects/settings/suppliers`; owner, 2026-11-02) are **the ERP's one supplier list** — Projects
 keeps it as it keeps clients, and Accounting's bills will point at the same rows — company-scoped and
 restorable in the Clients shape, plus TIN/BIN, trade licence and one bank account, each classified by
-a required **Supplier Category** (`projects/supplier-categories`), group-wide (the third ERP exception
+a required **Supplier Category** (`projects/settings/supplier-categories`), group-wide (the third ERP exception
 to §9.10) and guarded against deletion while suppliers use it — the `Employee` → `Designation`
-pairing. Neither has an import. **Units of Measure** (`projects/units`, model `Unit`; owner,
+pairing. Neither has an import. **Units of Measure** (`projects/settings/units`, model `Unit`; owner,
 2026-11-02) — what a quantity is counted in, with a printed symbol and the decimal places a quantity
 in it takes — are group-wide, the fourth ERP exception to §9.10, in the Tender Types shape without
 import, and **seeded** with a standard set (`UnitSeeder`, §9.14) because no BOQ or bill line can be
 written without them. Nothing references a unit yet.
-**Certifications** (`projects/certifications`; owner, 2026-11-02) are a **catalogue of standards** —
+**Certifications** (`projects/settings/certifications`; owner, 2026-11-02) are a **catalogue of standards** —
 ISO 9001, amfori BSCI, CE, the BSTI mark — not certificates anyone holds (a held certificate, with its
 number and expiry, will be a table of its own pointing here). Each has a required **Certification
-Category** (`projects/certification-categories`) — the Supplier → Supplier Category pairing, both
+Category** (`projects/settings/certification-categories`) — the Supplier → Supplier Category pairing, both
 group-wide (the fifth and sixth ERP exceptions to §9.10), restorable, without import and **seeded**
 (`CertificationCategorySeeder`, `CertificationSeeder`, §9.14). A certification's code is unique; its
 name is unique per version. Nothing references a certification yet; the owner will name the screens
 that do.
-**Verification Items** (`projects/verification-items`; owner, 2026-11-03) are company-scoped and
+**Verification Items** (`projects/settings/verification-items`; owner, 2026-11-03) are company-scoped and
 restorable in the Product Categories shape, **with no code** (name, description, status only), no
 import and no starter set; what will use an item is still the owner's to name, so it has no
 deletion guard yet.
@@ -353,6 +355,13 @@ Create files with `php artisan make:* --no-interaction`.
 - **Permission names are `{module}.{resource}.{action}`, kebab-case** — `admin.users.reset-password`.
   The format is enforced by `RbacTest`.
 - URL segments are kebab-case plurals (`admin/audit-logs`, `admin/sent-mails`).
+- **A module's setup lists may sit under a `settings` level** (owner, 2026-11-04; Projects so far):
+  the menu reads Projects → Settings → Clients, the URL `projects/settings/clients`, the route name
+  `projects.settings.clients.index`, the permission `projects.settings.clients.view`. `settings` is
+  the one optional extra segment `RbacTest` allows; the resource of such a permission is
+  `settings.clients` (`PermissionDescriptions::resourceOf()`). Classes stay one level deep in the
+  module folder ([§4](#4-the-organizing-rule)). Settings has no page of its own, and a working screen
+  (projects, tasks, timesheets) stays beside it, not in it.
 
 ### 6.3 Database
 
@@ -367,7 +376,8 @@ Create files with `php artisan make:* --no-interaction`.
 
 ### 6.4 Frontend pages
 
-The page path mirrors the URL: `admin/users` → `pages/admin/users/index.tsx`. A single-record screen
+The page path mirrors the URL: `admin/users` → `pages/admin/users/index.tsx`,
+`projects/settings/clients` → `pages/projects/settings/clients/index.tsx`. A single-record screen
 with no collection is a flat file (`pages/admin/application-settings.tsx`). One page per list; create,
 edit and every other action are dialogs on it ([§8.6](#86-every-list-is-paginated-sortable-and-filtered-per-column)).
 
@@ -418,7 +428,11 @@ to that list, deliberately.
 `components/app-sidebar.tsx` builds one group per module (`Platform`, `Admin`, `Projects`, `Accounts`,
 `HRM`); each link is included
 only when `useCan('{module}.{resource}.view')` passes, and an empty group is not rendered. **Hiding a
-link is convenience, not authorization.** The one exception is **Training** (Platform, under
+link is convenience, not authorization.** A group's item may be a **parent row** (`NavParent`,
+Projects → Settings, owner, 2026-11-04): it links nowhere, opens its links under it and is hidden
+when none of them are visible. Its open state shares the groups' set and cookie under the key
+`Projects/Settings`. `SidebarMenuSub` is `display: none` in the icon rail, so `NavMain` draws a
+parent's links flat there. The one exception is **Training** (Platform, under
 Dashboard), which has no `useCan` because the manual is open to everyone. The header's **?**
 (`TrainingHelpButton`, beside the bell in `app-sidebar-header.tsx`) is not a nav item; it renders only
 when the `training` prop names a guide for the screen. Groups collapse; the state lives in the `sidebar_groups`
@@ -520,9 +534,9 @@ A confirmation raised from inside another dialog closes its parent through `onSu
   permissions back from one role after its rules match: `hr-officer` gets no
   `hrm.designations.{delete,restore,force-delete}`, because a designation is shared by every company
   and an officer works for one (owner, 2026-10-29); `project-manager` likewise gets no
-  `projects.tender-types.{delete,restore,force-delete}` or
-  `projects.units.{delete,restore,force-delete}`, nor the same three on
-  `projects.certification-categories` and `projects.certifications` (owner, 2026-11-02).
+  `projects.settings.tender-types.{delete,restore,force-delete}` or
+  `projects.settings.units.{delete,restore,force-delete}`, nor the same three on
+  `projects.settings.certification-categories` and `projects.settings.certifications` (owner, 2026-11-02).
 - **`super-admin` passes every check** through `Gate::before` in `AppServiceProvider`. Routes and the
   UI check **permissions, never role names**.
 - **Authorization = route `permission:` middleware + service `*Blocker()` guards. No Policy classes**
@@ -653,8 +667,8 @@ them (owner, 2026-10-26). The buttons submit the real login form.
 *(owner, 2026-10-28; built 2026-10-29)* One installation serves one organization's companies — one or several.
 **Every Projects, Accounting and HRM record carries its company**, and each company has its own
 ledger, fiscal years and payroll. **The exceptions are HRM → Designations** (owner, 2026-10-29), **Projects
-→ Tender Types, Projects → Supplier Categories, Projects → Units of Measure, Projects → Certification
-Categories and Projects → Certifications** (owner, 2026-11-02): group-wide lists with no `company_id`
+→ Tender Types, Projects → Settings → Supplier Categories, Projects → Settings → Units of Measure, Projects → Settings → Certification
+Categories and Projects → Settings → Certifications** (owner, 2026-11-02): group-wide lists with no `company_id`
 — the same job titles, the same procurement methods, the same supplier classes, the same units, the
 same standards, for every company — in the master-crud *global* shape
 (restorable, unique across the table, no `BelongsToCompany`, no no-company panel). Add another
@@ -779,7 +793,7 @@ that can only return `null` reads as a guard while guarding nothing. Blockers li
 never a policy ([§9.1](#91-rbac-roles--permissions)).
 
 **Master tables ship empty** — rows arrive by import or by hand — **except Admin → Countries,
-Projects → Units of Measure and Projects → Certifications with their categories** (owner,
+Projects → Settings → Units of Measure and Projects → Settings → Certifications with their categories** (owner,
 2026-11-02): standard lists every installation needs, so `CountrySeeder` inserts the ISO 3166-1
 countries, `ProjectManagement\UnitSeeder` 27 common units (pieces, kilograms, square metres, hours…),
 and `CertificationCategorySeeder` then `CertificationSeeder` 16 categories and the common ISO,
@@ -790,7 +804,7 @@ on the next seed. Countries are group-wide like
 HRM → Designations, but they are Admin's, not an ERP record, so they are not among §9.10's ERP
 exceptions.
 
-**Projects → Product Categories is the one seeded master kept per company** (owner, 2026-11-03). A
+**Projects → Settings → Product Categories is the one seeded master kept per company** (owner, 2026-11-03). A
 seeder cannot know a company that does not exist yet, so the starter set (`ProductCategoryService::
 STARTER`) is written **when a company is created** — `CompanyService::create()`, in the same
 transaction, audited as the creator's — and `ProductCategorySeeder` only back-fills companies that

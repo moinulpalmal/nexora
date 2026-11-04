@@ -74,13 +74,11 @@ class PermissionService
      */
     protected function describe(Permission $permission): array
     {
-        [, $resource, $action] = array_pad(explode('.', $permission->name, 3), 3, '');
-
         return [
             'id' => $permission->id,
             'name' => $permission->name,
-            'resource' => $resource,
-            'action' => $action,
+            'resource' => PermissionDescriptions::resourceOf($permission->name),
+            'action' => PermissionDescriptions::actionOf($permission->name),
             'help' => $this->descriptions->for($permission->name),
         ];
     }

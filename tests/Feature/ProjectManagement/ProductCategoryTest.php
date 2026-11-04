@@ -12,10 +12,10 @@ use Database\Seeders\ProjectManagement\ProductCategorySeeder;
 
 /*
 |--------------------------------------------------------------------------
-| Projects → Product Categories
+| Projects → Settings → Product Categories
 |--------------------------------------------------------------------------
 |
-| Company-scoped as Projects → Clients (ARCHITECTURE.md §9.10): every read and
+| Company-scoped as Projects → Settings → Clients (ARCHITECTURE.md §9.10): every read and
 | write is the selected company's, `company_id` never comes from the browser,
 | and code and name are unique per company — ignoring case, deleted rows
 | included. Every company starts with a starter set (owner, 2026-11-03).
@@ -54,12 +54,12 @@ function productCategoryPayload(array $overrides = []): array
 */
 
 test('guests are sent to the login page', function () {
-    $this->get(route('projects.product-categories.index'))->assertRedirect(route('login'));
+    $this->get(route('projects.settings.product-categories.index'))->assertRedirect(route('login'));
 });
 
 test('the list is refused without the view permission', function () {
     $this->actingAs(productCategoryActor(Company::factory()->create()))
-        ->get(route('projects.product-categories.index'))
+        ->get(route('projects.settings.product-categories.index'))
         ->assertForbidden();
 });
 
@@ -71,19 +71,19 @@ test('each write is refused without its own permission', function (string $metho
         $category->delete();
     }
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.view'))
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.view'))
         ->{$method}(route($route, $category), productCategoryPayload())
         ->assertForbidden();
 })->with([
-    'update' => ['put', 'projects.product-categories.update', false],
-    'delete' => ['delete', 'projects.product-categories.destroy', false],
-    'restore' => ['put', 'projects.product-categories.restore', true],
-    'force delete' => ['delete', 'projects.product-categories.force-delete', true],
+    'update' => ['put', 'projects.settings.product-categories.update', false],
+    'delete' => ['delete', 'projects.settings.product-categories.destroy', false],
+    'restore' => ['put', 'projects.settings.product-categories.restore', true],
+    'force delete' => ['delete', 'projects.settings.product-categories.force-delete', true],
 ]);
 
 test('creating is refused without the create permission', function () {
-    $this->actingAs(productCategoryActor(Company::factory()->create(), 'projects.product-categories.view'))
-        ->post(route('projects.product-categories.store'), productCategoryPayload())
+    $this->actingAs(productCategoryActor(Company::factory()->create(), 'projects.settings.product-categories.view'))
+        ->post(route('projects.settings.product-categories.store'), productCategoryPayload())
         ->assertForbidden();
 });
 
@@ -94,8 +94,8 @@ test('the project-manager role holds every product category permission and the v
     $viewer = User::factory()->create()->assignRole('viewer');
 
     foreach (['view', 'create', 'update', 'delete', 'restore', 'force-delete'] as $action) {
-        expect($manager->can("projects.product-categories.{$action}"))->toBeTrue()
-            ->and($viewer->can("projects.product-categories.{$action}"))->toBe($action === 'view');
+        expect($manager->can("projects.settings.product-categories.{$action}"))->toBeTrue()
+            ->and($viewer->can("projects.settings.product-categories.{$action}"))->toBe($action === 'view');
     }
 });
 
@@ -108,11 +108,11 @@ test('the list shows only the selected company\'s categories', function () {
     ProductCategory::factory()->for($mine)->create(['code' => 'MINE']);
     ProductCategory::factory()->for($theirs)->create(['code' => 'THEIRS']);
 
-    $this->actingAs(productCategoryActor($mine, 'projects.product-categories.view'))
-        ->get(route('projects.product-categories.index'))
+    $this->actingAs(productCategoryActor($mine, 'projects.settings.product-categories.view'))
+        ->get(route('projects.settings.product-categories.index'))
         ->assertOk()
         ->assertInertia(fn ($page) => $page
-            ->component('projects/product-categories/index')
+            ->component('projects/settings/product-categories/index')
             ->where('company.id', $mine->id)
             ->has('categories.data', 1)
             ->where('categories.data.0.code', 'MINE')
@@ -125,8 +125,8 @@ test('the deleted tab lists only deleted categories', function () {
     ProductCategory::factory()->for($company)->create(['code' => 'LIVE']);
     ProductCategory::factory()->for($company)->create(['code' => 'GONE'])->delete();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.view'))
-        ->get(route('projects.product-categories.index', ['view' => 'trashed']))
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.view'))
+        ->get(route('projects.settings.product-categories.index', ['view' => 'trashed']))
         ->assertInertia(fn ($page) => $page
             ->has('categories.data', 1)
             ->where('categories.data.0.code', 'GONE')
@@ -138,21 +138,21 @@ test('another company\'s category is a 404', function (string $method, string $r
     [$mine, $theirs] = Company::factory()->count(2)->create();
     $foreign = ProductCategory::factory()->for($theirs)->create();
 
-    $this->actingAs(productCategoryActor($mine, 'projects.product-categories.update', 'projects.product-categories.delete'))
+    $this->actingAs(productCategoryActor($mine, 'projects.settings.product-categories.update', 'projects.settings.product-categories.delete'))
         ->{$method}(route($route, $foreign), productCategoryPayload())
         ->assertNotFound();
 })->with([
-    'update' => ['put', 'projects.product-categories.update'],
-    'delete' => ['delete', 'projects.product-categories.destroy'],
+    'update' => ['put', 'projects.settings.product-categories.update'],
+    'delete' => ['delete', 'projects.settings.product-categories.destroy'],
 ]);
 
 test('with no company selected the page says so and lists nothing', function () {
     ProductCategory::factory()->create();
-    $user = userWithPermissions('projects.product-categories.view');
+    $user = userWithPermissions('projects.settings.product-categories.view');
     $user->companies()->attach(Company::factory()->count(2)->create());
 
     $this->actingAs($user)
-        ->get(route('projects.product-categories.index'))
+        ->get(route('projects.settings.product-categories.index'))
         ->assertInertia(fn ($page) => $page
             ->where('company', null)
             ->has('categories.data', 0),
@@ -162,17 +162,17 @@ test('with no company selected the page says so and lists nothing', function () 
 test('a category lands in the selected company whatever company_id is posted', function () {
     [$mine, $theirs] = Company::factory()->count(2)->create();
 
-    $this->actingAs(productCategoryActor($mine, 'projects.product-categories.create'));
+    $this->actingAs(productCategoryActor($mine, 'projects.settings.product-categories.create'));
 
-    assertToast($this->post(route('projects.product-categories.store'), productCategoryPayload(['company_id' => $theirs->id])), 'success');
+    assertToast($this->post(route('projects.settings.product-categories.store'), productCategoryPayload(['company_id' => $theirs->id])), 'success');
 
     expect(ProductCategory::withoutGlobalScopes()->sole()->company_id)->toBe($mine->id);
 });
 
 test('creating without a selected company is refused', function () {
-    $user = userWithPermissions('projects.product-categories.create');
+    $user = userWithPermissions('projects.settings.product-categories.create');
 
-    assertToast($this->actingAs($user)->post(route('projects.product-categories.store'), productCategoryPayload()), 'warning');
+    assertToast($this->actingAs($user)->post(route('projects.settings.product-categories.store'), productCategoryPayload()), 'warning');
 
     expect(ProductCategory::withoutGlobalScopes()->count())->toBe(0);
 });
@@ -184,8 +184,8 @@ test('creating without a selected company is refused', function () {
 test('a category is created with its values tidied and an empty description saved as null', function () {
     $company = Company::factory()->create();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.create'))
-        ->post(route('projects.product-categories.store'), productCategoryPayload([
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.create'))
+        ->post(route('projects.settings.product-categories.store'), productCategoryPayload([
             'code' => ' raw-01 ',
             'name' => ' Raw   Materials ',
             'description' => '',
@@ -200,8 +200,8 @@ test('a category is created with its values tidied and an empty description save
 });
 
 test('a malformed field is refused', function (string $field, string $value) {
-    $this->actingAs(productCategoryActor(Company::factory()->create(), 'projects.product-categories.create'))
-        ->post(route('projects.product-categories.store'), productCategoryPayload([$field => $value]))
+    $this->actingAs(productCategoryActor(Company::factory()->create(), 'projects.settings.product-categories.create'))
+        ->post(route('projects.settings.product-categories.store'), productCategoryPayload([$field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
     'code missing' => ['code', ''],
@@ -215,8 +215,8 @@ test('a code or name already used in the company is refused whatever its case', 
     $company = Company::factory()->create();
     ProductCategory::factory()->for($company)->create(['code' => 'RAW', 'name' => 'Raw Materials']);
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.create'))
-        ->post(route('projects.product-categories.store'), productCategoryPayload(['code' => 'OTHER', 'name' => 'Other', $field => $value]))
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.create'))
+        ->post(route('projects.settings.product-categories.store'), productCategoryPayload(['code' => 'OTHER', 'name' => 'Other', $field => $value]))
         ->assertSessionHasErrors($field);
 })->with([
     'code, lower case' => ['code', 'raw'],
@@ -227,8 +227,8 @@ test('the same code and name are allowed in another company', function () {
     [$mine, $theirs] = Company::factory()->count(2)->create();
     ProductCategory::factory()->for($theirs)->create(['code' => 'RAW', 'name' => 'Raw Materials']);
 
-    $this->actingAs(productCategoryActor($mine, 'projects.product-categories.create'))
-        ->post(route('projects.product-categories.store'), productCategoryPayload())
+    $this->actingAs(productCategoryActor($mine, 'projects.settings.product-categories.create'))
+        ->post(route('projects.settings.product-categories.store'), productCategoryPayload())
         ->assertSessionHasNoErrors();
 
     expect(ProductCategory::withoutGlobalScopes()->where('code', 'RAW')->count())->toBe(2);
@@ -238,8 +238,8 @@ test('a deleted category keeps its code and name reserved and says to restore it
     $company = Company::factory()->create();
     ProductCategory::factory()->for($company)->create(['code' => 'RAW', 'name' => 'Raw Materials'])->delete();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.create'))
-        ->post(route('projects.product-categories.store'), productCategoryPayload())
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.create'))
+        ->post(route('projects.settings.product-categories.store'), productCategoryPayload())
         ->assertSessionHasErrors([
             'code' => 'The code "RAW" belongs to a deleted product category in this company. Restore it from the Deleted tab instead.',
             'name' => 'A deleted product category in this company is named "Raw Materials". Restore it from the Deleted tab instead.',
@@ -250,8 +250,8 @@ test('a category can be edited, keeping its own code and name', function () {
     $company = Company::factory()->create();
     $category = ProductCategory::factory()->for($company)->create(['code' => 'RAW', 'name' => 'Raw Materials']);
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.update'))
-        ->put(route('projects.product-categories.update', $category), productCategoryPayload(['status' => RecordStatus::Inactive->value, 'description' => 'Unprocessed inputs.']))
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.update'))
+        ->put(route('projects.settings.product-categories.update', $category), productCategoryPayload(['status' => RecordStatus::Inactive->value, 'description' => 'Unprocessed inputs.']))
         ->assertSessionHasNoErrors();
 
     expect($category->refresh()->status)->toBe(RecordStatus::Inactive)
@@ -262,17 +262,17 @@ test('a category is soft deleted, restored and permanently deleted', function ()
     $company = Company::factory()->create();
     $category = ProductCategory::factory()->for($company)->create();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.delete', 'projects.product-categories.restore', 'projects.product-categories.force-delete'));
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.delete', 'projects.settings.product-categories.restore', 'projects.settings.product-categories.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.product-categories.destroy', $category)), 'success');
+    assertToast($this->delete(route('projects.settings.product-categories.destroy', $category)), 'success');
     expect($category->refresh()->trashed())->toBeTrue();
 
-    assertToast($this->put(route('projects.product-categories.restore', $category)), 'success');
+    assertToast($this->put(route('projects.settings.product-categories.restore', $category)), 'success');
     expect($category->refresh()->trashed())->toBeFalse();
 
     $category->delete();
-    assertToast($this->delete(route('projects.product-categories.force-delete', $category)), 'success');
+    assertToast($this->delete(route('projects.settings.product-categories.force-delete', $category)), 'success');
 
     expect(ProductCategory::withoutGlobalScopes()->withTrashed()->find($category->id))->toBeNull()
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'product-category')->exists())->toBeTrue();
@@ -281,10 +281,10 @@ test('a category is soft deleted, restored and permanently deleted', function ()
 test('creating a category is audited with its company', function () {
     $company = Company::factory()->create();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.create'));
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.create'));
     config(['audit.console' => true]);
 
-    $this->post(route('projects.product-categories.store'), productCategoryPayload());
+    $this->post(route('projects.settings.product-categories.store'), productCategoryPayload());
 
     $audit = AuditLog::where('event', 'created')->where('auditable_type', 'product-category')->sole();
 
@@ -300,19 +300,19 @@ test('bulk delete and bulk permanent delete each need their own permission', fun
     $company = Company::factory()->create();
     $category = ProductCategory::factory()->for($company)->create();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.view'))
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.view'))
         ->delete(route($route), ['ids' => [$category->id]])
         ->assertForbidden();
-})->with(['projects.product-categories.bulk-destroy', 'projects.product-categories.bulk-force-delete']);
+})->with(['projects.settings.product-categories.bulk-destroy', 'projects.settings.product-categories.bulk-force-delete']);
 
 test('bulk delete moves the ticked categories to Deleted, never another company\'s', function () {
     [$mine, $theirs] = Company::factory()->count(2)->create();
     [$first, $second] = ProductCategory::factory()->for($mine)->count(2)->create();
     $foreign = ProductCategory::factory()->for($theirs)->create();
 
-    $this->actingAs(productCategoryActor($mine, 'projects.product-categories.delete'));
+    $this->actingAs(productCategoryActor($mine, 'projects.settings.product-categories.delete'));
 
-    $response = $this->delete(route('projects.product-categories.bulk-destroy'), ['ids' => [$first->id, $second->id, $foreign->id]]);
+    $response = $this->delete(route('projects.settings.product-categories.bulk-destroy'), ['ids' => [$first->id, $second->id, $foreign->id]]);
 
     assertToast($response, 'success')->assertSessionHas('inertia.flash_data.toast.message', '2 product categories moved to Deleted.');
 
@@ -327,10 +327,10 @@ test('bulk permanent delete removes the ticked deleted categories and records ea
     $first->delete();
     $second->delete();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.force-delete'));
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.force-delete'));
     config(['audit.console' => true]);
 
-    assertToast($this->delete(route('projects.product-categories.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
+    assertToast($this->delete(route('projects.settings.product-categories.bulk-force-delete'), ['ids' => [$first->id, $second->id]]), 'success');
 
     expect(ProductCategory::withoutGlobalScopes()->withTrashed()->count())->toBe(0)
         ->and(AuditLog::where('event', 'force-deleted')->where('auditable_type', 'product-category')->count())->toBe(2);
@@ -350,11 +350,11 @@ test('a category any product is in cannot be deleted or permanently deleted', fu
         $category->delete();
     }
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.delete', 'projects.product-categories.force-delete'));
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.delete', 'projects.settings.product-categories.force-delete'));
 
     $response = $trashed
-        ? $this->delete(route('projects.product-categories.force-delete', $category))
-        : $this->delete(route('projects.product-categories.destroy', $category));
+        ? $this->delete(route('projects.settings.product-categories.force-delete', $category))
+        : $this->delete(route('projects.settings.product-categories.destroy', $category));
 
     assertToast($response, 'warning')->assertSessionHas('inertia.flash_data.toast.message', 'Used by 2 products. Move them to another category, or deactivate this one instead.');
 
@@ -366,8 +366,8 @@ test('a category in use can still be deactivated', function () {
     $category = ProductCategory::factory()->for($company)->create(['code' => 'RAW', 'name' => 'Raw Materials']);
     Product::factory()->for($company)->for($category, 'category')->create();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.update'))
-        ->put(route('projects.product-categories.update', $category), productCategoryPayload(['status' => RecordStatus::Inactive->value]))
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.update'))
+        ->put(route('projects.settings.product-categories.update', $category), productCategoryPayload(['status' => RecordStatus::Inactive->value]))
         ->assertSessionHasNoErrors();
 
     expect($category->refresh()->status)->toBe(RecordStatus::Inactive);
@@ -379,9 +379,9 @@ test('bulk delete deletes the free categories and names the ones in use', functi
     $used = ProductCategory::factory()->for($company)->create(['code' => 'USED']);
     Product::factory()->for($company)->for($used, 'category')->create();
 
-    $this->actingAs(productCategoryActor($company, 'projects.product-categories.delete'));
+    $this->actingAs(productCategoryActor($company, 'projects.settings.product-categories.delete'));
 
-    $response = $this->delete(route('projects.product-categories.bulk-destroy'), ['ids' => [$free->id, $used->id]]);
+    $response = $this->delete(route('projects.settings.product-categories.bulk-destroy'), ['ids' => [$free->id, $used->id]]);
 
     assertToast($response, 'warning')->assertSessionHas(
         'inertia.flash_data.toast.message',

@@ -128,53 +128,53 @@ return [
             'title_en' => 'Projects overview', 'title_bn' => 'প্রকল্পের সারসংক্ষেপ', 'status' => 'pending',
             'shots' => [],
         ],
-        'projects.clients' => [
-            'route' => 'projects.clients.index', 'guide' => 'projects/clients', 'section' => 'projects', 'sort' => 20,
+        'projects.settings.clients' => [
+            'route' => 'projects.settings.clients.index', 'guide' => 'projects/clients', 'section' => 'projects', 'sort' => 20,
             'title_en' => 'Clients', 'title_bn' => 'ক্লায়েন্ট', 'status' => 'written',
             'shots' => ['overview' => 'The clients of an invented company', 'form' => 'The New client dialog'],
         ],
-        'projects.product-categories' => [
-            'route' => 'projects.product-categories.index', 'guide' => 'projects/product-categories', 'section' => 'projects', 'sort' => 22,
+        'projects.settings.product-categories' => [
+            'route' => 'projects.settings.product-categories.index', 'guide' => 'projects/product-categories', 'section' => 'projects', 'sort' => 22,
             'title_en' => 'Product categories', 'title_bn' => 'পণ্যের শ্রেণি', 'status' => 'written',
             'shots' => ['overview' => 'The product categories of an invented company', 'form' => 'The New product category dialog'],
         ],
-        'projects.products' => [
-            'route' => 'projects.products.index', 'guide' => 'projects/products', 'section' => 'projects', 'sort' => 23,
+        'projects.settings.products' => [
+            'route' => 'projects.settings.products.index', 'guide' => 'projects/products', 'section' => 'projects', 'sort' => 23,
             'title_en' => 'Products', 'title_bn' => 'পণ্য', 'status' => 'written',
             'shots' => ['overview' => 'The products of an invented company', 'form' => 'The New product dialog'],
         ],
-        'projects.supplier-categories' => [
-            'route' => 'projects.supplier-categories.index', 'guide' => 'projects/supplier-categories', 'section' => 'projects', 'sort' => 24,
+        'projects.settings.supplier-categories' => [
+            'route' => 'projects.settings.supplier-categories.index', 'guide' => 'projects/supplier-categories', 'section' => 'projects', 'sort' => 24,
             'title_en' => 'Supplier categories', 'title_bn' => 'সরবরাহকারীর শ্রেণি', 'status' => 'written',
             'shots' => ['overview' => 'The supplier categories every company shares', 'form' => 'The New supplier category dialog'],
         ],
-        'projects.suppliers' => [
-            'route' => 'projects.suppliers.index', 'guide' => 'projects/suppliers', 'section' => 'projects', 'sort' => 26,
+        'projects.settings.suppliers' => [
+            'route' => 'projects.settings.suppliers.index', 'guide' => 'projects/suppliers', 'section' => 'projects', 'sort' => 26,
             'title_en' => 'Suppliers', 'title_bn' => 'সরবরাহকারী', 'status' => 'written',
             'shots' => ['overview' => 'The suppliers of an invented company', 'form' => 'The New supplier dialog'],
         ],
-        'projects.tender-types' => [
-            'route' => 'projects.tender-types.index', 'guide' => 'projects/tender-types', 'section' => 'projects', 'sort' => 30,
+        'projects.settings.tender-types' => [
+            'route' => 'projects.settings.tender-types.index', 'guide' => 'projects/tender-types', 'section' => 'projects', 'sort' => 30,
             'title_en' => 'Tender types', 'title_bn' => 'দরপত্রের ধরন', 'status' => 'written',
             'shots' => ['overview' => 'The tender types every company shares', 'form' => 'The New tender type dialog'],
         ],
-        'projects.units' => [
-            'route' => 'projects.units.index', 'guide' => 'projects/units', 'section' => 'projects', 'sort' => 40,
+        'projects.settings.units' => [
+            'route' => 'projects.settings.units.index', 'guide' => 'projects/units', 'section' => 'projects', 'sort' => 40,
             'title_en' => 'Units of measure', 'title_bn' => 'পরিমাপের একক', 'status' => 'written',
             'shots' => ['overview' => 'The standard units every company shares', 'form' => 'The New unit dialog'],
         ],
-        'projects.certification-categories' => [
-            'route' => 'projects.certification-categories.index', 'guide' => 'projects/certification-categories', 'section' => 'projects', 'sort' => 50,
+        'projects.settings.certification-categories' => [
+            'route' => 'projects.settings.certification-categories.index', 'guide' => 'projects/certification-categories', 'section' => 'projects', 'sort' => 50,
             'title_en' => 'Certification categories', 'title_bn' => 'সার্টিফিকেশনের শ্রেণি', 'status' => 'written',
             'shots' => ['overview' => 'The certification categories every company shares', 'form' => 'The New certification category dialog'],
         ],
-        'projects.certifications' => [
-            'route' => 'projects.certifications.index', 'guide' => 'projects/certifications', 'section' => 'projects', 'sort' => 52,
+        'projects.settings.certifications' => [
+            'route' => 'projects.settings.certifications.index', 'guide' => 'projects/certifications', 'section' => 'projects', 'sort' => 52,
             'title_en' => 'Certifications', 'title_bn' => 'সার্টিফিকেশন', 'status' => 'written',
             'shots' => ['overview' => 'The standard certifications every company shares', 'form' => 'The New certification dialog'],
         ],
-        'projects.verification-items' => [
-            'route' => 'projects.verification-items.index', 'guide' => 'projects/verification-items', 'section' => 'projects', 'sort' => 60,
+        'projects.settings.verification-items' => [
+            'route' => 'projects.settings.verification-items.index', 'guide' => 'projects/verification-items', 'section' => 'projects', 'sort' => 60,
             'title_en' => 'Verification items', 'title_bn' => 'যাচাইয়ের বিষয়', 'status' => 'written',
             'shots' => ['overview' => 'The verification items of an invented company', 'form' => 'The New verification item dialog'],
         ],

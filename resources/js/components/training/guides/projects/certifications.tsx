@@ -19,7 +19,7 @@ import {
 import { RECORD_STATUS_LABELS } from '@/lib/enums';
 
 /**
- * Projects → Certifications (`projects.certifications.index`), with its New
+ * Projects → Settings → Certifications (`projects.settings.certifications.index`), with its New
  * certification / Edit dialog and the Deleted tab. Source:
  * documentation/projects.md §4 (Certifications).
  */
@@ -37,12 +37,17 @@ export default function CertificationsGuide() {
                 <Para
                     en={
                         <>
-                            <Ui>projects.certifications.view</Ui> opens the
-                            list; <Ui>projects.certifications.create</Ui>,{' '}
-                            <Ui>projects.certifications.update</Ui> and{' '}
-                            <Ui>projects.certifications.delete</Ui> add, edit
-                            and delete; <Ui>projects.certifications.restore</Ui>{' '}
-                            and <Ui>projects.certifications.force-delete</Ui>{' '}
+                            <Ui>projects.settings.certifications.view</Ui> opens
+                            the list;{' '}
+                            <Ui>projects.settings.certifications.create</Ui>,{' '}
+                            <Ui>projects.settings.certifications.update</Ui> and{' '}
+                            <Ui>projects.settings.certifications.delete</Ui>{' '}
+                            add, edit and delete;{' '}
+                            <Ui>projects.settings.certifications.restore</Ui>{' '}
+                            and{' '}
+                            <Ui>
+                                projects.settings.certifications.force-delete
+                            </Ui>{' '}
                             work on the Deleted tab. The project-manager role
                             may view, add and edit, but not delete or restore:
                             the list is shared, so removing a certification is
@@ -52,13 +57,16 @@ export default function CertificationsGuide() {
                     }
                     bn={
                         <>
-                            <Ui>projects.certifications.view</Ui> থাকলে তালিকা
-                            খোলা যায়; <Ui>projects.certifications.create</Ui>,{' '}
-                            <Ui>projects.certifications.update</Ui> ও{' '}
-                            <Ui>projects.certifications.delete</Ui> দিয়ে যোগ,
-                            সম্পাদনা ও মোছা যায়;{' '}
-                            <Ui>projects.certifications.restore</Ui> ও{' '}
-                            <Ui>projects.certifications.force-delete</Ui>{' '}
+                            <Ui>projects.settings.certifications.view</Ui> থাকলে
+                            তালিকা খোলা যায়;{' '}
+                            <Ui>projects.settings.certifications.create</Ui>,{' '}
+                            <Ui>projects.settings.certifications.update</Ui> ও{' '}
+                            <Ui>projects.settings.certifications.delete</Ui>{' '}
+                            দিয়ে যোগ, সম্পাদনা ও মোছা যায়;{' '}
+                            <Ui>projects.settings.certifications.restore</Ui> ও{' '}
+                            <Ui>
+                                projects.settings.certifications.force-delete
+                            </Ui>{' '}
                             Deleted ট্যাবে কাজ করে। project-manager রোল দেখতে,
                             যোগ করতে ও সম্পাদনা করতে পারে, কিন্তু মুছতে বা
                             ফিরিয়ে আনতে পারে না: তালিকাটি সবার, তাই
@@ -79,8 +87,8 @@ export default function CertificationsGuide() {
             <GuideSection kind="steps">
                 <Steps>
                     <Step
-                        en="Open Projects → Certifications. Search by code, name, category, issuing body or version in the row under the headings."
-                        bn="Projects → Certifications খুলুন। শিরোনামের নিচের সারিতে কোড, নাম, শ্রেণি, প্রদানকারী সংস্থা বা সংস্করণ দিয়ে খুঁজুন।"
+                        en="Open Projects → Settings → Certifications. Search by code, name, category, issuing body or version in the row under the headings."
+                        bn="Projects → Settings → Certifications খুলুন। শিরোনামের নিচের সারিতে কোড, নাম, শ্রেণি, প্রদানকারী সংস্থা বা সংস্করণ দিয়ে খুঁজুন।"
                     >
                         <Shot
                             id="overview"
@@ -227,7 +235,7 @@ export default function CertificationsGuide() {
 
             <GuideSection kind="related">
                 <RelatedGuide
-                    to="projects.certification-categories"
+                    to="projects.settings.certification-categories"
                     en="The categories certifications are filed under."
                     bn="যে শ্রেণিগুলোতে সার্টিফিকেশন রাখা হয়।"
                 />

@@ -5,7 +5,7 @@ import { Building2 } from 'lucide-react';
  * Drawn in place of a company-scoped list when no company is selected
  * (ARCHITECTURE.md §9.10) — "no access" must never read as "no data".
  *
- * In `components/shared/` since Projects → Clients became its second module's
+ * In `components/shared/` since Projects → Settings → Clients became its second module's
  * user, after HRM (§6.5).
  */
 export default function NoCompanyPanel() {

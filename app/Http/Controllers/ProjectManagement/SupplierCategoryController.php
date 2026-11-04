@@ -14,7 +14,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Projects → Supplier Categories: a group-wide list (ARCHITECTURE.md §9.10),
+ * Projects → Settings → Supplier Categories: a group-wide list (ARCHITECTURE.md §9.10),
  * shaped as {@see TenderTypeController} with the deletion guard of
  * `Hrm\DesignationController` — suppliers point here. The page works whether
  * or not a company is selected.
@@ -46,7 +46,7 @@ class SupplierCategoryController extends Controller
                 'deleted_at' => $category->deleted_at?->toDateString(),
             ]);
 
-        return Inertia::render('projects/supplier-categories/index', [
+        return Inertia::render('projects/settings/supplier-categories/index', [
             'supplierCategories' => $categories,
             'statuses' => RecordStatus::options(),
             'sortable' => SupplierCategory::SORTABLE,
