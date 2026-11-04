@@ -64,7 +64,7 @@ Seeded accounts (non-production), all with the password `password`:
 composer ci:check
 ```
 
-Runs ESLint, Prettier, tsc, Pint, PHPStan and the Pest tests. Browser tests need a one-time
+Runs ESLint, Prettier, tsc, a production `npm audit`, Pint, PHPStan and the Pest tests. Browser tests need a one-time
 `npx playwright install chromium`, then:
 
 ```bash

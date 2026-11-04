@@ -894,7 +894,7 @@ module adds its row to `MODULE_DOCS` in the hook ([§11](#11-adding-a-new-module
 | `php artisan migrate:fresh --seed` | roles + permissions, the super admin (`SUPER_ADMIN_*`), demo `admin`/`viewer` outside production |
 | `php artisan test --compact` | the Pest suite |
 | `php artisan test -c phpunit.browser.xml` | browser tests (after `npm run build`) |
-| `composer ci:check` | ESLint, Prettier, `tsc`, Pint, PHPStan L7, Pest |
+| `composer ci:check` | ESLint, Prettier, `tsc`, `npm audit --omit=dev`, Pint, PHPStan L7, Pest |
 | `php artisan enums:sync` | regenerate `lib/enums.ts` |
 | `php artisan wayfinder:generate --with-form` | regenerate Wayfinder output |
 | `php artisan training:gaps` | list every screen, guide, screenshot or translation the manual is missing (always exits 0; the gate is `TrainingGapsTest`) |

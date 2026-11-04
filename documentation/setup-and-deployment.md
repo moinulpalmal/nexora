@@ -76,13 +76,28 @@ A `queue:listen` keeps the environment it started with: **restart it after editi
 ## 4. Quality gates
 
 ```bash
-composer ci:check                          # ESLint, Prettier, tsc, Pint, PHPStan L7, Pest
+composer ci:check                          # ESLint, Prettier, tsc, production npm audit, Pint, PHPStan L7, Pest
 php artisan test --compact                 # Pest only
 npm run build && php artisan test -c phpunit.browser.xml   # browser tests
 ```
 
 The suite runs on in-memory SQLite and **refuses** to run against MySQL
 ([`ARCHITECTURE.md` §13.1](../ARCHITECTURE.md#131-the-suite-never-touches-the-development-database)).
+
+### 4.1 npm audit
+
+`composer ci:check` runs `npm audit --omit=dev`, which needs registry access and fails on any
+vulnerability in a production dependency. Dev-only findings do not fail it.
+
+**Never run `npm audit fix --force`.** It downgraded ESLint to 4.0.0 and other lint packages, which
+stopped `npm run lint:check` from working and added high-severity findings. If it has been run, restore
+`package.json` and `package-lock.json` from git and run `npm ci`.
+
+**Accepted risk (owner, 2026-11-04):** plain `npm audit` reports 15 moderate findings, all from one
+advisory, [GHSA-g3hv-75wg-m249](https://github.com/advisories/GHSA-g3hv-75wg-m249) (`minimatch` below
+11.0.1, denial of service through crafted glob patterns). It reaches only the ESLint toolchain, which is
+dev-only and takes its patterns from this repository's own config. ESLint 10.14.0 still requires
+`minimatch` `^10.2.6`, so upgrading does not clear it. Revisit when ESLint moves to a fixed `minimatch`.
 
 ## 5. Deployment — TBD
 
